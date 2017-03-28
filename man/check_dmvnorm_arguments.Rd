@@ -6,6 +6,19 @@
 \usage{
 check_dmvnorm_arguments(eval_points, mu_1, mu_2, sig_1, sig_2, rho)
 }
+\arguments{
+\item{eval_points}{A \code{kx2} matrix with evaluation points}
+
+\item{mu_1}{The first expectation vector}
+
+\item{mu_2}{The second expectation vector}
+
+\item{sig_1}{The first standard deviation vector}
+
+\item{sig_2}{The second standard deviation vector}
+
+\item{rho}{The correlation vector}
+}
 \description{
 Checks that the arguments are numerical and have the same lengths
 }

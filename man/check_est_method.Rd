@@ -6,6 +6,9 @@
 \usage{
 check_est_method(est_method)
 }
+\arguments{
+\item{est_method}{Check if equal to "1par" or "5par"}
+}
 \description{
 Checks that the estimation method is one of the allowed values
 }

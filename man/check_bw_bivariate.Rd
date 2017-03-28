@@ -6,6 +6,9 @@
 \usage{
 check_bw_bivariate(bw)
 }
+\arguments{
+\item{bw}{The bandwidth vector to be checked}
+}
 \description{
 Checks that the bandwidth vector supplied to the bivariate density function
 }

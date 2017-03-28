@@ -38,6 +38,8 @@ check_data <- function(x, dim_check = NA, type) {
 #' Check bandwidth vector
 #'
 #' Checks that the bandwidth vector supplied to the bivariate density function
+#'
+#' @param bw The bandwidth vector to be checked
 check_bw_bivariate <- function(bw) {
      # The bandwidths can only be a numerical vector of two elements
     if(!is.vector(bw)) {
@@ -59,9 +61,11 @@ check_est_method <- function(est_method) {
         stop("Estimation method must be either '1par' or '5par'")
 }
 
-#' Check the arguments for the dmvnorm_wrapper function
+#' Check the arguments for the \code{dmvnorm_wrapper} function
 #'
 #' Checks that the arguments are numerical and have the same lengths
+#'
+#' @inheritParams dmvnorm_wrapper 
 check_dmvnorm_arguments <- function(eval_points, mu_1, mu_2, sig_1, sig_2, rho) {
     if(!is.numeric(eval_points) |
        !is.numeric(mu_1) |

@@ -12,23 +12,43 @@
 #' density estimate in these points. We also need a vector of bandwidths, \code{bw},
 #' with two elements, and an estimation method \code{est_method}
 #'
-#' TODO: Add proper default values when they become available. Document further.
+#' @param x The data matrix (or data frame). Must have exactly 2 columns
+#' @param eval_points The grid where the density should be estimated. Must have exactly
+#'   2 columns
+#' @param grid_size If \code{eval_points} is not supplied, then the function will create
+#'   a suitable grid diagonally through the data, with this many grid points
+#' @param bw The two bandwidths, a numeric vector of length 2
+#' @param est_method The estimation method, must either be "1par" for estimation with just
+#'   the local correlation, or "5par"  for a full locally Gaussian fit with all 5 parameters
+#' @param tol The numerical tolerance to be used in the optimization. Opnly applicable in
+#' the 1-parameter optimization
+#' @param run_checks Logical. Should sanity checks be run on the arguments? Useful to disable
+#'   this when doing cross-validation for example. 
+#' 
+#' @export
 dlg_bivariate <- function(x,
-                          eval_points,
-                          bw,
-                          est_method,
+                          eval_points = NA,
+                          grid_size = 15,
+                          bw = c(1, 1),
+                          est_method = "1par",
                           tol = .Machine$double.eps^0.25/10^4,
                           run_checks = TRUE) {
 
-    ## NEED TO ADD OPTIONS TO SKIP THE CHECK FOR CV. Perhaps an option for doing just
-    ## enough for cross validation.
-    
     # Check that everything is the way it should be -----------------------------
     if(run_checks) {
         x <- check_data(x, dim_check = 2, type = "data")
-        eval_points <- check_data(eval_points, dim_check = 2, type = "grid")
         check_bw_bivariate(bw = bw)
         check_est_method(est_method)
+        if(!identical(eval_points, NA))
+            eval_points <- check_data(eval_points, dim_check = 2, type = "grid")
+    }
+
+    # If eval_points not supplied, create a suitable grid
+    if(identical(eval_points, NA)) {
+        eval_points <- apply(x,
+                             2,
+                             function(x) seq(quantile(x,.001),quantile(x,.999),
+                                             length.out = grid_size))
     }
 
     # Preliminary housekeeping - mostly so that we can re-use code from the previous
@@ -89,7 +109,7 @@ dlg_bivariate <- function(x,
                              lapply(X = split(eval_points, row(eval_points)),
                                     FUN = maximize_likelihood)))
         par_est <- matrix(est[,1])
-        f_est = est[,2]
+        f_est = as.vector(est[,2])
         colnames(par_est) = c('rho')
     }
 
@@ -117,8 +137,5 @@ dlg_bivariate <- function(x,
                 eval_points = eval_points,
                 par_est = par_est,
                 f_est = f_est))
-    
-
-
-    
+       
 }
