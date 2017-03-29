@@ -4,18 +4,18 @@
 \alias{dlg_marginal}
 \title{Marginal density estimation}
 \usage{
-dlg_marginal(x, bw = 1, grid_size = 15, eval_points = seq(quantile(x,
-  0.01), quantile(x, 0.99), length.out = grid_size))
+dlg_marginal(x, bw = 1, eval_points = seq(quantile(x, 0.01), quantile(x,
+  0.99), length.out = grid_size), grid_size = 15)
 }
 \arguments{
 \item{x}{The data vector.}
 
 \item{bw}{The bandwidth (a single number).}
 
-\item{grid_size}{Number of grid points if grid is not provided.}
-
 \item{eval_points}{The grid where we want to evaluate the density. Chosen
 suitably if not provided, with length equal to grid_size.}
+
+\item{grid_size}{Number of grid points if grid is not provided.}
 }
 \description{
 Function that estimates a univariate density estimation by local Gaussian

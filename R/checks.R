@@ -57,7 +57,7 @@ check_bw_bivariate <- function(bw) {
 #'
 #' @param est_method Check if equal to "1par" or "5par"
 check_est_method <- function(est_method) {
-    if(!(est_method %in% c("1par", "5par")))
+    if(!(est_method %in% c("1par", "5par", "5par_marginals_fixed")))
         stop("Estimation method must be either '1par' or '5par'")
 }
 

@@ -105,4 +105,13 @@ test_that("dlg_marginal returns values", {
     expect_equal(dim(est$par_est), c(length(eval_points), 2))
 })
 
+data_matrix <- cbind(rnorm(100), rnorm(100))
+eval_matrix <- cbind(c(1,2,3), c(2,3,4))
+bw_vector<- c(1,2)
+result <- dlg_marginal_wrapper(data_matrix, eval_matrix, bw_vector)
+test_that("dlg_marginal_wrapper returns values", {
+    expect_equal(is.list(result), TRUE)
+    expect_equal(length(result), ncol(data_matrix))
+})
+
 

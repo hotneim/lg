@@ -4,7 +4,8 @@
 
 #' Bivariate density estimation
 #'
-#' \code{dlg_bivariate} returns the locally Gaussian density estimate on a given grid.
+#' \code{dlg_bivariate} returns the locally Gaussian density estimate of a bivariate
+#' distribution on a given grid.
 #'
 #' This function serves as the backbone in the body of methods concerning local
 #' Gaussian correlation. It takes a bivariate data set, \code{x}, and a bivariate
@@ -23,8 +24,11 @@
 #' @param tol The numerical tolerance to be used in the optimization. Opnly applicable in
 #' the 1-parameter optimization
 #' @param run_checks Logical. Should sanity checks be run on the arguments? Useful to disable
-#'   this when doing cross-validation for example. 
-#' 
+#'   this when doing cross-validation for example.
+#' @param marginal_estimates Provide the marginal estimates here if estimation method is 
+#'   "\code{5par_marginals_fixed}", and the marginal estimates have already been found. Useful
+#'   for cross-valdiation. List with two elements as returned by \code{dlg_marginal_wrapper}
+#' @param bw_marginal Vector of bandwidths used to estimate the marginal distributions
 #' @export
 dlg_bivariate <- function(x,
                           eval_points = NA,
@@ -32,7 +36,9 @@ dlg_bivariate <- function(x,
                           bw = c(1, 1),
                           est_method = "1par",
                           tol = .Machine$double.eps^0.25/10^4,
-                          run_checks = TRUE) {
+                          run_checks = TRUE,
+                          marginal_estimates = NA,
+                          bw_marginal = NA) {
 
     # Check that everything is the way it should be -----------------------------
     if(run_checks) {
@@ -41,6 +47,8 @@ dlg_bivariate <- function(x,
         check_est_method(est_method)
         if(!identical(eval_points, NA))
             eval_points <- check_data(eval_points, dim_check = 2, type = "grid")
+        if(!identical(bw_marginal, NA))
+             check_bw_bivariate(bw = bw_marginal)
     }
 
     # If eval_points not supplied, create a suitable grid
@@ -62,12 +70,7 @@ dlg_bivariate <- function(x,
 
     # OPTION 1: THE ONE-PARAMETER OPTIMIZATION
 
-    if(est_method == "1par") {
-
-        # If est_method == "5par_marginal_fixed"
-        # Estimate marginals
-        # Else, set the marginal parameters equal to 0 and 1 respectively
-        
+    if((est_method == "1par")) {
 
         # We declare a function that maximizes the local likelihood in one grid point.
         maximize_likelihood = function(grid_point) {
@@ -137,6 +140,87 @@ dlg_bivariate <- function(x,
                                  rho = par_est[, "rho"],
                                  run_checks = run_checks)
     }
+
+    # OPTION 3: FIVE PARAMETERS WITH MARGINALS FIXED
+    if(est_method == "5par_marginals_fixed") {
+
+        # Have the marginals already been estimated? If not, do it
+        if(identical(marginal_estimates, NA)) {
+            marginal_estimates <- dlg_marginal_wrapper(data_matrix = x,
+                                                       eval_matrix = eval_points,
+                                                       bw_vector = bw_marginal)
+        }
+
+        # We declare a function that maximizes the local likelihood in one grid point,
+        # with fixed marginal parameter estimates.
+        maximize_likelihood = function(grid_point_and_marginal_parameters) {
+      
+            x1_0 <- grid_point_and_marginal_parameters[1]
+            x2_0 <- grid_point_and_marginal_parameters[2]
+            mu_1 <- grid_point_and_marginal_parameters[3]
+            sig_1 <- grid_point_and_marginal_parameters[4]
+            mu_2 <- grid_point_and_marginal_parameters[5]
+            sig_2 <- grid_point_and_marginal_parameters[6]
+            
+            # We need weights and some empirical moments in this grid point
+            W <- dnorm(x1, mean = x1_0, sd = h1)*dnorm(x2, mean = x2_0, sd = h2)
+
+            m1 <- mean(W)
+            m2 <- mean(W*((x1-mu_1)/sig_1)^2)
+            m3 <- mean(W*((x2-mu_2)/sig_2)^2)
+            m4 <- mean(W*((x1-mu_1)/sig_1)*((x2-mu_2)/sig_2))
+            
+            # The likelihood function
+            lik <- function(rho) {
+                - log(2*pi*sqrt(1 - rho^2)*sig_1*sig_2)*m1 - m2/(2*(1 - rho^2)) - m3/(2*(1 - rho^2)) +
+                    rho*m4/(1 - rho^2) -
+                        mvtnorm::dmvnorm(c(x1_0, x2_0),
+                                         mean = c(mu_1, mu_2),
+                                         sigma = matrix(c(sig_1^2 + h1^2,
+                                                          sig_1*sig_2*rho,
+                                                          sig_1*sig_2*rho,
+                                                          sig_2^2 + h2^2),
+                                                        byrow = TRUE,
+                                                        ncol = 2))
+            }
+            
+            # Return the maximum of the likelihood and the density estimate
+            opt <- try(optimise(lik,
+                                lower = -1,
+                                upper = 1,
+                                maximum = TRUE,
+                                tol = tol),
+                       silent = TRUE)
+
+            # Store the result if the optimization went alright. Return NA if not. 
+            if(class(opt) != "try-error") {
+                return(c(opt$maximum,
+                         mvtnorm::dmvnorm(c(x1_0, x2_0), mean = c(mu_1,mu_2),
+                                          sigma = matrix(c(sig_1^2,
+                                                           sig_1*sig_2*opt$maximum,
+                                                           sig_1*sig_2*opt$maximum,
+                                                           sig_2^2), 2))))
+            } else {
+                return(c(NA, NA))
+            }
+        }
+
+        ## Send the grid points to 'maximize_likelihood'
+        est <- cbind(do.call(rbind,
+                             lapply(X = split(cbind(eval_points,
+                                                    marginal_estimates[[1]], marginal_estimates[[2]]),
+                                              row(eval_points)),
+                                    FUN = maximize_likelihood)))
+        par_est <- cbind(marginal_estimates[[1]][,1],
+                         marginal_estimates[[2]][,1],
+                         marginal_estimates[[1]][,2],
+                         marginal_estimates[[2]][,2],
+                         matrix(est[,1]))
+        f_est = as.vector(est[,2])
+        colnames(par_est) <- c("mu_1", "mu_2", "sig_1", "sig_2", "rho")
+
+        
+    }
     
     return(list(x = x,
                 eval_points = eval_points,
@@ -163,8 +247,8 @@ dlg_bivariate <- function(x,
 #' @export
 dlg_marginal <- function(x,
                         bw = 1,
-                        grid_size = 15,
-                        eval_points = seq(quantile(x, .01), quantile(x, .99), length.out = grid_size)) {
+                        eval_points = seq(quantile(x, .01), quantile(x, .99), length.out = grid_size),
+                        grid_size = 15) {
 
     # Function that maximizes the local Gaussian likelihood in one grid point
     maximize_likelihood_univariate <- function(eval_point) {
@@ -213,4 +297,35 @@ dlg_marginal <- function(x,
                 bw = bw,
                 par_est = par_est,
                 f_est = f_est))
+}
+
+#' Marginal estimates for multivariate data
+#'
+#' Estimates the marginal locally Gaussian parameter estimates for a multivariate
+#' data set
+#'
+#' This function takes in a matrix of observations, a matrix of evaluation points
+#' and a vector of bandwidths, and does the marginal estimation pairwise. This
+#' function assumes that the data and evaluation points are organized column-wise
+#' in matrices, and that the bandwidth is found in the corresponding element in
+#' the bandwidth matrix.
+#'
+#' @param data_matrix The matrix of data points. One column constitutes an
+#'   observation vector.
+#' @param eval_matrix The matrix of evaluation points. One column constitutes
+#'   a vector of grid points.
+#' @param bw_vector The vector of bandwidths, one element per component.
+dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
+
+    # Return the parameters in a list
+    ret <- list()
+
+    # estimate the parameters for each marginal component
+    for(i in 1:ncol(data_matrix)) {
+        ret[[i]] <- dlg_marginal(x = data_matrix[,i],
+                                 bw = bw_vector[i],
+                                 eval_points = eval_matrix[,i])$par_est
+    }
+
+    return(ret)
 }

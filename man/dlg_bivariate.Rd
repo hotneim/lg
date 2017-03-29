@@ -6,7 +6,7 @@
 \usage{
 dlg_bivariate(x, eval_points = NA, grid_size = 15, bw = c(1, 1),
   est_method = "1par", tol = .Machine$double.eps^0.25/10^4,
-  run_checks = TRUE)
+  run_checks = TRUE, marginal_estimates = NA, bw_marginal = NA)
 }
 \arguments{
 \item{x}{The data matrix (or data frame). Must have exactly 2 columns}
@@ -27,9 +27,16 @@ the 1-parameter optimization}
 
 \item{run_checks}{Logical. Should sanity checks be run on the arguments? Useful to disable
 this when doing cross-validation for example.}
+
+\item{marginal_estimates}{Provide the marginal estimates here if estimation method is 
+"\code{5par_marginals_fixed}", and the marginal estimates have already been found. Useful
+for cross-valdiation. List with two elements as returned by \code{dlg_marginal_wrapper}}
+
+\item{bw_marginal}{Vector of bandwidths used to estimate the marginal distributions}
 }
 \description{
-\code{dlg_bivariate} returns the locally Gaussian density estimate on a given grid.
+\code{dlg_bivariate} returns the locally Gaussian density estimate of a bivariate
+distribution on a given grid.
 }
 \details{
 This function serves as the backbone in the body of methods concerning local
