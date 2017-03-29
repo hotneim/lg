@@ -73,15 +73,19 @@ test_that("dlg_bivariate gives proper errors", {
                  "Estimation method must be either '1par' or '5par'")
 })
 
-test_that("dlg_bivariate returns proper values", {
-    expect_equal(dlg_bivariate(test_matrix_2col,
+library(lgde)
+
+old_bivariate <- biLocal(data = test_matrix_2col,
+                         grid = test_matrix_2col,
+                         h = test_bw_ok)
+new_bivariate <- dlg_bivariate(x = test_matrix_2col,
                                eval_points = test_matrix_2col,
                                bw = test_bw_ok,
-                               est_method = test_estmethod1),
-                 list())
-    expect_equal(dlg_bivariate(test_df_2col,
-                               eval_points = test_df_2col,
-                               bw = test_bw_ok,
-                               est_method = test_estmethod1),
-                 list())
+                               est_method = test_estmethod1)
+
+test_that("dlg_bivariate returns the same values as the old code", {
+    expect_equal(old_bivariate$data, new_bivariate$x)
+    expect_equal(old_bivariate$grid, new_bivariate$eval_points)
+    expect_equal(old_bivariate$par.est, new_bivariate$par_est)
+    expect_equal(old_bivariate$f.est, new_bivariate$f_est)
 })

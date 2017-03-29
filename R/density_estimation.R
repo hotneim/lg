@@ -64,6 +64,11 @@ dlg_bivariate <- function(x,
 
     if(est_method == "1par") {
 
+        # If est_method == "5par_marginal_fixed"
+        # Estimate marginals
+        # Else, set the marginal parameters equal to 0 and 1 respectively
+        
+
         # We declare a function that maximizes the local likelihood in one grid point.
         maximize_likelihood = function(grid_point) {
       
@@ -104,13 +109,13 @@ dlg_bivariate <- function(x,
             }
         }
 
-        ## Send the grid points to 'maximize.likelihood'
+        ## Send the grid points to 'maximize_likelihood'
         est <- cbind(do.call(rbind,
                              lapply(X = split(eval_points, row(eval_points)),
                                     FUN = maximize_likelihood)))
         par_est <- matrix(est[,1])
         f_est = as.vector(est[,2])
-        colnames(par_est) = c('rho')
+        colnames(par_est) <- c('rho')
     }
 
     # OPTION 2: THE FIVE PARAMETER OPTIMIZATION
@@ -135,7 +140,77 @@ dlg_bivariate <- function(x,
     
     return(list(x = x,
                 eval_points = eval_points,
+                bw = bw,
                 par_est = par_est,
                 f_est = f_est))
        
+}
+
+#' Marginal density estimation
+#'
+#' Function that estimates a univariate density estimation by local Gaussian
+#' approximations
+#'
+#' This functio is mainly mean to be used as a tool in multivariate analysis
+#' as away to obtain the estimate of a univariate (marginal) density function,
+#' but it can of course be used in general to estimate univariate densities.
+#'
+#' @param x The data vector.
+#' @param bw The bandwidth (a single number).
+#' @param grid_size Number of grid points if grid is not provided.
+#' @param eval_points The grid where we want to evaluate the density. Chosen
+#'   suitably if not provided, with length equal to grid_size. 
+#' @export
+dlg_marginal <- function(x,
+                        bw = 1,
+                        grid_size = 15,
+                        eval_points = seq(quantile(x, .01), quantile(x, .99), length.out = grid_size)) {
+
+    # Function that maximizes the local Gaussian likelihood in one grid point
+    maximize_likelihood_univariate <- function(eval_point) {
+
+        W <- dnorm(x, mean = eval_point, sd = bw)
+
+        m1 <- mean(W)
+        m2 <- mean(W*x)
+        m3 <- mean(W*(x^2))
+
+        # The negative likelihood
+        lik <- function(par) {
+            mu <- par[1]
+            sig <- par[2]
+            - m2*mu/sig^2 + m3/(2*sig^2) + m1*(mu^2/(2*sig^2) + .5*log(2*pi*sig^2)) +
+                dnorm((eval_point - mu)/sqrt(sig^2 + bw^2))/sqrt(sig^2 + bw^2) 
+        }
+
+        # Do the optimization
+        opt <- try(optim(c(0, 1),
+                         lik))
+
+        # Return the result
+        if(class(opt) != "try-error") {
+            return(c(opt$par,
+                     dnorm(eval_point,
+                           mean = opt$par[1],
+                           sd = opt$par[2])))
+        } else {
+            return(c(NA, NA))
+        }        
+    }
+
+    # Send the grid points to 'maximize_likelihood_univariate'
+    est <- cbind(do.call(rbind,
+                         lapply(X = as.list(eval_points),
+                                FUN = maximize_likelihood_univariate)))
+
+    # Collect and return the results
+    par_est <- est[, 1:2]
+    colnames(par_est) <- c("mu", "sig")
+    f_est <- as.vector(est[, 3])
+
+    return(list(x = x,
+                eval_points = eval_points,
+                bw = bw,
+                par_est = par_est,
+                f_est = f_est))
 }

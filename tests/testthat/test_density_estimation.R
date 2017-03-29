@@ -96,4 +96,13 @@ test_that("dlg_bivariate returns the same grid for the two estimation methods", 
     
 })
 
+x <- rnorm(100); eval_points <- -5:5; bw <- .5
+est <- dlg_marginal(x = x, bw = bw, eval_points = eval_points)
+test_that("dlg_marginal returns values", {
+    expect_equal(x, est$x)
+    expect_equal(eval_points, est$eval_points)
+    expect_equal(bw, est$bw)
+    expect_equal(dim(est$par_est), c(length(eval_points), 2))
+})
+
 

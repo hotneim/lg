@@ -2,7 +2,7 @@
 % Please edit documentation in R/checks.R
 \name{check_dmvnorm_arguments}
 \alias{check_dmvnorm_arguments}
-\title{Check the arguments for the dmvnorm_wrapper function}
+\title{Check the arguments for the \code{dmvnorm_wrapper} function}
 \usage{
 check_dmvnorm_arguments(eval_points, mu_1, mu_2, sig_1, sig_2, rho)
 }
