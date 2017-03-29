@@ -1,0 +1,9 @@
+library(lg)
+context("Bandwidth selection")
+
+n <- 50
+x <- rt(n, df = 10)
+
+test_that("Univariate bw selection works", {
+    expect_true(is.numeric(bw_select_cv_univariate(x)))
+})

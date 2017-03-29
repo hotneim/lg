@@ -288,7 +288,12 @@ dlg_marginal <- function(x,
                                 FUN = maximize_likelihood_univariate)))
 
     # Collect and return the results
-    par_est <- est[, 1:2]
+    if(nrow(est) == 1) {
+        par_est <- matrix(est[, 1:2], ncol = 2)
+    } else {
+        par_est <- est[, 1:2]
+    }
+    
     colnames(par_est) <- c("mu", "sig")
     f_est <- as.vector(est[, 3])
 
