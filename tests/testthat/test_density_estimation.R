@@ -70,7 +70,7 @@ test_that("dlg_bivariate gives proper errors", {
                                eval_points = test_df_2col,
                                bw = test_bw_ok,
                                est_method = test_estmethod_wr),
-                 "Estimation method must be either '1par' or '5par'")
+                 "Estimation method must be either '1par', '5par' or '5par_marginals_fixed'")
 })
 
 library(lgde)

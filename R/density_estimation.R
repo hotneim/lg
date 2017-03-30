@@ -153,7 +153,8 @@ dlg_bivariate <- function(x,
 
         # We declare a function that maximizes the local likelihood in one grid point,
         # with fixed marginal parameter estimates.
-        maximize_likelihood = function(grid_point_and_marginal_parameters) {
+        maximize_likelihood_fixed_marginals =
+            function(grid_point_and_marginal_parameters) {
       
             x1_0 <- grid_point_and_marginal_parameters[1]
             x2_0 <- grid_point_and_marginal_parameters[2]
@@ -205,12 +206,12 @@ dlg_bivariate <- function(x,
             }
         }
 
-        ## Send the grid points to 'maximize_likelihood'
+        ## Send the grid points to 'maximize_likelihood_fixed_marginals'
         est <- cbind(do.call(rbind,
                              lapply(X = split(cbind(eval_points,
                                                     marginal_estimates[[1]], marginal_estimates[[2]]),
                                               row(eval_points)),
-                                    FUN = maximize_likelihood)))
+                                    FUN = maximize_likelihood_fixed_marginals)))
         par_est <- cbind(marginal_estimates[[1]][,1],
                          marginal_estimates[[2]][,1],
                          marginal_estimates[[1]][,2],

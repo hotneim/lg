@@ -2,10 +2,28 @@
 % Please edit documentation in R/bandwidth_selection.R
 \name{bw_select_cv_bivariate}
 \alias{bw_select_cv_bivariate}
-\title{Cross-validation for a pair of variables}
+\title{Cross-validation for bivariate distributions}
 \usage{
-bw_select_cv_bivariate()
+bw_select_cv_bivariate(x, tol = 10^(-3), est_method = "1par",
+  bw_marginal = NULL)
+}
+\arguments{
+\item{x}{The matrix of data points.}
+
+\item{tol}{The absolute tolerance in the optimization}
+
+\item{est_method}{The estimation method for the bivariate fit. If estimation method is
+\code{5par_marginals_fixed}, the marginal bandwidths must be supplied a s well through
+\code{bw_marginal}}
+
+\item{bw_marginal}{The bandwidths for estimation of the marginals if method
+\code{5par_fixed_marginals} is used}
 }
 \description{
-Cross-validation for a pair of variables
+Uses cross-valdiation to find the optimal bandwidth for a bivariate locally
+Gaussian fit
+}
+\details{
+This function looks at a 2-column matrix of observations and estimates the bandwidth that
+minimizes the Kullback-Leibler distance between the true and the estimated densities.
 }
