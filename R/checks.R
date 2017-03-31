@@ -61,6 +61,16 @@ check_est_method <- function(est_method) {
         stop("Estimation method must be either '1par', '5par' or '5par_marginals_fixed'")
 }
 
+#' Check bw method
+#'
+#' Checks that the bandwidth method is one of the allowed values
+#'
+#' @param bw_method Check if equal to "cv" or "plugin"
+check_bw_method <- function(bw_method) {
+    if(!(bw_method %in% c("cv", "plugin")))
+        stop("Estimation method must be either 'cv' or 'plugin'")
+}
+
 #' Check the arguments for the \code{dmvnorm_wrapper} function
 #'
 #' Checks that the arguments are numerical and have the same lengths

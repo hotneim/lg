@@ -90,3 +90,178 @@ bw_select_cv_bivariate <- function(x,
                 convergence = result$convergence))
     
 }
+
+#' Plugin bandwidth selection for univariate data
+#'
+#' Returns a plugin bandwidth for data vectors for use with univariate
+#' locally Gaussian density estimation
+#'
+#' This function takes in a data vector of length \code{n}, and returns a
+#' the real number \code{c*n^a}, which is a quick and dirty way of selecting
+#' a bandwidth for univariate locally Gaussian density estimation. The number
+#' \code{c} is by default set to \code{1.75}, and \code{c = -1/5} is the usual
+#' exponent, that stems from the asymptotic convergence rate of the density
+#' estimate.
+#' @param x The data vector.
+#' @param n The number of data points. Can provide only this if we do not
+#'   want to supply the entire data vector.
+#' @param a A constant, se details.
+#' @param c A constant, se details.
+bw_select_plugin_univariate <- function(x = NULL,
+                                        n = length(x),
+                                        c = 1.75,
+                                        a = -.2) {
+    c*n^a
+}
+
+#' Plugin bandwidth selection for multivariate data
+#'
+#' Returns a plugin bandwidth for multivariate data matrices for the estimation
+#' of local Gaussian correlations
+#'
+#' This function takes in a data matrix with \code{n} rows, and returns a
+#' the real number \code{c*n^a}, which is a quick and dirty way of selecting
+#' a bandwidth for locally Gaussian density estimation. The number  \code{c}
+#' is by default set to \code{1.75}, and \code{c = -1/5} is the usual
+#' exponent, that stems from the asymptotic convergence rate of the density
+#' estimate.
+#' @param x The data matrix.
+#' @param n The number of data points. Can provide only this if we do not
+#'   want to supply the entire data vector.
+#' @param a A constant, se details.
+#' @param c A constant, se details.
+bw_select_plugin_multivariate <- function(x = NULL,
+                                           n = nrow(x),
+                                           c = 1.75,
+                                           a = -1/6) {
+    c*n^a
+}
+
+#' Bandwidth selection for local Gaussian correlation.
+#'
+#' Takes a matrix of data points and returns the bandwidths used for estimating
+#' the local Gaussian correlations.
+#'
+#' This function takes in a data set of arbitrary dimension, and calculates the
+#' bandwidths needed to find the pairwise local Gaussian correlations.
+#' @param x A matrix or data frame with data, on column per variable, one row
+#'   per observation
+#' @param bw_method The method used for bandwidth selection. Must be either
+#'   \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
+#'   but crude)
+#' @param plugin_constant_marginal The constant \code{c} in \code{cn^a} used for
+#'   finding the plugin bandwidth for locally Gaussian marginal density estimates,
+#'   which we need if estimation method is "5par_marginals_fixed".
+#' @param plugin_exponent_marginal The constant \code{a} in \code{cn^a} used for
+#'   finding the plugin bandwidth for locally Gaussian marginal density estimates,
+#'   which we need if estimation method is "5par_marginals_fixed".
+#' @param plugin_constant_joint The constant \code{c} in \code{cn^a} used for
+#'   finding the plugin bandwidth for estimating the pairwise local Gaussian
+#'   correlation between two variables.
+#' @param plugin_exponent_joint The constant \code{a} in \code{cn^a} used for
+#'   finding the plugin bandwidth for estimating the pairwise local Gaussian
+#'   correlation between two variables.
+#' @param est_method The estimation method, must be either "1par", "5par" or
+#'   "5par_marginals_fixed"
+#' @param tol_marginal The absolute tolerance in the optimization for finding the
+#'   marginal bandwidths
+#' @param tol_joint The absolute tolerance in the optimization for finding the
+#'   joint bandwidths
+bw_select <- function(x,
+                      bw_method = "cv",
+                      est_method = "1par",
+                      plugin_constant_marginal = 1.75,
+                      plugin_exponent_marginal = -1/5,
+                      plugin_constant_joint = 1.75,
+                      plugin_exponent_joint = -1/6,
+                      tol_marginal = 10^(-3),
+                      tol_joint = 10^(-3)) {
+
+    # Do some sanity checks of the inputs
+    x <- check_data(x, type = "data")
+    check_bw_method(bw_method)
+    check_est_method(est_method)
+
+    # Dimension and sample size
+    d <- ncol(x)
+    n <- nrow(x)
+
+    # Initialize the vectors and matrices
+    marginal_bandwidths <- rep(NA, d)
+    marginal_convergence <- rep(NA, d)
+    
+    # If the estimation method is "5par_marginals_fixed" we must first find the
+    # marginal bandwidths
+    if(est_method == "5par_marginals_fixed") {
+      
+        for(i in 1:d) {
+            if(bw_method == "cv") {
+                result <- bw_select_cv_univariate(x[, i], tol = tol_marginal)
+                marginal_bandwidths[i] <- result$bw
+                marginal_convergence[i] <- result$convergence
+
+                # Print a warning if the convergence is not ok
+                if(result$convergence != 0)
+                    warning(paste("Cross valdidation for marginal bandwidth",
+                                  as.character(i),
+                                  "did not converge properly"))
+                
+            } else if(bw_method == "plugin") {
+                marginal_bandwidths[i] <-
+                    bw_select_plugin_univariate(n = n,
+                                                c = plugin_constant_marginal,
+                                                a = plugin_exponent_marginal)
+                
+            }           
+        }              
+    }
+
+    # Find the joint bandwidths
+    joint_bandwidths <- data.frame(t(combn(c(1:d), 2)), 0*t(combn(c(1:d), 2)))
+    joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
+    colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
+
+    # Iterate over all the pairs
+    for(i in 1:nrow(joint_bandwidths)) {
+
+        variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
+        
+        # Extract the pairs of variables
+        bivariate_data <- x[, variables]
+
+        if(bw_method == "cv") {
+
+            result <- bw_select_cv_bivariate(x = bivariate_data,
+                                             tol = tol_joint,
+                                             est_method = est_method,
+                                             bw_marginal = marginal_bandwidths[variables])
+
+            if(result$convergence != 0)
+                    warning(paste("Cross valdidation for joint bandwidths",
+                                  as.character(variables[1]), "and",  as.character(variables[2]),
+                                  "did not converge properly"))
+
+            joint_bandwidths$bw1[i] <- result$bw[1]
+            joint_bandwidths$bw2[i] <- result$bw[2]
+            joint_bandwidths$convergence[i] <- result$convergence
+
+        } else if(bw_method == "plugin") {
+
+            bw <- bw_select_plugin_multivariate(n = n,
+                                             c = plugin_constant_joint,
+                                             a = plugin_exponent_joint)
+            joint_bandwidths$bw1 <- bw
+            joint_bandwidths$bw2 <- bw
+            joint_bandwidths$convergence <- NA
+            
+        }
+        
+    }
+    
+    ret <- list(marginal = marginal_bandwidths,
+                marginal_convergence = marginal_convergence,
+                joint = joint_bandwidths)
+
+    return(ret)
+
+}
