@@ -149,6 +149,8 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #' @param bw_method The method used for bandwidth selection. Must be either
 #'   \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
 #'   but crude)
+#' @param est_method The estimation method, must be either "1par", "5par" or
+#'   "5par_marginals_fixed"
 #' @param plugin_constant_marginal The constant \code{c} in \code{cn^a} used for
 #'   finding the plugin bandwidth for locally Gaussian marginal density estimates,
 #'   which we need if estimation method is "5par_marginals_fixed".
@@ -161,14 +163,13 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #' @param plugin_exponent_joint The constant \code{a} in \code{cn^a} used for
 #'   finding the plugin bandwidth for estimating the pairwise local Gaussian
 #'   correlation between two variables.
-#' @param est_method The estimation method, must be either "1par", "5par" or
-#'   "5par_marginals_fixed"
 #' @param tol_marginal The absolute tolerance in the optimization for finding the
 #'   marginal bandwidths
 #' @param tol_joint The absolute tolerance in the optimization for finding the
 #'   joint bandwidths
+#' @export
 bw_select <- function(x,
-                      bw_method = "cv",
+                      bw_method = "plugin",
                       est_method = "1par",
                       plugin_constant_marginal = 1.75,
                       plugin_exponent_marginal = -1/5,

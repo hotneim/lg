@@ -4,7 +4,50 @@
 \alias{lg}
 \title{Create an \code{lg} object}
 \usage{
-lg()
+lg(x, bw_method = "plugin", est_method = "1par",
+  transform_to_marginal_normality = TRUE, bw = NULL,
+  plugin_constant_marginal = 1.75, plugin_constant_joint = 1.75,
+  plugin_exponent_marginal = -1/5, plugin_exponent_joint = -1/6,
+  tol_marginal = 10^(-3), tol_joint = 10^(-3))
+}
+\arguments{
+\item{x}{A matrix or data frame with data, on column per variable, one row
+per observation}
+
+\item{bw_method}{The method used for bandwidth selection. Must be either
+\code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
+but crude)}
+
+\item{est_method}{The estimation method, must be either "1par", "5par" or
+"5par_marginals_fixed"}
+
+\item{transform_to_marginal_normality}{Logical true if we want to transform our
+data to marginal standard normality. This is assumed by method "1par", but can
+of course be skipped using this argument if it has been done already.}
+
+\item{bw}{Bandwidth object if it has already been calculated.}
+
+\item{plugin_constant_marginal}{The constant \code{c} in \code{cn^a} used for
+finding the plugin bandwidth for locally Gaussian marginal density estimates,
+which we need if estimation method is "5par_marginals_fixed".}
+
+\item{plugin_constant_joint}{The constant \code{c} in \code{cn^a} used for
+finding the plugin bandwidth for estimating the pairwise local Gaussian
+correlation between two variables.}
+
+\item{plugin_exponent_marginal}{The constant \code{a} in \code{cn^a} used for
+finding the plugin bandwidth for locally Gaussian marginal density estimates,
+which we need if estimation method is "5par_marginals_fixed".}
+
+\item{plugin_exponent_joint}{The constant \code{a} in \code{cn^a} used for
+finding the plugin bandwidth for estimating the pairwise local Gaussian
+correlation between two variables.}
+
+\item{tol_marginal}{The absolute tolerance in the optimization for finding the
+marginal bandwidths}
+
+\item{tol_joint}{The absolute tolerance in the optimization for finding the
+joint bandwidths}
 }
 \description{
 Create an \code{lg}-object, that can be used to estimate local Gussian correlations,

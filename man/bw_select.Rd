@@ -4,7 +4,7 @@
 \alias{bw_select}
 \title{Bandwidth selection for local Gaussian correlation.}
 \usage{
-bw_select(x, bw_method = "cv", est_method = "1par",
+bw_select(x, bw_method = "plugin", est_method = "1par",
   plugin_constant_marginal = 1.75, plugin_exponent_marginal = -1/5,
   plugin_constant_joint = 1.75, plugin_exponent_joint = -1/6,
   tol_marginal = 10^(-3), tol_joint = 10^(-3))
