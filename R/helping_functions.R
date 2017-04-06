@@ -90,12 +90,12 @@ mvnorm_eval <- function(eval_points,
     # Evaluation in one point
     single_eval <- function(i) {
         mu_vec <- loc_mean[i,]
-        sigma <- diag(loc_sd[i,])
+        sigma <- diag(loc_sd[i,]^2)
         for(j in 1:nrow(pairs)) {
             var1 <- pairs$x1[j]
             var2 <- pairs$x2[j]
             rho <- loc_cor[i, j]
-            sigma[var1, var2] <- rho*sigma[var1, var1]*sigma[var2, var2]
+            sigma[var1, var2] <- rho*sqrt(sigma[var1, var1]*sigma[var2, var2])
             sigma[var2, var1] <- sigma[var1, var2]
         }
         mvtnorm::dmvnorm(eval_points[i,],
