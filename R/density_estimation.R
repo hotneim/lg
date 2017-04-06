@@ -395,7 +395,17 @@ dlg <- function(lg_object, grid = NULL) {
 
     # If method is "5par", then we have only one pair, and we can do all of the etsimation now
     if(lg_object$est_method == "5par") {
-        # TO DO!!!!!!!!!!!
+        estimate <- dlg_bivariate(x = x,
+                                  eval_points = x0,
+                                  bw = c(lg_object$bw$joint[1, "bw1"],
+                                         lg_object$bw$joint[1, "bw2"]),
+                                  est_method = lg_object$est_method)
+
+        loc_mean <- cbind(estimate$par_est[, "mu_1"],
+                          estimate$par_est[, "mu_2"])
+        loc_sd <- cbind(estimate$par_est[, "sig_1"],
+                        estimate$par_est[, "sig_2"])
+        loc_cor[,1] <- estimate$par_est[, "rho"]        
     } else {  # And if not, we estimate the local correlation pairwise now
         for(i in 1:nrow(pairs)) {
             if(lg_object$est_method == "1par") {
