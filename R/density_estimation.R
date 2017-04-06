@@ -335,3 +335,103 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 
     return(ret)
 }
+
+#' The locally Gaussian density estimator (LGDE)
+#'
+#' Estimate a mulivariate density function using locally Gaussian approximations
+#'
+#' This function does multivariate density estimation using the locally Gaussian
+#' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2016)
+#' [Proper citation needed!]. The function takes as arguments an \code{lg}-object
+#' as produced by the main \code{lg}-function, and a grid of points where the density
+#' estimate should be estimated.
+#' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
+#' @param grid A matrix of grid points, where we want to evaluate the density estimate
+#' @export
+dlg <- function(lg_object, grid = NULL) {
+
+    # Do some checks first
+    check_lg(lg_object)
+    if(!is.null(grid)) {
+        grid <- check_data(grid,
+                           dim_check = ncol(lg_object$transformed_data),
+                           type = "grid")
+    }
+
+    # Sample size and number of variables
+    n <- nrow(lg_object$x)
+    d <- ncol(lg_object$x)
+
+    # Extract the data that we will us in the optimization, transform the grid if needed
+    if(lg_object$transform_to_marginal_normality) {
+        x <- lg_object$transformed_data
+        transformed <- lg_object$trans_new(grid)
+        x0 <- transformed$trans
+        normalizing_constants <- transformed$normalizing_constants
+    } else {
+        x <- lg_object$x
+        x0 <- grid
+        normalizing_constants <- rep(1, nrow(grid))
+    }
+
+    # Extract the pairs from the list of bandwidths
+    pairs <- lg_object$bw$joint[, c("x1", "x2")]
+
+    # Initialize the matrices where we eventually are going to store the parameter estimates
+    loc_mean <- matrix(0, ncol = d, nrow = nrow(grid))
+    loc_sd <- loc_mean + 1
+    loc_cor <- matrix(0, ncol = nrow(pairs), nrow = nrow(grid))
+
+    # If method "5par_marginals_fixed" we estimate the marginals now.
+    if(lg_object$est_method == "5par_marginals_fixed") {
+        marginal_estimates <- dlg_marginal_wrapper(data_matrix = x,
+                                                   eval_matrix = x0,
+                                                   bw_vector = lg_object$bw$marginal)
+        for(i in 1:d) {
+            loc_mean[,i] <- marginal_estimates[[i]][, "mu"]
+            loc_sd[,i] <- marginal_estimates[[i]][, "sig"]
+        }
+    }
+
+    # If method is "5par", then we have only one pair, and we can do all of the etsimation now
+    if(lg_object$est_method == "5par") {
+        # TO DO!!!!!!!!!!!
+    } else {  # And if not, we estimate the local correlation pairwise now
+        for(i in 1:nrow(pairs)) {
+            if(lg_object$est_method == "1par") {
+                pairwise_marginal_estimates <- NA
+            } else {
+                pairwise_marginal_estimates <- list(marginal_estimates[[pairs$x1[i]]],
+                                                    marginal_estimates[[pairs$x2[i]]])
+            }
+            
+            pairwise_estimate <-
+                dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
+                              eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
+                              bw = c(lg_object$bw$joint[i, "bw1"],
+                                     lg_object$bw$joint[i, "bw2"]),
+                              est_method = lg_object$est_method,
+                              marginal_estimates = pairwise_marginal_estimates)
+            
+            loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
+        }
+    }
+
+    # Evaluate the density estimate
+    f_est <- mvnorm_eval(eval_points = x0,
+                         loc_mean = loc_mean,
+                         loc_sd = loc_sd,
+                         loc_cor = loc_cor,
+                         pairs = pairs)
+
+    # Return
+    return(list(f_est = f_est,
+                loc_mean = loc_mean,
+                loc_sd = loc_sd,
+                loc_cor = loc_cor,
+                x = lg_object$x,
+                transformed_data = lg_object$transformed_data,
+                grid = grid,
+                transformed_grid = x0))
+    
+}

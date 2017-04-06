@@ -48,7 +48,7 @@ trans_normal<- function(x) {
                                                  FUN = transform_grid)), ncol = d)
 
         return(list(trans = transformed_grid,
-                    normalizing_constants=normalizing_constants))
+                    normalizing_constants = normalizing_constants))
     }
     
     ret$trans_new <- trans_new

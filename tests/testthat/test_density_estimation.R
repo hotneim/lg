@@ -114,4 +114,18 @@ test_that("dlg_marginal_wrapper returns values", {
     expect_equal(length(result), ncol(data_matrix))
 })
 
+set.seed(1)
+n <- 100
+x <- mvtnorm::rmvt(n, df = 10, sigma = diag(3))
+grid <- cbind(c(1,2,3), c(1,2,3), c(1,2,3))
 
+lg_object <- lg(x)
+density_estimate <- dlg(lg_object, grid = grid)
+
+lg_object_wrong <- grid
+grid_wrong_dimension <- cbind(grid, c(1,2,3))
+
+test_that("The main density estimator produces correct errors", {
+    expect_error(dlg(lg_object_wrong, grid), "Object must be of class 'lg'")
+    expect_error(dlg(lg_object, grid_wrong_dimension), "The grid can only have 3 variables")
+})

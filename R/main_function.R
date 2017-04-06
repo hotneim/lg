@@ -68,6 +68,7 @@ lg <- function(x,
     ret$x <- x
     ret$bw_method <- bw_method
     ret$est_method <- est_method
+    ret$transform_to_marginal_normality <- transform_to_marginal_normality
 
     # Transformation
     if(transform_to_marginal_normality) {
@@ -75,8 +76,8 @@ lg <- function(x,
         ret$transformed_data <- transformed$transformed_data
         ret$trans_new <- transformed$trans_new
     } else {
-        ret$transformed_data = x
-        ret$trans_new = NA
+        ret$transformed_data <- x
+        ret$trans_new <- NA
     }
     
     # Bandwidth selection

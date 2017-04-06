@@ -49,7 +49,8 @@ dmvnorm_wrapper <- function(eval_points,
         check_dmvnorm_arguments(eval_points, mu_1, mu_2, sig_1, sig_2, rho)
     }
     
-    # Collect the arguments in one matrix, so that we can apply the single wrapper function
+    # Collect the arguments in one matrix, so that we can apply the single
+    # wrapper function
     arguments <- cbind(eval_points, mu_1, mu_2, sig_1, sig_2, rho)
 
     # Calculate the bivariate normal
@@ -59,6 +60,49 @@ dmvnorm_wrapper <- function(eval_points,
                                                            mu_2 = x[4],
                                                            sig_1 = x[5],
                                                            sig_2 = x[6],
-                                                           rho = x[7]))                        
-                    
+                                                           rho = x[7]))           
+              
+}
+
+#' Evaluate the multivariate normal
+#'
+#' Function that evaluates the multivariate normal distribution with local
+#' parameters
+#'
+#' Takes in a grid, where we want to evaluate the multivariate normal, and
+#' in each grid point we have a new set of parameters.
+#'
+#' @param eval_points A matrix of grid points
+#' @param loc_mean A matrix of local means, one row per grid point, one column
+#'   per component
+#' @param loc_sd A  matrix of local standard deviations, one row per grid point,
+#' one column per component
+#' @param loc_cor A matrix of local correlations, one row per grid point, on
+#'  column per pair of variables
+#' @param pairs A data frame specifying the components that make up each pair,
+#'   two colimns names 'x1' and 'x2', one row per pair of components
+mvnorm_eval <- function(eval_points,
+                        loc_mean,
+                        loc_sd,
+                        loc_cor,
+                        pairs) {
+
+    # Evaluation in one point
+    single_eval <- function(i) {
+        mu_vec <- loc_mean[i,]
+        sigma <- diag(loc_sd[i,])
+        for(j in 1:nrow(pairs)) {
+            var1 <- pairs$x1[j]
+            var2 <- pairs$x2[j]
+            rho <- loc_cor[i, j]
+            sigma[var1, var2] <- rho*sigma[var1, var1]*sigma[var2, var2]
+            sigma[var2, var1] <- sigma[var1, var2]
+        }
+        mvtnorm::dmvnorm(eval_points[i,],
+                        mean = mu_vec,
+                        sigma = sigma)
+    }
+
+    unlist(lapply(X = as.list(1:nrow(eval_points)),
+                  FUN = single_eval))
 }

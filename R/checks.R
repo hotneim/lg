@@ -97,3 +97,11 @@ check_dmvnorm_arguments <- function(eval_points, mu_1, mu_2, sig_1, sig_2, rho) 
         stop("Mismatch in dimensions in dmvnorm_wrapper")
 }
 
+#' Check that an object has class "lg"
+#' @param check_object The object to be checked
+check_lg <- function(check_object) {
+    if(class(check_object) != "lg")
+        stop("Object must be of class 'lg'")
+}
+
+
