@@ -432,7 +432,8 @@ dlg <- function(lg_object, grid = NULL) {
                          loc_mean = loc_mean,
                          loc_sd = loc_sd,
                          loc_cor = loc_cor,
-                         pairs = pairs)
+                         pairs = pairs)*
+        apply(normalizing_constants, 1, prod)
 
     # Return
     return(list(f_est = f_est,
