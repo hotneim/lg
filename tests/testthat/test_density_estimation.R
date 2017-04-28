@@ -12,7 +12,7 @@ test_bw_nonnumeric <- c("a", "b")
 test_bw_nonvector  <- function() {}
 test_estmethod1    <- "1par"
 test_estmethod2    <- "5par"
-test_estmethod_wr  <- "4par" 
+test_estmethod_wr  <- "4par"
 
 
 test_that("dlg_bivariate gives proper errors", {
@@ -93,7 +93,7 @@ test_that("dlg_bivariate returns the same values as the old code", {
 test_that("dlg_bivariate returns the same grid for the two estimation methods", {
     expect_equal(dlg_bivariate(x = test_matrix_2col, grid_size = 15, est_method = "1par")$eval_points,
                  dlg_bivariate(x = test_matrix_2col, grid_size = 15, est_method = "5par")$eval_points)
-    
+
 })
 
 x <- rnorm(100); eval_points <- -5:5; bw <- .5
@@ -129,3 +129,24 @@ test_that("The main density estimator produces correct errors", {
     expect_error(dlg(lg_object_wrong, grid), "Object must be of class 'lg'")
     expect_error(dlg(lg_object, grid_wrong_dimension), "The grid can only have 3 variables")
 })
+
+condition       <- c(1, 0)
+grid            <- matrix(seq(-5, 5, length.out = 100), ncol = 1)
+grid_wrong      <- matrix(seq(-5, 5, length.out = 100), ncol = 2)
+condition_wrong <- c(1)
+
+test_that("The conditional density estimator produces correct errors", {
+    expect_error(clg(lg_object, grid = grid_wrong, condition = condition), "The grid can only have 1 variables")
+    expect_error(clg(lg_object, grid = grid, condition = condition_wrong), "The grid can only have 2 variables")
+})
+
+
+
+
+
+
+
+
+
+
+

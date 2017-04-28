@@ -393,7 +393,7 @@ dlg <- function(lg_object, grid = NULL) {
         }
     }
 
-    # If method is "5par", then we have only one pair, and we can do all of the etsimation now
+    # If method is "5par", then we have only one pair, and we can do all of the estimation now
     if(lg_object$est_method == "5par") {
         estimate <- dlg_bivariate(x = x,
                                   eval_points = x0,
@@ -442,7 +442,124 @@ dlg <- function(lg_object, grid = NULL) {
                 loc_cor = loc_cor,
                 x = lg_object$x,
                 transformed_data = lg_object$transformed_data,
+                normalizing_constants = normalizing_constants,
                 grid = grid,
                 transformed_grid = x0))
     
 }
+
+#' The locally Gaussian conditional density estimator
+#'
+#' Estimate a conditional density function using locally Gaussian approximations.
+#'
+#' This function is the coditional version of the locally Gaussian density estimator
+#' (LGDE), described in Otneim & Tjøstheim (2017) [Proper citation needed!]. The
+#' function takes as arguments an \code{lg}-object as produced by the main \code{lg}-
+#' function, a grid of points where the density estimate should be estimated, and a
+#' set of conditions.
+#'
+#' The variables must be sorted befor they are supplied to this function. It will always
+#' assume that the free variables come before the conditioning variables.
+#' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
+#' @param grid A matrix of grid points, where we want to evaluate the density estimate
+#' @param condition A vector with conditions for the variables that we condition upon
+#' @export
+clg <- function(lg_object, grid = NULL, condition = NULL) {
+
+    # Extract some basic info
+    n  <- nrow(lg_object$x)        # Sample size
+    d  <- ncol(lg_object$x)        # Number of variables
+    nc <- length(condition)        # Number of conditioning variables
+    m  <- nrow(grid)               # Number of grid points
+    
+    # Do some checks first
+    check_lg(lg_object)
+    if(!is.null(grid)) {
+        grid <- check_data(grid,
+                           dim_check = d - nc,     # The grid must have d - c columns,
+                           type = "grid")         # that is: the number of free variables
+    }
+    
+    
+    # Create the estimation grid, where we need the local correlation.
+    estimation_grid <- matrix(NA, ncol = d, nrow = m)
+    estimation_grid[, 1:(d-nc)] <- grid
+    for(i in 1:nc) {
+        estimation_grid[,d-nc+i] <- rep(condition[i], m)
+    }
+
+    # Estimate the local correlation in these points using the density function
+    density_object <- dlg(lg_object, grid = estimation_grid)
+
+    # In each grid point, we need to calculate the conditional mean vector and
+    # covariance matrix in order to calculate the conditional density estimate.
+
+    # Some useful quantities:
+    pairs   <- lg_object$bw$joint[, c("x1", "x2")]                         # All pairs of variables
+    n_pairs <- nrow(pairs)                                                 # The number of pairs
+    z2      <- matrix(density_object$transformed_grid[1, (d - nc + 1):d],
+                      ncol = 1) # The transformed location 
+    
+    # This is a function that does this task in grid point number i.
+    f_eval <- function(i) {
+
+        # This grid point
+        grid_point <- density_object$transformed_grid[i, 1:(d - nc)]
+
+        # First, this is the conditional mean at that point
+        mu <- density_object$loc_mean[i,]
+        # First, we build up the unconditional covariance matrix
+        sigma <- diag(density_object$loc_sd[i,]^2)
+        
+        for(j in 1:n_pairs) { # For each pair of variables
+
+            var1 <- pairs[j,1]      #| The variables
+            var2 <- pairs[j,2]      #|
+
+            rho <- density_object$loc_cor[i, j]     #| The local correlation in *this*
+                                                    #| grid point, and for *this* variable
+                                                    #| pair.
+
+            # Finally, fill in the covariances
+            sigma[var1, var2] <- rho*sqrt(sigma[var1, var1]*sigma[var2, var2])
+            sigma[var2, var1] <- sigma[var1, var2]
+        }
+
+        # Next, we partition the mean vector and covariance matrix to produce the conditional
+        # parameters
+        mu1 <- matrix(mu[1:(d - nc)], ncol = 1)
+        mu2 <- matrix(mu[nc:d], ncol = 1)
+        
+        S11 <- as.matrix(sigma[1:(d - nc), 1:(d - nc)])
+        S22 <- as.matrix(sigma[(d - nc + 1):d, (d - nc + 1):d])
+        S12 <- as.matrix(sigma[1:(d - nc),  (d - nc + 1):d])
+        dim(S12) <- c(d - nc, nc)
+        S21 <- as.matrix(sigma[(d - nc + 1):d, 1:(d - nc)])
+        dim(S21) <- rev(dim(S12))
+
+        # The formulas for conditional mean and conditional covariance matrix:
+        c_mean <- mu1 + S12%*%solve(S22)%*%(z2 - mu2)
+        c_cov  <- S11 - S12%*%solve(S22)%*%S21
+
+        f_est <- mvtnorm::dmvnorm(x = grid_point,
+                                  mean = c_mean,
+                                  sigma = c_cov)*
+            prod(density_object$normalizing_constants[i, 1:(d - nc)])
+
+        return(list(f_est = f_est,
+                    c_mean = c_mean,
+                    c_cov = c_cov))
+    }
+
+    # Apply the f_eval function to all the grid points
+    estimate <- lapply(as.list(1:m), f_eval)
+
+    # Extract the conditional density estimates into a vector
+    f_est <- unlist(lapply(estimate, "[[", 1))
+
+    # Extract the conditional means and covariance matrices into lists
+    c_mean <- lapply(estimate, "[[", 2)
+    c_cov  <- lapply(estimate, "[[", 3)
+
+    # Return the result
+}   

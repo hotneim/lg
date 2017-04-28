@@ -104,4 +104,3 @@ check_lg <- function(check_object) {
         stop("Object must be of class 'lg'")
 }
 
-
