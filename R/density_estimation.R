@@ -567,7 +567,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL) {
                 c_cov = c_cov,
                 x = lg_object$x,
                 transformed_data = lg_object$transformed_data,
-                normalizing_constants = normalizing_constants,
+                normalizing_constants = density_object$normalizing_constants,
                 grid = grid,
                 transformed_grid = density_object$transformed_grid))
 }   
