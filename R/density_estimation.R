@@ -528,7 +528,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL) {
         # Next, we partition the mean vector and covariance matrix to produce the conditional
         # parameters
         mu1 <- matrix(mu[1:(d - nc)], ncol = 1)
-        mu2 <- matrix(mu[(nc+1):d], ncol = 1)
+        mu2 <- matrix(mu[(d-nc+1):d], ncol = 1)
         
         S11 <- as.matrix(sigma[1:(d - nc), 1:(d - nc)])
         S22 <- as.matrix(sigma[(d - nc + 1):d, (d - nc + 1):d])
