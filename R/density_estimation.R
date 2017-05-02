@@ -562,4 +562,12 @@ clg <- function(lg_object, grid = NULL, condition = NULL) {
     c_cov  <- lapply(estimate, "[[", 3)
 
     # Return the result
+    return(list(f_est = f_est,
+                c_mean = c_mean,
+                c_cov = c_cov,
+                x = lg_object$x,
+                transformed_data = lg_object$transformed_data,
+                normalizing_constants = normalizing_constants,
+                grid = grid,
+                transformed_grid = density_object$transformed_grid))
 }   
