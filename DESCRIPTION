@@ -15,4 +15,6 @@ Suggests: testthat
 Imports:
     mvtnorm,
     localgauss,
-    logspline
+    logspline,
+    aspline
+    
