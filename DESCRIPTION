@@ -16,5 +16,5 @@ Imports:
     mvtnorm,
     localgauss,
     logspline,
-    aspline
+    akima
     
