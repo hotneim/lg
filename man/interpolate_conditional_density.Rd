@@ -4,7 +4,8 @@
 \alias{interpolate_conditional_density}
 \title{Interpolate a univariate conditional density function}
 \usage{
-interpolate_conditional_density(lg_object, condition, nodes, extend = 0.3)
+interpolate_conditional_density(lg_object, condition, nodes, extend = 0.3,
+  gaussian_scale = lg_object$transform_to_marginal_normality)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the \code{lg}-function}
@@ -17,6 +18,9 @@ supplied by the user}
 
 \item{extend}{How far to extend the grid beyond the extreme data points, in share of
 the range}
+
+\item{gaussian_scale}{Stay on the standard Gaussian scale, useful for the accept-reject
+algorithm}
 }
 \description{
 Estimates the conditional density function for one free variable on

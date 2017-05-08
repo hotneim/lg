@@ -15,11 +15,14 @@
 #'   supplied by the user
 #' @param extend How far to extend the grid beyond the extreme data points, in share of
 #'   the range
+#' @param gaussian_scale Stay on the standard Gaussian scale, useful for the accept-reject
+#'   algorithm
 #' @export
 interpolate_conditional_density <- function(lg_object,
                                             condition,
                                             nodes,
-                                            extend = .3) {
+                                            extend = .3,
+                                            gaussian_scale = lg_object$transform_to_marginal_normality) {
 
     # Extract some basic info
     n  <- nrow(lg_object$x)        # Sample size
@@ -39,7 +42,6 @@ interpolate_conditional_density <- function(lg_object,
                            to   = max(lg_object$x[,1]) + extend*width,
                            length.out = nodes),
                        ncol = 1)
-        delta <- diff(grid)[1]
     } else {
         grid <- matrix(nodes,
                        ncol = 1)
@@ -49,11 +51,17 @@ interpolate_conditional_density <- function(lg_object,
     conditional_density_estimate <- clg(lg_object, grid = grid, condition = condition)
 
     # Create the interpolation function
-    x <- c(grid)
-    y <- conditional_density_estimate$f_est
+    if(gaussian_scale) {
+        x <- c(conditional_density_estimate$transformed_grid[,1])
+        y <- conditional_density_estimate$f_est/conditional_density_estimate$normalizing_constants[,1]
+    } else {
+        x <- c(grid)
+        y <- conditional_density_estimate$f_est
+    }
 
     # Mean and variance of the density estimate, useful for accept-reject
     if(length(nodes) == 1) {
+        delta <- diff(x)[1]
         mean <- sum(x*y)*delta
         var <- sum((x - mean)^2*y)*delta
     } else {
@@ -77,7 +85,9 @@ interpolate_conditional_density <- function(lg_object,
 #' Generate sample from a conditional density estimate
 #'
 #' Generate a sample from a locally Gaussian conditional density estimate using
-#' the accept-reject algorithm.
+#' the accept-reject algorithm. If the \code{transform_to_marginal_normality}-
+#' component of the lg_object is \code{TRUE}, the replicates will be on the standard
+#' normal scale.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
 #' @param n_new The number of observations to generate
@@ -159,26 +169,91 @@ accept_reject <- function(lg_object,
     }
 }
 
-#' Test for conditional independence
+#' Bootstrap replication under the null hypothesis
 #'
-#' Test for conditional independence using local Gaussian correlations.
+#' Generate bootstrap replicates under the null hypothesis that the first two
+#' variables are conditionally independent given the rest of the variables.
 #'
-#' This is the main function for performing a test for conditional independence
-#' between two variables given a (set of) variable(s). The function takes in an
-#' lg-object as produced by the main \code{lg}-function, 
-#'
-ci_test <- function(lg_object,
-                    n_replicates = 1000,
-                    h = function(x) x^2,
-                    return_replicated_test_statistics = TRUE,
-                    return_replicated_data = FALSE,
-                    return_auxiliary_info = FALSE) {
+#' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
+#' @param r_rep  The number of replicated bootstrap samples
+#' @param nodes Either the number of equidistant nodes to generate, or a vector of nodes
+#'   supplied by the user
+#' @param M The value for M in the accept-reject algorithm if already known
+#' @param M_sim The number of replicates to simulate in order to find a value for M
+#' @param M_corr Correction factor for M, to be on the safe side
+#' @param n_corr Correction factor for n_new, so that we mostly will generate enough
+#'   observations in the first go
+#' @param extend How far to extend the grid beyond the extreme data points when interpolating,
+#'   in share of the range
+replicate_under_ci <- function(lg_object,
+                               n_rep,
+                               nodes,
+                               M = NULL,
+                               M_sim = 1500,
+                               M_corr = 1.5,
+                               n_corr = 1.2,
+                               extend = .3) {
+
+    # Extract some info
+    n <- nrow(lg_object$x)
+    d <- ncol(lg_object$x)
+
+    # Initialize a big list of replicates. Fill the matrices of X1 and X2 by row, pick them
+    # apart by column. Also, we want to return the Ms that were used for accept reject.
+    X <- list(X1 = matrix(NA, nrow = n, ncol = n_rep),
+              X2 = matrix(NA, nrow = n, ncol = n_rep))
+    Mret <- matrix(NA, nrow = n, ncol = 2)
+
+    # Go over two times, one for each variable
+    for(i in 1:2) {
+
+        # Data without the other variable
+        temp_lg_object <- lg(x = lg_object$x[,-i],
+                             bw_method = lg_object$bw_method,
+                             est_method = lg_object$est_method,
+                             transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
+                             plugin_constant_marginal = lg_object$plugin_constant_marginal,
+                             plugin_constant_joint = lg_object$plugin_constant_joint,
+                             plugin_exponent_marginal = lg_object$plugin_exponent_marginal,
+                             plugin_exponent_joint = lg_object$plugin_exponent_joint,
+                             tol_marginal = lg_object$tol_marginal,
+                             tol_joint = lg_object$tol_joint)
+
+        # Fill each row with a new sample, one for each condition
+        for(j in 1:n) {
+            new_sample <- accept_reject(temp_lg_object,
+                                        condition = temp_lg_object$x[j, 2:(d-1)],
+                                        n_new = n_rep,
+                                        nodes = nodes,
+                                        M = NULL,
+                                        M_sim = M_sim,
+                                        M_corr = M_corr,
+                                        n_corr = n_corr,
+                                        extend = extend)
+            X[[i]][j,] <- new_sample$sample
+            Mret[j,i] <- new_sample$M
+        }
+    }
+
+    # Distribute the generated observations into a list of replicated data
+    replicates <- list()
+    for(i in 1:n_rep) {
+        replicates[[i]] <- lg_object$transformed_data
+        replicates[[i]][, 1] <- X[[2]][,i]
+        replicates[[i]][, 2] <- X[[1]][,i]
+    }
+    
 }
 
-
-#' Generate replicates under the null hypothesis for conditional independence test
+#' Calculate the local conditional covariance between two variables
 #'
-generate_replicates <- function(x,
-                                n_replicates,
-                                h) {
+#' Wrapper for the \code{clg} function that extracts the local Gaussian conditional
+#' covariance between two variables from an object that is produced by the clg-function.
+#'
+#' This function is a wrapper for the clag-function, and extracts the estimated local
+#' conditional covariance between the first two variables in the data matrix, on the grid
+#' specified to the clg-function.
+#'
+#' @param clg_object The object produced by the clg-function
+local_conditional_covariance <- function(clg_object) {
 }

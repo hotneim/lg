@@ -93,6 +93,14 @@ lg <- function(x,
                         tol_joint = tol_joint)
     }
     ret$bw <- bw
+
+    # Add the rest of the information to the object that we return
+    ret$plugin_constant_marginal <- plugin_constant_marginal
+    ret$plugin_constant_joint    <- plugin_constant_joint
+    ret$plugin_exponent_marginal <- plugin_exponent_marginal
+    ret$plugin_exponent_joint    <- plugin_exponent_joint
+    ret$tol_marginal             <- tol_marginal
+    ret$tol_joint                <- tol_joint
     
     class(ret) <- "lg"
 
