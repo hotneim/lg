@@ -4,10 +4,12 @@
 \alias{local_conditional_covariance}
 \title{Calculate the local conditional covariance between two variables}
 \usage{
-local_conditional_covariance(clg_object)
+local_conditional_covariance(clg_object, coord = c(1, 2))
 }
 \arguments{
 \item{clg_object}{The object produced by the clg-function}
+
+\item{coord}{The variables for which the conditional covariance should be extracted}
 }
 \description{
 Wrapper for the \code{clg} function that extracts the local Gaussian conditional

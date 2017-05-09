@@ -4,7 +4,7 @@
 \alias{clg}
 \title{The locally Gaussian conditional density estimator}
 \usage{
-clg(lg_object, grid = NULL, condition = NULL)
+clg(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the \code{lg}-function}
@@ -12,6 +12,9 @@ clg(lg_object, grid = NULL, condition = NULL)
 \item{grid}{A matrix of grid points, where we want to evaluate the density estimate}
 
 \item{condition}{A vector with conditions for the variables that we condition upon}
+
+\item{fixed_grid}{Used by the conditional independence test to calculate the test
+statistic}
 }
 \description{
 Estimate a conditional density function using locally Gaussian approximations.

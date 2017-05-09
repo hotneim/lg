@@ -255,5 +255,26 @@ replicate_under_ci <- function(lg_object,
 #' specified to the clg-function.
 #'
 #' @param clg_object The object produced by the clg-function
-local_conditional_covariance <- function(clg_object) {
+#' @param coord The variables for which the conditional covariance should be extracted
+local_conditional_covariance <- function(clg_object, coord = c(1, 2)) {
+    
+    unlist(lapply(clg_object$c_cov, `[`, coord[1], coord[2]))
+
+}
+
+#' Calculate the value of the test statistic for the conditional independence test
+#'
+#' Calculate the test statistic in the test for conditional independence between the first
+#' two variables in the data set, given the remaining variables.
+#'
+#' @param lg__object An object of type \code{lg}, as produced by the \code{lg}-function
+#' @param h The \code{h}-function used in the calulation of the test statistic. The default
+#' value is \code{h(x) = x^2}. 
+ci_test_statistic <- function(lg_object, h = function(x) x^2) {
+
+    # Calculate the conditional coveriance between the first two variables in the data points
+    clg_object <- clg(lg_object, fixed_grid = lg_object$x)
+
+    # Extract the conditional covariances and calculate the value of the test statistic
+    mean(h(local_conditional_covariance(clg_object)))
 }

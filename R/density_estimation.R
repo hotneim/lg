@@ -463,14 +463,21 @@ dlg <- function(lg_object, grid = NULL) {
 #' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
 #' @param grid A matrix of grid points, where we want to evaluate the density estimate
 #' @param condition A vector with conditions for the variables that we condition upon
+#' @param fixed_grid Used by the conditional independence test to calculate the test
+#'   statistic
 #' @export
-clg <- function(lg_object, grid = NULL, condition = NULL) {
+clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
 
     # Extract some basic info
     n  <- nrow(lg_object$x)        # Sample size
     d  <- ncol(lg_object$x)        # Number of variables
-    nc <- length(condition)        # Number of conditioning variables
-    m  <- nrow(grid)               # Number of grid points
+    if(is.null(fixed_grid)) {
+        nc <- length(condition)        # Number of conditioning variables
+        m  <- nrow(grid)               # Number of grid points
+    } else {
+        nc <- d - 2
+        m <- nrow(fixed_grid)
+    }
     
     # Do some checks first
     check_lg(lg_object)
@@ -482,10 +489,14 @@ clg <- function(lg_object, grid = NULL, condition = NULL) {
     
     
     # Create the estimation grid, where we need the local correlation.
-    estimation_grid <- matrix(NA, ncol = d, nrow = m)
-    estimation_grid[, 1:(d-nc)] <- grid
-    for(i in 1:nc) {
-        estimation_grid[,d-nc+i] <- rep(condition[i], m)
+    if(is.null(fixed_grid)) {
+        estimation_grid <- matrix(NA, ncol = d, nrow = m)
+        estimation_grid[, 1:(d-nc)] <- grid
+        for(i in 1:nc) {
+            estimation_grid[,d-nc+i] <- rep(condition[i], m)
+        }
+    } else {
+        estimation_grid <- fixed_grid
     }
 
     # Estimate the local correlation in these points using the density function
