@@ -175,7 +175,7 @@ accept_reject <- function(lg_object,
 #' variables are conditionally independent given the rest of the variables.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
-#' @param r_rep  The number of replicated bootstrap samples
+#' @param n_rep  The number of replicated bootstrap samples
 #' @param nodes Either the number of equidistant nodes to generate, or a vector of nodes
 #'   supplied by the user
 #' @param M The value for M in the accept-reject algorithm if already known
@@ -242,7 +242,9 @@ replicate_under_ci <- function(lg_object,
         replicates[[i]][, 1] <- X[[2]][,i]
         replicates[[i]][, 2] <- X[[1]][,i]
     }
-    
+
+    return(list(replicates = replicates,
+                Mret = Mret))
 }
 
 #' Calculate the local conditional covariance between two variables
@@ -277,4 +279,77 @@ ci_test_statistic <- function(lg_object, h = function(x) x^2) {
 
     # Extract the conditional covariances and calculate the value of the test statistic
     mean(h(local_conditional_covariance(clg_object)))
+}
+
+#' Test for conditional independence
+#'
+#' Perform a test for conditional independence between the first two variables in the data
+#' set, given the remaining variables.
+#'
+#' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
+#' @param h The \code{h}-function used in the calulation of the test statistic. The default
+#' value is \code{h(x) = x^2}.
+#' @param n_rep The number of replicated bootstrap samples
+#' @param nodes Either the number of equidistant nodes to generate, or a vector of nodes
+#'   supplied by the user
+#' @param M The value for M in the accept-reject algorithm if already known
+#' @param M_sim The number of replicates to simulate in order to find a value for M
+#' @param M_corr Correction factor for M, to be on the safe side
+#' @param n_corr Correction factor for n_new, so that we mostly will generate enough
+#'   observations in the first go
+#' @param extend How far to extend the grid beyond the extreme data points when interpolating,
+#'   in share of the range
+#' @param return_time Measure how long the test takes to run, and return along with the test
+#'   result
+ci_test <- function(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000, M = NULL,
+                    M_sim = 1500, M_corr = 1.5, n_corr = 1.2, extend = .3, return_time = TRUE) {
+
+    ## Start the clock
+    if(return_time) {
+        start_time <- Sys.time()
+    }
+    
+    ## Generate bootstrap samples under the null
+    replicates <- replicate_under_ci(lg_object, n_rep = n_rep, nodes = nodes, M = M, M_sim = M_sim,
+                                     M_corr = M_corr, n_corr = n_corr, extend = extend)
+
+    ## The observed test functional
+    observed <- ci_test_statistic(lg_object, h = h)
+
+    ## Initialize the vector where we want to store the replicated test functionals
+    replicated <- rep(NA, n_rep)
+
+    ## Run over the replicated data sets in order to calculate the test statistics
+    ## under the null hypothesis
+    for(i in 1:n_rep) {
+
+        # First, create the temporary lg-object. Parameters are the same as for the original data.
+        temp_lg_object <- lg(replicates$replicates[[i]], bw_method = lg_object$bw_method,
+                             est_method = lg_object$est_method,
+                             transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
+                             plugin_constant_marginal = lg_object$plugin_constant_marginal,
+                             plugin_constant_joint = lg_object$plugin_constant_joint,
+                             plugin_exponent_marginal = lg_object$plugin_exponent_marginal,
+                             plugin_exponent_joint = lg_object$plugin_exponent_joint,
+                             tol_marginal = lg_object$tol_marginal,
+                             tol_joint = lg_object$tol_joint)
+
+        # Then calculate the test statistic
+        replicated[i] <- ci_test_statistic(temp_lg_object, h = h)
+
+    }
+
+    ## Stop the clock
+    if(return_time) {
+        end_time <- Sys.time()
+        duration <- as.numeric(end_time - start_time, unit = "mins")
+    } else {
+        duration <- NA
+    }
+
+    return(list(p_value = mean(observed < replicated),
+                observed = observed,
+                replicated = replicated,
+                Mret = replicates$Mret,
+                duration = duration))
 }
