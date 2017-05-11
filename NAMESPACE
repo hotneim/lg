@@ -2,6 +2,7 @@
 
 export(accept_reject)
 export(bw_select)
+export(ci_test)
 export(clg)
 export(dlg)
 export(dlg_bivariate)

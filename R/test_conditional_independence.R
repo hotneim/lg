@@ -28,7 +28,7 @@ interpolate_conditional_density <- function(lg_object,
     n  <- nrow(lg_object$x)        # Sample size
     d  <- ncol(lg_object$x)        # Number of variables
     nc <- length(condition)        # Number of conditioning variables
-    
+
     # Do some checks
     check_lg(lg_object)
     if((d - nc) != 1)
@@ -116,7 +116,7 @@ accept_reject <- function(lg_object,
 
     # Get function for interpolation
     int_object <- interpolate_conditional_density(lg_object, condition, nodes, extend)
-    
+
     # Do a quick check
     if(is.null(M) && is.null(int_object$mean))
         stop("Not enough information to calculate M")
@@ -153,12 +153,12 @@ accept_reject <- function(lg_object,
 
         # Do we have enough samples?
         enough = length(generated) >= n_new
- 
+
         # Get more samples if needed
         while(!enough) {
             n_missing <- n_new - length(generated)
             generated <- c(generated, get(round(n_corr*M*n_missing)))
-            enough = length(generated) >= n_new        
+            enough = length(generated) >= n_new
         }
 
         return(list(sample = generated[1:n_new], M = M))
@@ -259,7 +259,7 @@ replicate_under_ci <- function(lg_object,
 #' @param clg_object The object produced by the clg-function
 #' @param coord The variables for which the conditional covariance should be extracted
 local_conditional_covariance <- function(clg_object, coord = c(1, 2)) {
-    
+
     unlist(lapply(clg_object$c_cov, `[`, coord[1], coord[2]))
 
 }
@@ -271,7 +271,7 @@ local_conditional_covariance <- function(clg_object, coord = c(1, 2)) {
 #'
 #' @param lg__object An object of type \code{lg}, as produced by the \code{lg}-function
 #' @param h The \code{h}-function used in the calulation of the test statistic. The default
-#' value is \code{h(x) = x^2}. 
+#' value is \code{h(x) = x^2}.
 ci_test_statistic <- function(lg_object, h = function(x) x^2) {
 
     # Calculate the conditional coveriance between the first two variables in the data points
@@ -301,6 +301,7 @@ ci_test_statistic <- function(lg_object, h = function(x) x^2) {
 #'   in share of the range
 #' @param return_time Measure how long the test takes to run, and return along with the test
 #'   result
+#' @export
 ci_test <- function(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000, M = NULL,
                     M_sim = 1500, M_corr = 1.5, n_corr = 1.2, extend = .3, return_time = TRUE) {
 
@@ -308,7 +309,7 @@ ci_test <- function(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000, 
     if(return_time) {
         start_time <- Sys.time()
     }
-    
+
     ## Generate bootstrap samples under the null
     replicates <- replicate_under_ci(lg_object, n_rep = n_rep, nodes = nodes, M = M, M_sim = M_sim,
                                      M_corr = M_corr, n_corr = n_corr, extend = extend)
