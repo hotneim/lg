@@ -28,7 +28,7 @@ the 1-parameter optimization}
 \item{run_checks}{Logical. Should sanity checks be run on the arguments? Useful to disable
 this when doing cross-validation for example.}
 
-\item{marginal_estimates}{Provide the marginal estimates here if estimation method is 
+\item{marginal_estimates}{Provide the marginal estimates here if estimation method is
 "\code{5par_marginals_fixed}", and the marginal estimates have already been found. Useful
 for cross-valdiation. List with two elements as returned by \code{dlg_marginal_wrapper}}
 
