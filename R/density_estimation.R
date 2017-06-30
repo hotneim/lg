@@ -25,7 +25,7 @@
 #' the 1-parameter optimization
 #' @param run_checks Logical. Should sanity checks be run on the arguments? Useful to disable
 #'   this when doing cross-validation for example.
-#' @param marginal_estimates Provide the marginal estimates here if estimation method is 
+#' @param marginal_estimates Provide the marginal estimates here if estimation method is
 #'   "\code{5par_marginals_fixed}", and the marginal estimates have already been found. Useful
 #'   for cross-valdiation. List with two elements as returned by \code{dlg_marginal_wrapper}
 #' @param bw_marginal Vector of bandwidths used to estimate the marginal distributions
@@ -74,10 +74,10 @@ dlg_bivariate <- function(x,
 
         # We declare a function that maximizes the local likelihood in one grid point.
         maximize_likelihood = function(grid_point) {
-      
+
             x1_0 <- grid_point[1]
             x2_0 <- grid_point[2]
-            
+
             # We need weights and some empirical moments in this grid point
             W <- dnorm(x1, mean = x1_0, sd = h1)*dnorm(x2, mean = x2_0, sd = h2)
 
@@ -85,7 +85,7 @@ dlg_bivariate <- function(x,
             m2 <- mean(W*x1^2)
             m3 <- mean(W*x2^2)
             m4 <- mean(W*x1*x2)
-            
+
             # The likelihood function
             lik <- function(rho) {
                 - log(2*pi*sqrt(1 - rho^2))*m1 - m2/(2*(1 - rho^2)) - m3/(2*(1 - rho^2)) +
@@ -93,7 +93,7 @@ dlg_bivariate <- function(x,
                     2*x1_0*rho*x2_0 + x2_0^2)/(-rho^2 + h2^2 + 1 + h1^2 + h1^2*h2^2))/
                     (pi*(-rho^2 + h2^2 + 1 + h1^2 + h1^2*h2^2)^(1/2))
             }
-            
+
             # Return the maximum of the likelihood and the density estimate
             opt <- try(optimise(lik,
                                 lower = -1,
@@ -102,7 +102,7 @@ dlg_bivariate <- function(x,
                                 tol = tol),
                        silent = TRUE)
 
-            # Store the result if the optimization went alright. Return NA if not. 
+            # Store the result if the optimization went alright. Return NA if not.
             if(class(opt) != "try-error") {
                 return(c(opt$maximum,
                          mvtnorm::dmvnorm(c(x1_0, x2_0), mean = c(0,0),
@@ -155,14 +155,14 @@ dlg_bivariate <- function(x,
         # with fixed marginal parameter estimates.
         maximize_likelihood_fixed_marginals =
             function(grid_point_and_marginal_parameters) {
-      
+
             x1_0 <- grid_point_and_marginal_parameters[1]
             x2_0 <- grid_point_and_marginal_parameters[2]
             mu_1 <- grid_point_and_marginal_parameters[3]
             sig_1 <- grid_point_and_marginal_parameters[4]
             mu_2 <- grid_point_and_marginal_parameters[5]
             sig_2 <- grid_point_and_marginal_parameters[6]
-            
+
             # We need weights and some empirical moments in this grid point
             W <- dnorm(x1, mean = x1_0, sd = h1)*dnorm(x2, mean = x2_0, sd = h2)
 
@@ -170,7 +170,7 @@ dlg_bivariate <- function(x,
             m2 <- mean(W*((x1-mu_1)/sig_1)^2)
             m3 <- mean(W*((x2-mu_2)/sig_2)^2)
             m4 <- mean(W*((x1-mu_1)/sig_1)*((x2-mu_2)/sig_2))
-            
+
             # The likelihood function
             lik <- function(rho) {
                 - log(2*pi*sqrt(1 - rho^2)*sig_1*sig_2)*m1 - m2/(2*(1 - rho^2)) - m3/(2*(1 - rho^2)) +
@@ -184,7 +184,7 @@ dlg_bivariate <- function(x,
                                                         byrow = TRUE,
                                                         ncol = 2))
             }
-            
+
             # Return the maximum of the likelihood and the density estimate
             opt <- try(optimise(lik,
                                 lower = -1,
@@ -193,7 +193,7 @@ dlg_bivariate <- function(x,
                                 tol = tol),
                        silent = TRUE)
 
-            # Store the result if the optimization went alright. Return NA if not. 
+            # Store the result if the optimization went alright. Return NA if not.
             if(class(opt) != "try-error") {
                 return(c(opt$maximum,
                          mvtnorm::dmvnorm(c(x1_0, x2_0), mean = c(mu_1,mu_2),
@@ -220,15 +220,15 @@ dlg_bivariate <- function(x,
         f_est = as.vector(est[,2])
         colnames(par_est) <- c("mu_1", "mu_2", "sig_1", "sig_2", "rho")
 
-        
+
     }
-    
+
     return(list(x = x,
                 eval_points = eval_points,
                 bw = bw,
                 par_est = par_est,
                 f_est = f_est))
-       
+
 }
 
 #' Marginal density estimation
@@ -244,7 +244,7 @@ dlg_bivariate <- function(x,
 #' @param bw The bandwidth (a single number).
 #' @param grid_size Number of grid points if grid is not provided.
 #' @param eval_points The grid where we want to evaluate the density. Chosen
-#'   suitably if not provided, with length equal to grid_size. 
+#'   suitably if not provided, with length equal to grid_size.
 #' @export
 dlg_marginal <- function(x,
                         bw = 1,
@@ -265,7 +265,7 @@ dlg_marginal <- function(x,
             mu <- par[1]
             sig <- par[2]
             - m2*mu/sig^2 + m3/(2*sig^2) + m1*(mu^2/(2*sig^2) + .5*log(2*pi*sig^2)) +
-                dnorm((eval_point - mu)/sqrt(sig^2 + bw^2))/sqrt(sig^2 + bw^2) 
+                dnorm((eval_point - mu)/sqrt(sig^2 + bw^2))/sqrt(sig^2 + bw^2)
         }
 
         # Do the optimization
@@ -280,7 +280,7 @@ dlg_marginal <- function(x,
                            sd = opt$par[2])))
         } else {
             return(c(NA, NA))
-        }        
+        }
     }
 
     # Send the grid points to 'maximize_likelihood_univariate'
@@ -294,7 +294,7 @@ dlg_marginal <- function(x,
     } else {
         par_est <- est[, 1:2]
     }
-    
+
     colnames(par_est) <- c("mu", "sig")
     f_est <- as.vector(est[, 3])
 
@@ -371,7 +371,7 @@ dlg <- function(lg_object, grid = NULL) {
     } else {
         x <- lg_object$x
         x0 <- grid
-        normalizing_constants <- rep(1, nrow(grid))
+        normalizing_constants <- matrix(1, nrow = nrow(grid), ncol = 1)
     }
 
     # Extract the pairs from the list of bandwidths
@@ -405,7 +405,7 @@ dlg <- function(lg_object, grid = NULL) {
                           estimate$par_est[, "mu_2"])
         loc_sd <- cbind(estimate$par_est[, "sig_1"],
                         estimate$par_est[, "sig_2"])
-        loc_cor[,1] <- estimate$par_est[, "rho"]        
+        loc_cor[,1] <- estimate$par_est[, "rho"]
     } else {  # And if not, we estimate the local correlation pairwise now
         for(i in 1:nrow(pairs)) {
             if(lg_object$est_method == "1par") {
@@ -414,7 +414,7 @@ dlg <- function(lg_object, grid = NULL) {
                 pairwise_marginal_estimates <- list(marginal_estimates[[pairs$x1[i]]],
                                                     marginal_estimates[[pairs$x2[i]]])
             }
-            
+
             pairwise_estimate <-
                 dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
                               eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
@@ -422,7 +422,7 @@ dlg <- function(lg_object, grid = NULL) {
                                      lg_object$bw$joint[i, "bw2"]),
                               est_method = lg_object$est_method,
                               marginal_estimates = pairwise_marginal_estimates)
-            
+
             loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
         }
     }
@@ -445,7 +445,7 @@ dlg <- function(lg_object, grid = NULL) {
                 normalizing_constants = normalizing_constants,
                 grid = grid,
                 transformed_grid = x0))
-    
+
 }
 
 #' The locally Gaussian conditional density estimator
@@ -478,7 +478,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
         nc <- d - 2
         m <- nrow(fixed_grid)
     }
-    
+
     # Do some checks first
     check_lg(lg_object)
     if(!is.null(grid)) {
@@ -486,8 +486,8 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
                            dim_check = d - nc,     # The grid must have d - c columns,
                            type = "grid")         # that is: the number of free variables
     }
-    
-    
+
+
     # Create the estimation grid, where we need the local correlation.
     if(is.null(fixed_grid)) {
         estimation_grid <- matrix(NA, ncol = d, nrow = m)
@@ -509,8 +509,8 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
     pairs   <- lg_object$bw$joint[, c("x1", "x2")]                         # All pairs of variables
     n_pairs <- nrow(pairs)                                                 # The number of pairs
     z2      <- matrix(density_object$transformed_grid[1, (d - nc + 1):d],
-                      ncol = 1) # The transformed location 
-    
+                      ncol = 1) # The transformed location
+
     # This is a function that does this task in grid point number i.
     f_eval <- function(i) {
 
@@ -521,7 +521,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
         mu <- density_object$loc_mean[i,]
         # First, we build up the unconditional covariance matrix
         sigma <- diag(density_object$loc_sd[i,]^2)
-        
+
         for(j in 1:n_pairs) { # For each pair of variables
 
             var1 <- pairs[j,1]      #| The variables
@@ -540,7 +540,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
         # parameters
         mu1 <- matrix(mu[1:(d - nc)], ncol = 1)
         mu2 <- matrix(mu[(d-nc+1):d], ncol = 1)
-        
+
         S11 <- as.matrix(sigma[1:(d - nc), 1:(d - nc)])
         S22 <- as.matrix(sigma[(d - nc + 1):d, (d - nc + 1):d])
         S12 <- as.matrix(sigma[1:(d - nc),  (d - nc + 1):d])
@@ -581,4 +581,4 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
                 normalizing_constants = density_object$normalizing_constants,
                 grid = grid,
                 transformed_grid = density_object$transformed_grid))
-}   
+}
