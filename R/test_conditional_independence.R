@@ -133,39 +133,45 @@ accept_reject <- function(lg_object,
         M <- min(10,  M_corr*quantile(test_f/test_g, .95, type = 1))
     }
 
-    # Function for generating a sample from the candidate, and retaining the accepts
-    get <- function(k) {
-        # Generate k samples from the candidate and the uniform
-        Y <- rnorm(k,
-                   mean = int_object$mean,
-                   sd = sqrt(int_object$var))
-        U <- runif(k)
-        g <- dnorm(Y,
-                   mean = int_object$mean,
-                   sd = sqrt(int_object$var))
-        f <- int_object$conditional_density(Y)
-        Y[U < (f/(M*g))]
-    }
-
-    # Get the replicates, or just return M if that was specified
-    if(!return_just_M) {
-        generated <- get(round(n_corr*M*n_new))
-
-        # Do we have enough samples?
-        enough = length(generated) >= n_new
-
-        # Get more samples if needed
-        while(!enough) {
-            n_missing <- n_new - length(generated)
-            generated <- c(generated, get(round(n_corr*M*n_missing)))
-            enough = length(generated) >= n_new
+    # For some very extreme observations, M can become very small here. For the time being,
+    # we will return nothing if that happens
+    if(M < 1) {
+        return(0)
+    } else {
+        # Function for generating a sample from the candidate, and retaining the accepts
+        get <- function(k) {
+            # Generate k samples from the candidate and the uniform
+            Y <- rnorm(k,
+                       mean = int_object$mean,
+                       sd = sqrt(int_object$var))
+            U <- runif(k)
+            g <- dnorm(Y,
+                       mean = int_object$mean,
+                       sd = sqrt(int_object$var))
+            f <- int_object$conditional_density(Y)
+            Y[U < (f/(M*g))]
         }
 
-        return(list(sample = generated[1:n_new], M = M))
+        # Get the replicates, or just return M if that was specified
+        if(!return_just_M) {
+            generated <- get(round(n_corr*M*n_new))
 
-    } else {
+            # Do we have enough samples?
+            enough = length(generated) >= n_new
 
-        return(list(M = M))
+            # Get more samples if needed
+            while(!enough) {
+                n_missing <- n_new - length(generated)
+                generated <- c(generated, get(round(n_corr*M*n_missing)))
+                enough = length(generated) >= n_new
+            }
+
+            return(list(sample = generated[1:n_new], M = M))
+
+        } else {
+
+            return(list(M = M))
+        }
     }
 }
 
@@ -230,8 +236,13 @@ replicate_under_ci <- function(lg_object,
                                         M_corr = M_corr,
                                         n_corr = n_corr,
                                         extend = extend)
-            X[[i]][j,] <- new_sample$sample
-            Mret[j,i] <- new_sample$M
+            if(!is.numeric(new_sample)) {
+                X[[i]][j,] <- new_sample$sample
+                Mret[j,i] <- new_sample$M
+            } else {
+                X[[i]][j,] <- NA
+                Mret[j,i] <- NA
+            }
         }
     }
 
