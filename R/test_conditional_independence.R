@@ -61,9 +61,9 @@ interpolate_conditional_density <- function(lg_object,
 
     # Mean and variance of the density estimate, useful for accept-reject
     if(length(nodes) == 1) {
-        delta <- diff(x)[1]
-        mean <- sum(x*y)*delta
-        var <- sum((x - mean)^2*y)*delta
+        delta <- diff(x)
+        mean <- sum(x[-1]*y[-1]*delta, na.rm = TRUE)
+        var <- sum((x[-1] - mean)^2*y[-1]*delta, na.rm = TRUE)
     } else {
         mean = NULL
         var = NULL
