@@ -454,7 +454,7 @@ dlg <- function(lg_object, grid = NULL) {
 #' Estimate a conditional density function using locally Gaussian approximations.
 #'
 #' This function is the coditional version of the locally Gaussian density estimator
-#' (LGDE), described in Otneim & Tjøstheim (2017) [Proper citation needed!]. The
+#' (LGDE), described in Otneim & Tjøstheim (2017) [Proper citation needed!!]. The
 #' function takes as arguments an \code{lg}-object as produced by the main \code{lg}-
 #' function, a grid of points where the density estimate should be estimated, and a
 #' set of conditions.
