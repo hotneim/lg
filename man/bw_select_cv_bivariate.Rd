@@ -10,20 +10,44 @@ bw_select_cv_bivariate(x, tol = 10^(-3), est_method = "1par",
 \arguments{
 \item{x}{The matrix of data points.}
 
-\item{tol}{The absolute tolerance in the optimization}
+\item{tol}{The absolute tolerance in the optimization, used by the
+\code{optim}-function.}
 
-\item{est_method}{The estimation method for the bivariate fit. If estimation method is
-\code{5par_marginals_fixed}, the marginal bandwidths must be supplied a s well through
-\code{bw_marginal}}
+\item{est_method}{The estimation method for the bivariate fit. If estimation
+method is \code{5par_marginals_fixed}, the marginal bandwidths must be
+supplied as well through the argument \code{bw_marginal}. This is
+automatically handled by the \code{lg} wrapper function.}
 
 \item{bw_marginal}{The bandwidths for estimation of the marginals if method
 \code{5par_fixed_marginals} is used}
+}
+\value{
+The function returns a list with two elements: \code{bw} is the
+  selected bandwidths, and \code{convergence} is the convergence flag returned
+  by the \code{optim}-function.
 }
 \description{
 Uses cross-valdiation to find the optimal bandwidth for a bivariate locally
 Gaussian fit
 }
 \details{
-This function looks at a 2-column matrix of observations and estimates the bandwidth that
-minimizes the Kullback-Leibler distance between the true and the estimated densities.
+This function provides an implementation for the Cross Validation algorithm
+for bandwidth selection described in Otneim & Tjøstheim (2017), Section 4.
+Let \eqn{\hat{f}_h(x)} be the bivariate locally Gaussian density estimate
+obtained using the bandwidth \eqn{h}, then this function returns the
+bandwidth that maximizes \deqn{CV(h) = n^{-1} \sum_{i=1}^n \log
+\hat{f}_h^{(-i)}(x_i),} where \eqn{\hat{f}_h^{(-i)}} is the density estimate
+calculated without observation \eqn{x_i}.
+
+The recommended use of this function is through the \code{lg} wrapper
+function.
+}
+\examples{
+  x <- cbind(rnorm(100), rnorm(100))
+  bw <- bw_select_cv_univariate(x)
+
+}
+\references{
+Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 }

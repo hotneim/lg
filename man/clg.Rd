@@ -7,25 +7,75 @@
 clg(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL)
 }
 \arguments{
-\item{lg_object}{An object of type \code{lg}, as produced by the \code{lg}-function}
+\item{lg_object}{An object of type \code{lg}, as produced by the
+\code{lg}-function}
 
-\item{grid}{A matrix of grid points, where we want to evaluate the density estimate}
+\item{grid}{A matrix of grid points, where we want to evaluate the density
+estimate. Number of columns *must* be the same as number of variables in
+X1.}
 
-\item{condition}{A vector with conditions for the variables that we condition upon}
+\item{condition}{A vector with conditions for the variables that we condition
+upon. Length of this vector *must* be the same as the number of variables
+in X2. The function will throw an arrow of there is any discrepancy in the
+dimensions of \code{grid} and \code{condition}.}
 
-\item{fixed_grid}{Used by the conditional independence test to calculate the test
-statistic}
+\item{fixed_grid}{Used by the conditional independence test to calculate the
+test statistic (please ignore this).}
+}
+\value{
+A list containing the conditional density estimate as well as all the
+  running parameters that has been used. The elements are:
+
+  \itemize{
+    \item \code{f_est}: The estimated conditional density.
+    \item \code{c_mean}: The estimated local conditional means as defined in
+         equation (10) of Otneim & Tjøstheim (2017).
+    \item \code{c_cov}: The estimated local conditional covariance matrices
+          as defined in equation (11) of Otneim & Tjøstheim (2017).
+    \item \code{x}: The data set.
+    \item \code{bw}: The bandwidth object.
+    \item \code{transformed_data}: The data transformed to approximate
+          marginal standard normality.
+    \item \code{normalizing_constants}: The normalizing constants used to
+          transform data and grid back and forth to the marginal standard
+          normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
+    \item \code{grid}: The grid where the estimation was performed, on the
+          original scale.
+    \item \code{transformed_grid}: The grid where the estimation was
+          performed, on the marginal standard normal scale.
+ }
 }
 \description{
-Estimate a conditional density function using locally Gaussian approximations.
+Estimate a conditional density function using locally Gaussian
+approximations.
 }
 \details{
-This function is the coditional version of the locally Gaussian density estimator
-(LGDE), described in Otneim & Tjøstheim (2017) [Proper citation needed!!]. The
-function takes as arguments an \code{lg}-object as produced by the main \code{lg}-
-function, a grid of points where the density estimate should be estimated, and a
-set of conditions.
+This function is the coditional version of the locally Gaussian density
+estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
+as arguments an \code{lg}-object as produced by the main \code{lg}- function,
+a grid of points where the density estimate should be estimated, and a set of
+conditions.
 
-The variables must be sorted befor they are supplied to this function. It will always
-assume that the free variables come before the conditioning variables.
+The variables must be sorted befor they are supplied to this function. It
+will always assume that the free variables come before the conditioning
+variables.
+
+Assume that X is a stochastic vector with two components X1 and X2. This
+function will thus estimate the consitional density of X1 given a speciefied
+value of X2.
+}
+\examples{
+  # A 3 variate example
+  x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+
+  # Generate the lg-object with default settings
+  lg_object <- lg(x)
+
+  # Estimate the conditional density of X1|X2 = 0, X3 = 1 on a small grid
+  cond_dens <- clg(lg_object, grid = -4:4, condition = c(0, 1))
+
+}
+\references{
+Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
+  the local Gaussian correlation" Statistics and Computing (2017): 1-19.
 }

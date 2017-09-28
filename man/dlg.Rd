@@ -7,17 +7,57 @@
 dlg(lg_object, grid = NULL)
 }
 \arguments{
-\item{lg_object}{An object of type \code{lg}, as produced by the \code{lg}-function}
+\item{lg_object}{An object of type \code{lg}, as produced by the
+\code{lg}-function}
 
-\item{grid}{A matrix of grid points, where we want to evaluate the density estimate}
+\item{grid}{A matrix of grid points, where we want to evaluate the density
+estimate}
+}
+\value{
+A list containing the density estimate as well as all the running
+  parameters that has been used. The elements are:
+
+  \itemize{
+    \item \code{f_est}: The estimated multivariate density.
+    \item \code{loc_mean}: The estimated local means if \code{est_method}
+          is "5par" or "5par_marginals_fixed", a matrix of zeros if
+          \code{est_method} is "1par".
+    \item \code{loc_sd}: The estimated local st. deviations if
+          \code{est_method} is "5par" or "5par_marginals_fixed", a matrix
+           of ones if \code{est_method} is "1par".
+    \item \code{loc_cor}: Matrix of estimated local correlations, one column
+          for each pair of variables, in the same order as specified in the
+          bandwidth object.
+    \item \code{x}: The data set.
+    \item \code{bw}: The bandwidth object.
+    \item \code{transformed_data}: The data transformed to approximate
+          marginal standard normality.
+    \item \code{normalizing_constants}: The normalizing constants used to
+          transform data and grid back and forth to the marginal standard
+          normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
+    \item \code{grid}: The grid where the estimation was performed, on the
+          original scale.
+    \item \code{transformed_grid}: The grid where the estimation was
+          performed, on the marginal standard normal scale.
+ }
 }
 \description{
 Estimate a mulivariate density function using locally Gaussian approximations
 }
 \details{
 This function does multivariate density estimation using the locally Gaussian
-density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2016)
-[Proper citation needed!]. The function takes as arguments an \code{lg}-object
-as produced by the main \code{lg}-function, and a grid of points where the density
-estimate should be estimated.
+density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
+The function takes as arguments an \code{lg}-object as produced by the main
+\code{lg}-function (where all the running parameters are sepcified), and a
+grid of points where the density estimate should be estimated.
+}
+\examples{
+   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+   lg_object <- lg(x)  # Put all the running parameters in here.
+   density_estimate <- dlg(lg_object)
+
+}
+\references{
+Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+   multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 }

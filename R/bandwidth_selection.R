@@ -3,15 +3,25 @@
 # ---------------------------------
 
 #' Cross-validation for univariate distributions
-#'
-#' Uses cross-valdiation to find the optimal bandwidth for a univariate locally
+#' 
+#' Uses cross-valdiation to find the optimal bandwidth for a univariate locally 
 #' Gaussian fit
-#'
-#' This function looks at a vector of observations and estimates the bandwidth that
-#' minimizes the Kullback-Leibler distance between the true and the estimated densities.
-#'
+#' 
+#' This function looks at a vector of observations and estimates the bandwidth 
+#' that minimizes the Kullback-Leibler distance between the true and the 
+#' estimated densities.
+#' 
 #' @param x The vector of data points.
-#' @param tol The absolute tolerance in the optimization
+#' @param tol The absolute tolerance in the optimization, passed to the 
+#'   \code{optim}-function using the BFGS-method.
+#'   
+#' @return The function returns a list with two elements: \code{bw} is the
+#'   selected bandwidth, and \code{convergence} is the convergence flag returned
+#'   by the \code{optim}-function.
+#'   
+#' @example 
+#'   x <- rnorm(100)
+#'   bw <- bw_select_cv_univariate(x)
 bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 
     # The estimated (negative) KL-error for a given bandwidth, calculated by

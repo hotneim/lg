@@ -10,5 +10,5 @@ check_lg(check_object)
 \item{check_object}{The object to be checked}
 }
 \description{
-Check that an object has class "lg"
+Checks that the provided object has class \code{lg}.
 }

@@ -4,31 +4,49 @@
 
 #' Bivariate density estimation
 #'
-#' \code{dlg_bivariate} returns the locally Gaussian density estimate of a bivariate
-#' distribution on a given grid.
+#' \code{dlg_bivariate} returns the locally Gaussian density estimate of a
+#' bivariate distribution on a given grid.
 #'
 #' This function serves as the backbone in the body of methods concerning local
-#' Gaussian correlation. It takes a bivariate data set, \code{x}, and a bivariate
-#' set of grid points \code{eval_points}, and returns the bivariate, localy Gaussian
-#' density estimate in these points. We also need a vector of bandwidths, \code{bw},
-#' with two elements, and an estimation method \code{est_method}
+#' Gaussian correlation. It takes a bivariate data set, \code{x}, and a
+#' bivariate set of grid points \code{eval_points}, and returns the bivariate,
+#' locally Gaussian density estimate in these points. We also need a vector of
+#' bandwidths, \code{bw}, with two elements, and an estimation method
+#' \code{est_method}
 #'
 #' @param x The data matrix (or data frame). Must have exactly 2 columns
-#' @param eval_points The grid where the density should be estimated. Must have exactly
-#'   2 columns
-#' @param grid_size If \code{eval_points} is not supplied, then the function will create
-#'   a suitable grid diagonally through the data, with this many grid points
+#' @param eval_points The grid where the density should be estimated. Must have
+#'   exactly 2 columns
+#' @param grid_size If \code{eval_points} is not supplied, then the function
+#'   will create a suitable grid diagonally through the data, with this many
+#'   grid points
 #' @param bw The two bandwidths, a numeric vector of length 2
-#' @param est_method The estimation method, must either be "1par" for estimation with just
-#'   the local correlation, or "5par"  for a full locally Gaussian fit with all 5 parameters
-#' @param tol The numerical tolerance to be used in the optimization. Opnly applicable in
-#' the 1-parameter optimization
-#' @param run_checks Logical. Should sanity checks be run on the arguments? Useful to disable
-#'   this when doing cross-validation for example.
-#' @param marginal_estimates Provide the marginal estimates here if estimation method is
-#'   "\code{5par_marginals_fixed}", and the marginal estimates have already been found. Useful
-#'   for cross-valdiation. List with two elements as returned by \code{dlg_marginal_wrapper}
-#' @param bw_marginal Vector of bandwidths used to estimate the marginal distributions
+#' @param est_method The estimation method, must either be "1par" for estimation
+#'   with just the local correlation, or "5par"  for a full locally Gaussian fit
+#'   with all 5 parameters
+#' @param tol The numerical tolerance to be used in the optimization. Opnly
+#'   applicable in the 1-parameter optimization
+#' @param run_checks Logical. Should sanity checks be run on the arguments?
+#'   Useful to disable this when doing cross-validation for example.
+#' @param marginal_estimates Provide the marginal estimates here if estimation
+#'   method is "\code{5par_marginals_fixed}", and the marginal estimates have
+#'   already been found. Useful for cross-valdiation. List with two elements as
+#'   returned by \code{dlg_marginal_wrapper}
+#' @param bw_marginal Vector of bandwidths used to estimate the marginal
+#'   distributions
+#'
+#' @return A list including the data set \code{$x}, the grid
+#'   \code{$eval_points}, the bandwidths \code{$bw}, as well as a matrix of the
+#'   estimated parameter estimates \code{$par_est} and the estimated bivariate
+#'   density \code{$f_est}.
+#'
+#' @examples
+#'   x <- cbind(rnorm(100), rnorm(100))
+#'   bw <- c(1, 1)
+#'   eval_points <- cbind(seq(-4, 4, 1), seq(-4, 4, 1))
+#'
+#'   estimate <- dlg_bivariate(x, eval_points = eval_points, bw = bw)
+#'
 #' @export
 dlg_bivariate <- function(x,
                           eval_points = NA,
@@ -234,17 +252,33 @@ dlg_bivariate <- function(x,
 #' Marginal density estimation
 #'
 #' Function that estimates a univariate density estimation by local Gaussian
-#' approximations
+#' approximations, as described in Hufthammer and Tjøstheim (2009).
 #'
-#' This functio is mainly mean to be used as a tool in multivariate analysis
-#' as away to obtain the estimate of a univariate (marginal) density function,
-#' but it can of course be used in general to estimate univariate densities.
+#' This function is mainly mean to be used as a tool in multivariate analysis as
+#' away to obtain the estimate of a univariate (marginal) density function, but
+#' it can of course be used in general to estimate univariate densities.
 #'
 #' @param x The data vector.
 #' @param bw The bandwidth (a single number).
 #' @param grid_size Number of grid points if grid is not provided.
 #' @param eval_points The grid where we want to evaluate the density. Chosen
 #'   suitably if not provided, with length equal to grid_size.
+#'
+#' @return A list including the data set \code{$x}, the grid
+#'   \code{$eval_points}, the bandwidth \code{$bw}, as well as a matrix of the
+#'   estimated parameter estimates \code{$par_est} and the estimated bivariate
+#'   density \code{$f_est}.
+#'
+#' @examples
+#'   x <- rnorm(100)
+#'   estimate <- dlg_marginal(x, bw = 1, eval_points = -4:4)
+#'
+#' @references
+#'
+#' Hufthammer, Karl Ove, and Dag Tjøstheim. "Local Gaussian Likelihood and Local
+#' Gaussian Correlation" PhD Thesis of Karl Ove Hufthammer, University of
+#' Bergen, 2009.
+#'
 #' @export
 dlg_marginal <- function(x,
                         bw = 1,
@@ -307,20 +341,34 @@ dlg_marginal <- function(x,
 
 #' Marginal estimates for multivariate data
 #'
-#' Estimates the marginal locally Gaussian parameter estimates for a multivariate
-#' data set
+#' Estimates the marginal locally Gaussian parameter estimates for a
+#' multivariate data set
 #'
-#' This function takes in a matrix of observations, a matrix of evaluation points
-#' and a vector of bandwidths, and does the marginal estimation pairwise. This
-#' function assumes that the data and evaluation points are organized column-wise
-#' in matrices, and that the bandwidth is found in the corresponding element in
-#' the bandwidth matrix.
+#' This function takes in a matrix of observations, a matrix of evaluation
+#' points and a vector of bandwidths, and does a locally Gaussian fit on each of
+#' the marginals using the \code{dlg_bivariate}-function. This function assumes
+#' that the data and evaluation points are organized column-wise in matrices,
+#' and that the bandwidth is found in the corresponding element in the bandwidth
+#' matrix. The primary use for this function is multivariate density estimation
+#' using the "5par_marginals_fixed"-method.
 #'
 #' @param data_matrix The matrix of data points. One column constitutes an
 #'   observation vector.
-#' @param eval_matrix The matrix of evaluation points. One column constitutes
-#'   a vector of grid points.
+#' @param eval_matrix The matrix of evaluation points. One column constitutes a
+#'   vector of grid points.
 #' @param bw_vector The vector of bandwidths, one element per component.
+#'
+#' @return A list with marginal parameter and density estimates as provided by
+#'   the \code{dlg_bivariate}-function. One element per column in the data.
+#'
+#' @examples
+#'   data_matrix <- cbind(rnorm(100), rnorm(100))
+#'   eval_matrix <- cbind(seq(-4, 4, 1), seq(-4, 4, 1))
+#'   bw_vector <- c(1, 1)
+#'
+#'   estimate <- dlg_bivariate_wrapper(x, eval_points = eval_points, bw = bw)
+#'
+#' @export
 dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 
     # Return the parameters in a list
@@ -341,12 +389,53 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' Estimate a mulivariate density function using locally Gaussian approximations
 #'
 #' This function does multivariate density estimation using the locally Gaussian
-#' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2016)
-#' [Proper citation needed!]. The function takes as arguments an \code{lg}-object
-#' as produced by the main \code{lg}-function, and a grid of points where the density
-#' estimate should be estimated.
-#' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
-#' @param grid A matrix of grid points, where we want to evaluate the density estimate
+#' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
+#' The function takes as arguments an \code{lg}-object as produced by the main
+#' \code{lg}-function (where all the running parameters are sepcified), and a
+#' grid of points where the density estimate should be estimated.
+#'
+#' @param lg_object An object of type \code{lg}, as produced by the
+#'   \code{lg}-function
+#' @param grid A matrix of grid points, where we want to evaluate the density
+#'   estimate
+#'
+#' @return A list containing the density estimate as well as all the running
+#'   parameters that has been used. The elements are:
+#'
+#'   \itemize{
+#'     \item \code{f_est}: The estimated multivariate density.
+#'     \item \code{loc_mean}: The estimated local means if \code{est_method}
+#'           is "5par" or "5par_marginals_fixed", a matrix of zeros if
+#'           \code{est_method} is "1par".
+#'     \item \code{loc_sd}: The estimated local st. deviations if
+#'           \code{est_method} is "5par" or "5par_marginals_fixed", a matrix
+#'            of ones if \code{est_method} is "1par".
+#'     \item \code{loc_cor}: Matrix of estimated local correlations, one column
+#'           for each pair of variables, in the same order as specified in the
+#'           bandwidth object.
+#'     \item \code{x}: The data set.
+#'     \item \code{bw}: The bandwidth object.
+#'     \item \code{transformed_data}: The data transformed to approximate
+#'           marginal standard normality.
+#'     \item \code{normalizing_constants}: The normalizing constants used to
+#'           transform data and grid back and forth to the marginal standard
+#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
+#'     \item \code{grid}: The grid where the estimation was performed, on the
+#'           original scale.
+#'     \item \code{transformed_grid}: The grid where the estimation was
+#'           performed, on the marginal standard normal scale.
+#'  }
+#'
+#' @examples
+#'    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+#'    lg_object <- lg(x)  # Put all the running parameters in here.
+#'    density_estimate <- dlg(lg_object)
+#'
+#' @references
+#'
+#'    Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#'    multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
+#'
 #' @export
 dlg <- function(lg_object, grid = NULL) {
 
@@ -451,21 +540,72 @@ dlg <- function(lg_object, grid = NULL) {
 
 #' The locally Gaussian conditional density estimator
 #'
-#' Estimate a conditional density function using locally Gaussian approximations.
+#' Estimate a conditional density function using locally Gaussian
+#' approximations.
 #'
-#' This function is the coditional version of the locally Gaussian density estimator
-#' (LGDE), described in Otneim & Tjøstheim (2017) [Proper citation needed!!]. The
-#' function takes as arguments an \code{lg}-object as produced by the main \code{lg}-
-#' function, a grid of points where the density estimate should be estimated, and a
-#' set of conditions.
+#' This function is the coditional version of the locally Gaussian density
+#' estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
+#' as arguments an \code{lg}-object as produced by the main \code{lg}- function,
+#' a grid of points where the density estimate should be estimated, and a set of
+#' conditions.
 #'
-#' The variables must be sorted befor they are supplied to this function. It will always
-#' assume that the free variables come before the conditioning variables.
-#' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
-#' @param grid A matrix of grid points, where we want to evaluate the density estimate
-#' @param condition A vector with conditions for the variables that we condition upon
-#' @param fixed_grid Used by the conditional independence test to calculate the test
-#'   statistic
+#' The variables must be sorted befor they are supplied to this function. It
+#' will always assume that the free variables come before the conditioning
+#' variables.
+#'
+#' Assume that X is a stochastic vector with two components X1 and X2. This
+#' function will thus estimate the consitional density of X1 given a speciefied
+#' value of X2.
+#'
+#' @param lg_object An object of type \code{lg}, as produced by the
+#'   \code{lg}-function
+#' @param grid A matrix of grid points, where we want to evaluate the density
+#'   estimate. Number of columns *must* be the same as number of variables in
+#'   X1.
+#' @param condition A vector with conditions for the variables that we condition
+#'   upon. Length of this vector *must* be the same as the number of variables
+#'   in X2. The function will throw an arrow of there is any discrepancy in the
+#'   dimensions of \code{grid} and \code{condition}.
+#' @param fixed_grid Used by the conditional independence test to calculate the
+#'   test statistic (please ignore this).
+#'
+#' @return A list containing the conditional density estimate as well as all the
+#'   running parameters that has been used. The elements are:
+#'
+#'   \itemize{
+#'     \item \code{f_est}: The estimated conditional density.
+#'     \item \code{c_mean}: The estimated local conditional means as defined in
+#'          equation (10) of Otneim & Tjøstheim (2017).
+#'     \item \code{c_cov}: The estimated local conditional covariance matrices
+#'           as defined in equation (11) of Otneim & Tjøstheim (2017).
+#'     \item \code{x}: The data set.
+#'     \item \code{bw}: The bandwidth object.
+#'     \item \code{transformed_data}: The data transformed to approximate
+#'           marginal standard normality.
+#'     \item \code{normalizing_constants}: The normalizing constants used to
+#'           transform data and grid back and forth to the marginal standard
+#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
+#'     \item \code{grid}: The grid where the estimation was performed, on the
+#'           original scale.
+#'     \item \code{transformed_grid}: The grid where the estimation was
+#'           performed, on the marginal standard normal scale.
+#'  }
+#'
+#' @examples
+#'   # A 3 variate example
+#'   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+#'
+#'   # Generate the lg-object with default settings
+#'   lg_object <- lg(x)
+#'
+#'   # Estimate the conditional density of X1|X2 = 0, X3 = 1 on a small grid
+#'   cond_dens <- clg(lg_object, grid = -4:4, condition = c(0, 1))
+#'
+#' @references
+#'
+#'   Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
+#'   the local Gaussian correlation" Statistics and Computing (2017): 1-19.
+#'
 #' @export
 clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
 

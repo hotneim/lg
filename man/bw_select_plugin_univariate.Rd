@@ -9,22 +9,32 @@ bw_select_plugin_univariate(x = NULL, n = length(x), c = 1.75, a = -0.2)
 \arguments{
 \item{x}{The data vector.}
 
-\item{n}{The number of data points. Can provide only this if we do not
-want to supply the entire data vector.}
+\item{n}{The number of data points. Can provide only this if we do not want
+to supply the entire data vector.}
 
 \item{c}{A constant, se details.}
 
 \item{a}{A constant, se details.}
 }
+\value{
+A number, the selected bandwidth.
+}
 \description{
-Returns a plugin bandwidth for data vectors for use with univariate
-locally Gaussian density estimation
+Returns a plugin bandwidth for data vectors for use with univariate locally
+Gaussian density estimation
 }
 \details{
-This function takes in a data vector of length \code{n}, and returns a
-the real number \code{c*n^a}, which is a quick and dirty way of selecting
-a bandwidth for univariate locally Gaussian density estimation. The number
+This function takes in a data vector of length \code{n}, and returns a the
+real number \code{c*n^a}, which is a quick and dirty way of selecting a
+bandwidth for univariate locally Gaussian density estimation. The number
 \code{c} is by default set to \code{1.75}, and \code{c = -1/5} is the usual
-exponent, that stems from the asymptotic convergence rate of the density
-estimate.
+exponent that stems from the asymptotic convergence rate of the density
+estimate. Recommended use of this function is through the \code{lg} wrapper
+function.
+}
+\examples{
+  x <- rnorm(100)
+  bw <- bw_select_plugin_univariate(x = x)
+  bw <- bw_select_plugin_univariate(n = 100)
+
 }

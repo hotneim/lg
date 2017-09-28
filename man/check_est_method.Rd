@@ -10,5 +10,6 @@ check_est_method(est_method)
 \item{est_method}{Check if equal to "1par" or "5par"}
 }
 \description{
-Checks that the estimation method is one of the allowed values
+Checks that the estimation method is one of the allowed values, currently
+"1par", "5par" and "5par_marginals_fixed".
 }

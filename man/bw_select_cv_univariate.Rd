@@ -9,13 +9,33 @@ bw_select_cv_univariate(x, tol = 10^(-3))
 \arguments{
 \item{x}{The vector of data points.}
 
-\item{tol}{The absolute tolerance in the optimization}
+\item{tol}{The absolute tolerance in the optimization, passed to the
+\code{optim}-function using the BFGS-method.}
+}
+\value{
+The function returns a list with two elements: \code{bw} is the
+  selected bandwidth, and \code{convergence} is the convergence flag returned
+  by the \code{optim}-function.
 }
 \description{
 Uses cross-valdiation to find the optimal bandwidth for a univariate locally
 Gaussian fit
 }
 \details{
-This function looks at a vector of observations and estimates the bandwidth that
-minimizes the Kullback-Leibler distance between the true and the estimated densities.
+This function provides the univariate version of the Cross Validation
+algorithm for bandwidth selection described in Otneim & Tjøstheim (2017),
+Section 4. Let \eqn{\hat{f}_h(x)} be the univariate locally Gaussian density
+estimate obtained using the bandwidth \eqn{h}, then this function returns the
+bandwidth that maximizes \deqn{CV(h) = n^{-1} \sum_{i=1}^n \log
+\hat{f}_h^{(-i)}(x_i),} where \eqn{\hat{f}_h^{(-i)}} is the density estimate
+calculated without observation \eqn{x_i}.
+}
+\examples{
+  x <- rnorm(100)
+  bw <- bw_select_cv_univariate(x)
+
+}
+\references{
+Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 }

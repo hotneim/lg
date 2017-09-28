@@ -9,22 +9,31 @@ bw_select_plugin_multivariate(x = NULL, n = nrow(x), c = 1.75, a = -1/6)
 \arguments{
 \item{x}{The data matrix.}
 
-\item{n}{The number of data points. Can provide only this if we do not
-want to supply the entire data vector.}
+\item{n}{The number of data points. Can provide only this if we do not want
+to supply the entire data vector.}
 
 \item{c}{A constant, se details.}
 
 \item{a}{A constant, se details.}
+}
+\value{
+A number, the selected bandwidth.
 }
 \description{
 Returns a plugin bandwidth for multivariate data matrices for the estimation
 of local Gaussian correlations
 }
 \details{
-This function takes in a data matrix with \code{n} rows, and returns a
-the real number \code{c*n^a}, which is a quick and dirty way of selecting
-a bandwidth for locally Gaussian density estimation. The number  \code{c}
-is by default set to \code{1.75}, and \code{c = -1/5} is the usual
-exponent, that stems from the asymptotic convergence rate of the density
-estimate.
+This function takes in a data matrix with \code{n} rows, and returns a the
+real number \code{c*n^a}, which is a quick and dirty way of selecting a
+bandwidth for locally Gaussian density estimation. The number  \code{c} is by
+default set to \code{1.75}, and \code{c = -1/5} is the usual exponent, that
+stems from the asymptotic convergence rate of the density estimate. This
+function is usually called from the \code{lg} wrapper function.
+}
+\examples{
+  x <- cbind(rnorm(100), rnorm(100))
+  bw <- bw_select_plugin_multivariate(x = x)
+  bw <- bw_select_plugin_multivariate(n = 100)
+
 }

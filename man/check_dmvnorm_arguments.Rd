@@ -20,5 +20,6 @@ check_dmvnorm_arguments(eval_points, mu_1, mu_2, sig_1, sig_2, rho)
 \item{rho}{The correlation vector}
 }
 \description{
-Checks that the arguments are numerical and have the same lengths
+Checks that the arguments provided to the \code{dmvnorm_wrapper}-function are
+numerical vectors, all having the same lengths.
 }

@@ -11,37 +11,56 @@ dlg_bivariate(x, eval_points = NA, grid_size = 15, bw = c(1, 1),
 \arguments{
 \item{x}{The data matrix (or data frame). Must have exactly 2 columns}
 
-\item{eval_points}{The grid where the density should be estimated. Must have exactly
-2 columns}
+\item{eval_points}{The grid where the density should be estimated. Must have
+exactly 2 columns}
 
-\item{grid_size}{If \code{eval_points} is not supplied, then the function will create
-a suitable grid diagonally through the data, with this many grid points}
+\item{grid_size}{If \code{eval_points} is not supplied, then the function
+will create a suitable grid diagonally through the data, with this many
+grid points}
 
 \item{bw}{The two bandwidths, a numeric vector of length 2}
 
-\item{est_method}{The estimation method, must either be "1par" for estimation with just
-the local correlation, or "5par"  for a full locally Gaussian fit with all 5 parameters}
+\item{est_method}{The estimation method, must either be "1par" for estimation
+with just the local correlation, or "5par"  for a full locally Gaussian fit
+with all 5 parameters}
 
-\item{tol}{The numerical tolerance to be used in the optimization. Opnly applicable in
-the 1-parameter optimization}
+\item{tol}{The numerical tolerance to be used in the optimization. Opnly
+applicable in the 1-parameter optimization}
 
-\item{run_checks}{Logical. Should sanity checks be run on the arguments? Useful to disable
-this when doing cross-validation for example.}
+\item{run_checks}{Logical. Should sanity checks be run on the arguments?
+Useful to disable this when doing cross-validation for example.}
 
-\item{marginal_estimates}{Provide the marginal estimates here if estimation method is
-"\code{5par_marginals_fixed}", and the marginal estimates have already been found. Useful
-for cross-valdiation. List with two elements as returned by \code{dlg_marginal_wrapper}}
+\item{marginal_estimates}{Provide the marginal estimates here if estimation
+method is "\code{5par_marginals_fixed}", and the marginal estimates have
+already been found. Useful for cross-valdiation. List with two elements as
+returned by \code{dlg_marginal_wrapper}}
 
-\item{bw_marginal}{Vector of bandwidths used to estimate the marginal distributions}
+\item{bw_marginal}{Vector of bandwidths used to estimate the marginal
+distributions}
+}
+\value{
+A list including the data set \code{$x}, the grid
+  \code{$eval_points}, the bandwidths \code{$bw}, as well as a matrix of the
+  estimated parameter estimates \code{$par_est} and the estimated bivariate
+  density \code{$f_est}.
 }
 \description{
-\code{dlg_bivariate} returns the locally Gaussian density estimate of a bivariate
-distribution on a given grid.
+\code{dlg_bivariate} returns the locally Gaussian density estimate of a
+bivariate distribution on a given grid.
 }
 \details{
 This function serves as the backbone in the body of methods concerning local
-Gaussian correlation. It takes a bivariate data set, \code{x}, and a bivariate
-set of grid points \code{eval_points}, and returns the bivariate, localy Gaussian
-density estimate in these points. We also need a vector of bandwidths, \code{bw},
-with two elements, and an estimation method \code{est_method}
+Gaussian correlation. It takes a bivariate data set, \code{x}, and a
+bivariate set of grid points \code{eval_points}, and returns the bivariate,
+locally Gaussian density estimate in these points. We also need a vector of
+bandwidths, \code{bw}, with two elements, and an estimation method
+\code{est_method}
+}
+\examples{
+  x <- cbind(rnorm(100), rnorm(100))
+  bw <- c(1, 1)
+  eval_points <- cbind(seq(-4, 4, 1), seq(-4, 4, 1))
+
+  estimate <- dlg_bivariate(x, eval_points = eval_points, bw = bw)
+
 }

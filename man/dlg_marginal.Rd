@@ -17,12 +17,28 @@ suitably if not provided, with length equal to grid_size.}
 
 \item{grid_size}{Number of grid points if grid is not provided.}
 }
+\value{
+A list including the data set \code{$x}, the grid
+  \code{$eval_points}, the bandwidth \code{$bw}, as well as a matrix of the
+  estimated parameter estimates \code{$par_est} and the estimated bivariate
+  density \code{$f_est}.
+}
 \description{
 Function that estimates a univariate density estimation by local Gaussian
-approximations
+approximations, as described in Hufthammer and Tjøstheim (2009).
 }
 \details{
-This functio is mainly mean to be used as a tool in multivariate analysis
-as away to obtain the estimate of a univariate (marginal) density function,
-but it can of course be used in general to estimate univariate densities.
+This function is mainly mean to be used as a tool in multivariate analysis as
+away to obtain the estimate of a univariate (marginal) density function, but
+it can of course be used in general to estimate univariate densities.
+}
+\examples{
+  x <- rnorm(100)
+  estimate <- dlg_marginal(x, bw = 1, eval_points = -4:4)
+
+}
+\references{
+Hufthammer, Karl Ove, and Dag Tjøstheim. "Local Gaussian Likelihood and Local
+Gaussian Correlation" PhD Thesis of Karl Ove Hufthammer, University of
+Bergen, 2009.
 }

@@ -14,19 +14,19 @@ bw_select(x, bw_method = "plugin", est_method = "1par",
 per observation}
 
 \item{bw_method}{The method used for bandwidth selection. Must be either
-\code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
-but crude)}
+\code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"}
+(fast, but crude)}
 
 \item{est_method}{The estimation method, must be either "1par", "5par" or
 "5par_marginals_fixed"}
 
 \item{plugin_constant_marginal}{The constant \code{c} in \code{cn^a} used for
-finding the plugin bandwidth for locally Gaussian marginal density estimates,
-which we need if estimation method is "5par_marginals_fixed".}
+finding the plugin bandwidth for locally Gaussian marginal density
+estimates, which we need if estimation method is "5par_marginals_fixed".}
 
 \item{plugin_exponent_marginal}{The constant \code{a} in \code{cn^a} used for
-finding the plugin bandwidth for locally Gaussian marginal density estimates,
-which we need if estimation method is "5par_marginals_fixed".}
+finding the plugin bandwidth for locally Gaussian marginal density
+estimates, which we need if estimation method is "5par_marginals_fixed".}
 
 \item{plugin_constant_joint}{The constant \code{c} in \code{cn^a} used for
 finding the plugin bandwidth for estimating the pairwise local Gaussian
@@ -36,17 +36,37 @@ correlation between two variables.}
 finding the plugin bandwidth for estimating the pairwise local Gaussian
 correlation between two variables.}
 
-\item{tol_marginal}{The absolute tolerance in the optimization for finding the
-marginal bandwidths}
+\item{tol_marginal}{The absolute tolerance in the optimization for finding
+the marginal bandwidths}
 
 \item{tol_joint}{The absolute tolerance in the optimization for finding the
 joint bandwidths}
+}
+\value{
+A List with three elements, \code{marginal}  contains the bandwidths
+  used for the marginal locally Gaussian estimation,
+  \code{marginal_convergence} contains the convergence flags for the marginal
+  banwidths, as returned by the \code{optim} function, and \code{joint}
+  contains the pairwise bandwidths and convergence flags.
 }
 \description{
 Takes a matrix of data points and returns the bandwidths used for estimating
 the local Gaussian correlations.
 }
 \details{
-This function takes in a data set of arbitrary dimension, and calculates the
-bandwidths needed to find the pairwise local Gaussian correlations.
+This is the main bandwidth selection function within the framework of locally
+Gaussian distributions as described in Otneim and Tjøstheim (2017). This
+function takes in a data set of arbitrary dimension, and calculates the
+bandwidths needed to find the pairwise local Gaussian correlations, and
+serves as an intermediate step for the main \code{lg} wrapper function by
+choosing the appropriate method.
+}
+\examples{
+  x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+  bw <- bw_select(x)
+
+}
+\references{
+Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 }

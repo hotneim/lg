@@ -11,4 +11,5 @@ check_bw_bivariate(bw)
 }
 \description{
 Checks that the bandwidth vector supplied to the bivariate density function
+is a numeric vector of length 2.
 }

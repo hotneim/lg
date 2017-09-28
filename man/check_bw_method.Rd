@@ -10,5 +10,6 @@ check_bw_method(bw_method)
 \item{bw_method}{Check if equal to "cv" or "plugin"}
 }
 \description{
-Checks that the bandwidth method is one of the allowed values
+Checks that the bandwidth method is one of the allowed values, currently "cv"
+or "plugin".
 }
