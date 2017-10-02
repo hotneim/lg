@@ -22,13 +22,14 @@ dmvnorm_wrapper_single <- function(x1, x2, mu_1, mu_2, sig_1, sig_2, rho) {
 }
 
 #' Wrapper for \code{dmvnorm}
-#'
-#' \code{dmvnorm_wrapper} is a function that evaluates the bivariate normal distribution
-#' in a matrix of evaluation points, with local parameters.
-#'
-#' This functions takes as arguments a matrix of grid points, and vectors of parameter values,
-#' and returns the bivariate normal density at these points, with these parameter values.
-#'
+#' 
+#' \code{dmvnorm_wrapper} is a function that evaluates the bivariate normal 
+#' distribution in a matrix of evaluation points, with local parameters.
+#' 
+#' This functions takes as arguments a matrix of grid points, and vectors of 
+#' parameter values, and returns the bivariate normal density at these points, 
+#' with these parameter values.
+#' 
 #' @param eval_points A \code{kx2} matrix with evaluation points
 #' @param mu_1 The first expectation vector
 #' @param mu_2 The second expectation vector
@@ -65,21 +66,21 @@ dmvnorm_wrapper <- function(eval_points,
 }
 
 #' Evaluate the multivariate normal
-#'
-#' Function that evaluates the multivariate normal distribution with local
+#' 
+#' Function that evaluates the multivariate normal distribution with local 
 #' parameters
-#'
-#' Takes in a grid, where we want to evaluate the multivariate normal, and
-#' in each grid point we have a new set of parameters.
-#'
+#' 
+#' Takes in a grid, where we want to evaluate the multivariate normal, and in
+#' each grid point we have a new set of parameters.
+#' 
 #' @param eval_points A matrix of grid points
-#' @param loc_mean A matrix of local means, one row per grid point, one column
+#' @param loc_mean A matrix of local means, one row per grid point, one column 
 #'   per component
 #' @param loc_sd A  matrix of local standard deviations, one row per grid point,
-#' one column per component
-#' @param loc_cor A matrix of local correlations, one row per grid point, on
-#'  column per pair of variables
-#' @param pairs A data frame specifying the components that make up each pair,
+#'   one column per component
+#' @param loc_cor A matrix of local correlations, one row per grid point, on 
+#'   column per pair of variables
+#' @param pairs A data frame specifying the components that make up each pair, 
 #'   two colimns names 'x1' and 'x2', one row per pair of components
 mvnorm_eval <- function(eval_points,
                         loc_mean,

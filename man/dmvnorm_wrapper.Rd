@@ -24,10 +24,11 @@ dmvnorm_wrapper(eval_points, mu_1 = rep(0, nrow(eval_points)), mu_2 = rep(0,
 \item{run_checks}{Run sanity check for the arguments}
 }
 \description{
-\code{dmvnorm_wrapper} is a function that evaluates the bivariate normal distribution
-in a matrix of evaluation points, with local parameters.
+\code{dmvnorm_wrapper} is a function that evaluates the bivariate normal 
+distribution in a matrix of evaluation points, with local parameters.
 }
 \details{
-This functions takes as arguments a matrix of grid points, and vectors of parameter values,
-and returns the bivariate normal density at these points, with these parameter values.
+This functions takes as arguments a matrix of grid points, and vectors of 
+parameter values, and returns the bivariate normal density at these points, 
+with these parameter values.
 }

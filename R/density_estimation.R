@@ -306,14 +306,14 @@ dlg_marginal <- function(x,
         opt <- try(optim(c(0, 1),
                          lik))
 
-        # Return the result
+        # Return the result, take absolute value of the sd.
         if(class(opt) != "try-error") {
-            return(c(opt$par,
+            return(c(opt$par[1], abs(opt$par[2]),
                      dnorm(eval_point,
                            mean = opt$par[1],
-                           sd = opt$par[2])))
+                           sd = abs(opt$par[2]))))
         } else {
-            return(c(NA, NA))
+            return(c(NA, NA, NA))
         }
     }
 

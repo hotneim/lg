@@ -3,32 +3,43 @@
 # ---------------------------------
 
 #' Cross-validation for univariate distributions
-#' 
-#' Uses cross-valdiation to find the optimal bandwidth for a univariate locally 
+#'
+#' Uses cross-valdiation to find the optimal bandwidth for a univariate locally
 #' Gaussian fit
-#' 
-#' This function looks at a vector of observations and estimates the bandwidth 
-#' that minimizes the Kullback-Leibler distance between the true and the 
-#' estimated densities.
-#' 
+#'
+#' This function provides the univariate version of the Cross Validation
+#' algorithm for bandwidth selection described in Otneim & Tjøstheim (2017),
+#' Section 4. Let \eqn{\hat{f}_h(x)} be the univariate locally Gaussian density
+#' estimate obtained using the bandwidth \eqn{h}, then this function returns the
+#' bandwidth that maximizes \deqn{CV(h) = n^{-1} \sum_{i=1}^n \log
+#' \hat{f}_h^{(-i)}(x_i),} where \eqn{\hat{f}_h^{(-i)}} is the density estimate
+#' calculated without observation \eqn{x_i}.
+#'
 #' @param x The vector of data points.
-#' @param tol The absolute tolerance in the optimization, passed to the 
+#' @param tol The absolute tolerance in the optimization, passed to the
 #'   \code{optim}-function using the BFGS-method.
-#'   
+#'
 #' @return The function returns a list with two elements: \code{bw} is the
 #'   selected bandwidth, and \code{convergence} is the convergence flag returned
 #'   by the \code{optim}-function.
-#'   
-#' @example 
+#'
+#' @examples
 #'   x <- rnorm(100)
 #'   bw <- bw_select_cv_univariate(x)
+#'
+#' @references
+#'
+#' Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
+#'
+#' @export
 bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 
     # The estimated (negative) KL-error for a given bandwidth, calculated by
     # cross-validation
     KL <- function(bw) {
 
-        # Leave one out 
+        # Leave one out
         objective <- function(j) {
             log(dlg_marginal(x = x[-j],
                              bw = bw,
@@ -50,17 +61,42 @@ bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 #'
 #' Uses cross-valdiation to find the optimal bandwidth for a bivariate locally
 #' Gaussian fit
-#' 
-#' This function looks at a 2-column matrix of observations and estimates the bandwidth that
-#' minimizes the Kullback-Leibler distance between the true and the estimated densities.
+#'
+#' This function provides an implementation for the Cross Validation algorithm
+#' for bandwidth selection described in Otneim & Tjøstheim (2017), Section 4.
+#' Let \eqn{\hat{f}_h(x)} be the bivariate locally Gaussian density estimate
+#' obtained using the bandwidth \eqn{h}, then this function returns the
+#' bandwidth that maximizes \deqn{CV(h) = n^{-1} \sum_{i=1}^n \log
+#' \hat{f}_h^{(-i)}(x_i),} where \eqn{\hat{f}_h^{(-i)}} is the density estimate
+#' calculated without observation \eqn{x_i}.
+#'
+#' The recommended use of this function is through the \code{lg} wrapper
+#' function.
 #'
 #' @param x The matrix of data points.
-#' @param tol The absolute tolerance in the optimization
-#' @param est_method The estimation method for the bivariate fit. If estimation method is
-#'   \code{5par_marginals_fixed}, the marginal bandwidths must be supplied a s well through
-#'   \code{bw_marginal}
+#' @param tol The absolute tolerance in the optimization, used by the
+#'   \code{optim}-function.
+#' @param est_method The estimation method for the bivariate fit. If estimation
+#'   method is \code{5par_marginals_fixed}, the marginal bandwidths must be
+#'   supplied as well through the argument \code{bw_marginal}. This is
+#'   automatically handled by the \code{lg} wrapper function.
 #' @param bw_marginal The bandwidths for estimation of the marginals if method
-#'   \code{5par_fixed_marginals} is used 
+#'   \code{5par_fixed_marginals} is used
+#'
+#' @return The function returns a list with two elements: \code{bw} is the
+#'   selected bandwidths, and \code{convergence} is the convergence flag returned
+#'   by the \code{optim}-function.
+#'
+#' @examples
+#'   x <- cbind(rnorm(100), rnorm(100))
+#'   bw <- bw_select_cv_univariate(x)
+#'
+#' @references
+#'
+#' Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
+#'
+#' @export
 bw_select_cv_bivariate <- function(x,
                                    tol = 10^(-3),
                                    est_method = "1par",
@@ -76,7 +112,7 @@ bw_select_cv_bivariate <- function(x,
     # cross-validation
     KL <- function(bw) {
 
-        # Leave one out 
+        # Leave one out
         objective <- function(j) {
             log(dlg_bivariate(x = x[-j,],
                              bw = bw,
@@ -88,7 +124,7 @@ bw_select_cv_bivariate <- function(x,
 
         objective_values <- do.call(rbind, lapply(X = as.list(1:nrow(x)),
                                     FUN = objective))
-        
+
         -mean(objective_values[abs(objective_values) != Inf],
               na.rm = TRUE)
     }
@@ -98,25 +134,35 @@ bw_select_cv_bivariate <- function(x,
 
     return(list(bw = result$par,
                 convergence = result$convergence))
-    
+
 }
 
 #' Plugin bandwidth selection for univariate data
 #'
-#' Returns a plugin bandwidth for data vectors for use with univariate
-#' locally Gaussian density estimation
+#' Returns a plugin bandwidth for data vectors for use with univariate locally
+#' Gaussian density estimation
 #'
-#' This function takes in a data vector of length \code{n}, and returns a
-#' the real number \code{c*n^a}, which is a quick and dirty way of selecting
-#' a bandwidth for univariate locally Gaussian density estimation. The number
+#' This function takes in a data vector of length \code{n}, and returns a the
+#' real number \code{c*n^a}, which is a quick and dirty way of selecting a
+#' bandwidth for univariate locally Gaussian density estimation. The number
 #' \code{c} is by default set to \code{1.75}, and \code{c = -1/5} is the usual
-#' exponent, that stems from the asymptotic convergence rate of the density
-#' estimate.
+#' exponent that stems from the asymptotic convergence rate of the density
+#' estimate. Recommended use of this function is through the \code{lg} wrapper
+#' function.
 #' @param x The data vector.
-#' @param n The number of data points. Can provide only this if we do not
-#'   want to supply the entire data vector.
+#' @param n The number of data points. Can provide only this if we do not want
+#'   to supply the entire data vector.
 #' @param a A constant, se details.
 #' @param c A constant, se details.
+#'
+#' @return A number, the selected bandwidth.
+#'
+#' @examples
+#'   x <- rnorm(100)
+#'   bw <- bw_select_plugin_univariate(x = x)
+#'   bw <- bw_select_plugin_univariate(n = 100)
+#'
+#' @export
 bw_select_plugin_univariate <- function(x = NULL,
                                         n = length(x),
                                         c = 1.75,
@@ -129,17 +175,26 @@ bw_select_plugin_univariate <- function(x = NULL,
 #' Returns a plugin bandwidth for multivariate data matrices for the estimation
 #' of local Gaussian correlations
 #'
-#' This function takes in a data matrix with \code{n} rows, and returns a
-#' the real number \code{c*n^a}, which is a quick and dirty way of selecting
-#' a bandwidth for locally Gaussian density estimation. The number  \code{c}
-#' is by default set to \code{1.75}, and \code{c = -1/5} is the usual
-#' exponent, that stems from the asymptotic convergence rate of the density
-#' estimate.
+#' This function takes in a data matrix with \code{n} rows, and returns a the
+#' real number \code{c*n^a}, which is a quick and dirty way of selecting a
+#' bandwidth for locally Gaussian density estimation. The number  \code{c} is by
+#' default set to \code{1.75}, and \code{c = -1/5} is the usual exponent, that
+#' stems from the asymptotic convergence rate of the density estimate. This
+#' function is usually called from the \code{lg} wrapper function.
 #' @param x The data matrix.
-#' @param n The number of data points. Can provide only this if we do not
-#'   want to supply the entire data vector.
+#' @param n The number of data points. Can provide only this if we do not want
+#'   to supply the entire data vector.
 #' @param a A constant, se details.
 #' @param c A constant, se details.
+#'
+#' @return A number, the selected bandwidth.
+#'
+#' @examples
+#'   x <- cbind(rnorm(100), rnorm(100))
+#'   bw <- bw_select_plugin_multivariate(x = x)
+#'   bw <- bw_select_plugin_multivariate(n = 100)
+#'
+#' @export
 bw_select_plugin_multivariate <- function(x = NULL,
                                            n = nrow(x),
                                            c = 1.75,
@@ -152,31 +207,51 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #' Takes a matrix of data points and returns the bandwidths used for estimating
 #' the local Gaussian correlations.
 #'
-#' This function takes in a data set of arbitrary dimension, and calculates the
-#' bandwidths needed to find the pairwise local Gaussian correlations.
+#' This is the main bandwidth selection function within the framework of locally
+#' Gaussian distributions as described in Otneim and Tjøstheim (2017). This
+#' function takes in a data set of arbitrary dimension, and calculates the
+#' bandwidths needed to find the pairwise local Gaussian correlations, and
+#' serves as an intermediate step for the main \code{lg} wrapper function by
+#' choosing the appropriate method.
 #' @param x A matrix or data frame with data, on column per variable, one row
 #'   per observation
 #' @param bw_method The method used for bandwidth selection. Must be either
-#'   \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
-#'   but crude)
+#'   \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"}
+#'   (fast, but crude)
 #' @param est_method The estimation method, must be either "1par", "5par" or
 #'   "5par_marginals_fixed"
 #' @param plugin_constant_marginal The constant \code{c} in \code{cn^a} used for
-#'   finding the plugin bandwidth for locally Gaussian marginal density estimates,
-#'   which we need if estimation method is "5par_marginals_fixed".
+#'   finding the plugin bandwidth for locally Gaussian marginal density
+#'   estimates, which we need if estimation method is "5par_marginals_fixed".
 #' @param plugin_exponent_marginal The constant \code{a} in \code{cn^a} used for
-#'   finding the plugin bandwidth for locally Gaussian marginal density estimates,
-#'   which we need if estimation method is "5par_marginals_fixed".
+#'   finding the plugin bandwidth for locally Gaussian marginal density
+#'   estimates, which we need if estimation method is "5par_marginals_fixed".
 #' @param plugin_constant_joint The constant \code{c} in \code{cn^a} used for
 #'   finding the plugin bandwidth for estimating the pairwise local Gaussian
 #'   correlation between two variables.
 #' @param plugin_exponent_joint The constant \code{a} in \code{cn^a} used for
 #'   finding the plugin bandwidth for estimating the pairwise local Gaussian
 #'   correlation between two variables.
-#' @param tol_marginal The absolute tolerance in the optimization for finding the
-#'   marginal bandwidths
+#' @param tol_marginal The absolute tolerance in the optimization for finding
+#'   the marginal bandwidths
 #' @param tol_joint The absolute tolerance in the optimization for finding the
 #'   joint bandwidths
+#'
+#' @return A List with three elements, \code{marginal}  contains the bandwidths
+#'   used for the marginal locally Gaussian estimation,
+#'   \code{marginal_convergence} contains the convergence flags for the marginal
+#'   banwidths, as returned by the \code{optim} function, and \code{joint}
+#'   contains the pairwise bandwidths and convergence flags.
+#'
+#' @examples
+#'   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+#'   bw <- bw_select(x)
+#'
+#' @references
+#'
+#' Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
+#'
 #' @export
 bw_select <- function(x,
                       bw_method = "plugin",
@@ -200,11 +275,11 @@ bw_select <- function(x,
     # Initialize the vectors and matrices
     marginal_bandwidths <- rep(NA, d)
     marginal_convergence <- rep(NA, d)
-    
+
     # If the estimation method is "5par_marginals_fixed" we must first find the
     # marginal bandwidths
     if(est_method == "5par_marginals_fixed") {
-      
+
         for(i in 1:d) {
             if(bw_method == "cv") {
                 result <- bw_select_cv_univariate(x[, i], tol = tol_marginal)
@@ -216,15 +291,15 @@ bw_select <- function(x,
                     warning(paste("Cross valdidation for marginal bandwidth",
                                   as.character(i),
                                   "did not converge properly"))
-                
+
             } else if(bw_method == "plugin") {
                 marginal_bandwidths[i] <-
                     bw_select_plugin_univariate(n = n,
                                                 c = plugin_constant_marginal,
                                                 a = plugin_exponent_marginal)
-                
-            }           
-        }              
+
+            }
+        }
     }
 
     # Find the joint bandwidths
@@ -236,7 +311,7 @@ bw_select <- function(x,
     for(i in 1:nrow(joint_bandwidths)) {
 
         variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
-        
+
         # Extract the pairs of variables
         bivariate_data <- x[, variables]
 
@@ -264,11 +339,11 @@ bw_select <- function(x,
             joint_bandwidths$bw1 <- bw
             joint_bandwidths$bw2 <- bw
             joint_bandwidths$convergence <- NA
-            
+
         }
-        
+
     }
-    
+
     ret <- list(marginal = marginal_bandwidths,
                 marginal_convergence = marginal_convergence,
                 joint = joint_bandwidths)
