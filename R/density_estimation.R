@@ -90,51 +90,14 @@ dlg_bivariate <- function(x,
 
     if((est_method == "1par")) {
 
-        # We declare a function that maximizes the local likelihood in one grid point.
-        maximize_likelihood = function(grid_point) {
-
-            x1_0 <- grid_point[1]
-            x2_0 <- grid_point[2]
-
-            # We need weights and some empirical moments in this grid point
-            W <- dnorm(x1, mean = x1_0, sd = h1)*dnorm(x2, mean = x2_0, sd = h2)
-
-            m1 <- mean(W)
-            m2 <- mean(W*x1^2)
-            m3 <- mean(W*x2^2)
-            m4 <- mean(W*x1*x2)
-
-
-            # Return the maximum of the likelihood and the density estimate
-            opt <- try(optimise(lik_1par,
-                                lower = -1,
-                                upper = 1,
-                                maximum = TRUE,
-                                tol = tol,
-                                m1 = m1,
-                                m2 = m2,
-                                m3 = m3,
-                                m4 = m4,
-                                x1_0 = x1_0,
-                                x2_0 = x2_0,
-                                h1 = h1,
-                                h2 = h2),
-                       silent = TRUE)
-
-            # Store the result if the optimization went alright. Return NA if not.
-            if(class(opt) != "try-error") {
-                return(c(opt$maximum,
-                         mvtnorm::dmvnorm(c(x1_0, x2_0), mean = c(0,0),
-                                          sigma = matrix(c(1, opt$maximum, opt$maximum, 1), 2))))
-            } else {
-                return(c(NA, NA))
-            }
-        }
-
         ## Send the grid points to 'maximize_likelihood'
+      est_test = maximize_likelihood_1par(split(eval_points, row(eval_points))[[1]],
+                                          x1=x2,x2=x2,h1=h1,h2=h2,tol=tol)
+
         est <- cbind(do.call(rbind,
                              lapply(X = split(eval_points, row(eval_points)),
-                                    FUN = maximize_likelihood)))
+                                    FUN = maximize_likelihood_1par,
+                                    x1=x1,x2=x2,h1=h1,h2=h2,tol=tol)))
         par_est <- matrix(est[,1])
         f_est = as.vector(est[,2])
         colnames(par_est) <- c('rho')
@@ -541,7 +504,7 @@ dlg <- function(lg_object, grid = NULL) {
 
 #' The locally Gaussian density estimator (LGDE)
 #'
-#' Estimate a mulivariate density function using locally Gaussian approximations (using parallellization)
+#' Estimate a mulivariate density function using locally Gaussian approximations (using parallelization)
 #'
 #' This function does multivariate density estimation using the locally Gaussian
 #' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).

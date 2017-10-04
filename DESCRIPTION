@@ -16,5 +16,8 @@ Imports:
     mvtnorm,
     localgauss,
     logspline,
-    akima
+    akima,
+	doParallel,
+	parallel,
+	foreach
     
