@@ -29,5 +29,5 @@ lik_1par(rho, m1, m2, m3, m4, x1_0, x2_0, h1, h2)
 The likelihood for the one-parameter case.
 }
 \description{
-\code{lik_1par} returns the likelihood function
+Did not bother to document this function properly
 }

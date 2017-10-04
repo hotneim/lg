@@ -23,5 +23,5 @@ maximize_likelihood_1par(grid_point, x1, x2, h1, h2, tol)
 The maximized likelihood for the one-parameter case.
 }
 \description{
-1-parameter likelihood maximization function for bivariate data
+Did not bother to document this function properly
 }

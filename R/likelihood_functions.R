@@ -2,8 +2,7 @@
 
 #' 1-parameter likelihood function for bivariate data
 #'
-#' \code{lik_1par} returns the likelihood function
-#'
+#' Did not bother to document this function properly
 #'
 #' @param rho rho
 #' @param m1 m1
@@ -29,6 +28,8 @@ lik_1par <- function(rho,m1,m2,m3,m4,x1_0,x2_0,h1,h2) {
 
 
 #' 1-parameter likelihood maximization function for bivariate data
+#'
+#' Did not bother to document this function properly
 #'
 #' @param rho grid_point
 #' @param x1 x1

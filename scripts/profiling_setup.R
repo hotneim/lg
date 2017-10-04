@@ -1,5 +1,3 @@
-library(lg)
-
 set.seed(123)
 n <- 500
 n.grid <- 1000
