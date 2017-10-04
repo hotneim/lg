@@ -91,9 +91,6 @@ dlg_bivariate <- function(x,
     if((est_method == "1par")) {
 
         ## Send the grid points to 'maximize_likelihood'
-      est_test = maximize_likelihood_1par(split(eval_points, row(eval_points))[[1]],
-                                          x1=x2,x2=x2,h1=h1,h2=h2,tol=tol)
-
         est <- cbind(do.call(rbind,
                              lapply(X = split(eval_points, row(eval_points)),
                                     FUN = maximize_likelihood_1par,
@@ -645,8 +642,10 @@ dlg_par <- function(lg_object, grid = NULL,num.cores = 1) {
                       est_method = lg_object$est_method,
                       marginal_estimates = pairwise_marginal_estimates)
 
-      loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
+      #loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
+      pairwise_estimate$par_est[, "rho"]
     }
+    dimnames(loc_cor) <- NULL
   }
 
   # Evaluate the density estimate
