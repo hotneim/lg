@@ -15,49 +15,71 @@ lg(x, bw_method = "plugin", est_method = "1par",
 per observation}
 
 \item{bw_method}{The method used for bandwidth selection. Must be either
-\code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
-but crude)}
+\code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"}
+(fast, but crude)}
 
 \item{est_method}{The estimation method, must be either "1par", "5par" or
-"5par_marginals_fixed"}
+"5par_marginals_fixed" (see details)}
 
-\item{transform_to_marginal_normality}{Logical true if we want to transform our
-data to marginal standard normality. This is assumed by method "1par", but can
-of course be skipped using this argument if it has been done already.}
+\item{transform_to_marginal_normality}{Logical true if we want to transform
+our data to marginal standard normality. This is assumed by method "1par",
+but can of course be skipped using this argument if it has been done
+already.}
 
 \item{bw}{Bandwidth object if it has already been calculated.}
 
 \item{plugin_constant_marginal}{The constant \code{c} in \code{cn^a} used for
-finding the plugin bandwidth for locally Gaussian marginal density estimates,
-which we need if estimation method is "5par_marginals_fixed".}
+finding the plugin bandwidth for locally Gaussian marginal density
+estimates, which we need if estimation method is "5par_marginals_fixed".}
 
 \item{plugin_constant_joint}{The constant \code{c} in \code{cn^a} used for
 finding the plugin bandwidth for estimating the pairwise local Gaussian
 correlation between two variables.}
 
 \item{plugin_exponent_marginal}{The constant \code{a} in \code{cn^a} used for
-finding the plugin bandwidth for locally Gaussian marginal density estimates,
-which we need if estimation method is "5par_marginals_fixed".}
+finding the plugin bandwidth for locally Gaussian marginal density
+estimates, which we need if estimation method is "5par_marginals_fixed".}
 
 \item{plugin_exponent_joint}{The constant \code{a} in \code{cn^a} used for
 finding the plugin bandwidth for estimating the pairwise local Gaussian
 correlation between two variables.}
 
-\item{tol_marginal}{The absolute tolerance in the optimization for finding the
-marginal bandwidths}
+\item{tol_marginal}{The absolute tolerance in the optimization for finding
+the marginal bandwidths, passed on to the \code{optim}-function.}
 
 \item{tol_joint}{The absolute tolerance in the optimization for finding the
-joint bandwidths}
+joint bandwidths. Passed on to the \code{optim}-function.}
 }
 \description{
-Create an \code{lg}-object, that can be used to estimate local Gussian correlations,
-unconditional and conditional densities, local partial correlation and for testing
-purposes.
+Create an \code{lg}-object, that can be used to estimate local Gussian
+correlations, unconditional and conditional densities, local partial
+correlation and for testing purposes.
 }
 \details{
-This is the main function in the package. It lets the user supply a data set and set
-a number of options, which is then used to prepare an \code{lg} object that can be
-supplied to other functions in the package, such as \code{dlg} (density estimation),
-\code{clg} (conditional density estimation), or other tasks in the locally Gaussian
-universe.
+This is the main function in the package. It lets the user supply a data set
+and set a number of options, which is then used to prepare an \code{lg}
+object that can be supplied to other functions in the package, such as
+\code{dlg} (density estimation), \code{clg} (conditional density estimation),
+or other tasks in the locally Gaussian universe. The details has been laid
+out in Otneim & Tjøstheim (2017a) and Otneim & Tjøstheim (2017b).
+
+The papers mentioned above deal with the estimation of multivariate density
+functions and conditional density functions. The idea is to fit a
+multivariate Normal locally to the unknown density function by first
+transforming the data to marginal standard normality, and then estimate the
+local correlations \strong{pairwise}. The local means and local standard
+deviations are held fixed and constantly equal to 0 and 1 respectively to
+reflect the knowledge that the marginals are approximetaly standard normal.
+Use \code{est_method = "1par"} for this strategy, which means that we only
+estimate one local parameter (the correlation) for each pair, and note that
+this method requires marginally standard normal data. If \code{est_method =
+"1par"} and \code{transform_to_marginal_normality = FALSE} the function will
+throw a warning. It might be okay though, if you know that the data are
+marginally standard normal already.
+
+The second option is \code{est_method = "5par_marginals_fixed"} which is more
+flexible than \code{"1par"}. This method will estimate univariate local
+Gaussian fits to each marginal, thus producing local estmates of the local
+means: \eqn{\mu_i(x_i)} and \eqn{\sigma_i(x_i)} that will be held fixed in
+the next step when the \strong{pairwise} local correlations are estimated.
 }
