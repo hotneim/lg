@@ -526,7 +526,7 @@ dlg <- function(lg_object, grid = NULL) {
         apply(normalizing_constants, 1, prod)
 
     # Return
-    return(list(f_est = f_est,
+    ret <- list(f_est = f_est,
                 loc_mean = loc_mean,
                 loc_sd = loc_sd,
                 loc_cor = loc_cor,
@@ -535,7 +535,11 @@ dlg <- function(lg_object, grid = NULL) {
                 transformed_data = lg_object$transformed_data,
                 normalizing_constants = normalizing_constants,
                 grid = grid,
-                transformed_grid = x0))
+                transformed_grid = x0)
+
+    class(ret) <- "dlg"
+
+    retun(ret)
 
 }
 
@@ -715,7 +719,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
     c_cov  <- lapply(estimate, "[[", 3)
 
     # Return the result
-    return(list(f_est = f_est,
+    ret <- list(f_est = f_est,
                 c_mean = c_mean,
                 c_cov = c_cov,
                 x = lg_object$x,
@@ -723,5 +727,9 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
                 transformed_data = lg_object$transformed_data,
                 normalizing_constants = density_object$normalizing_constants,
                 grid = grid,
-                transformed_grid = density_object$transformed_grid))
+                transformed_grid = density_object$transformed_grid)
+
+    class(ret) <- "clg"
+
+    return(ret)
 }
