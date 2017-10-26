@@ -35,8 +35,8 @@ using the "5par_marginals_fixed"-method.
 \examples{
   data_matrix <- cbind(rnorm(100), rnorm(100))
   eval_matrix <- cbind(seq(-4, 4, 1), seq(-4, 4, 1))
-  bw_vector <- c(1, 1)
+  bw <- c(1, 1)
 
-  estimate <- dlg_bivariate_wrapper(x, eval_points = eval_points, bw = bw)
+  estimate <- dlg_marginal_wrapper(data_matrix, eval_matrix = eval_matrix, bw = bw)
 
 }

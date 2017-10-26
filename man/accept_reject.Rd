@@ -10,6 +10,8 @@ accept_reject(lg_object, condition, n_new, nodes, M = NULL, M_sim = 1500,
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the \code{lg}-function}
 
+\item{condition}{The value of the conditioning variables}
+
 \item{n_new}{The number of observations to generate}
 
 \item{nodes}{Either the number of equidistant nodes to generate, or a vector of nodes

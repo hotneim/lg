@@ -364,9 +364,9 @@ dlg_marginal <- function(x,
 #' @examples
 #'   data_matrix <- cbind(rnorm(100), rnorm(100))
 #'   eval_matrix <- cbind(seq(-4, 4, 1), seq(-4, 4, 1))
-#'   bw_vector <- c(1, 1)
+#'   bw <- c(1, 1)
 #'
-#'   estimate <- dlg_bivariate_wrapper(x, eval_points = eval_points, bw = bw)
+#'   estimate <- dlg_marginal_wrapper(data_matrix, eval_matrix = eval_matrix, bw = bw)
 #'
 #' @export
 dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
@@ -429,7 +429,8 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' @examples
 #'    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
 #'    lg_object <- lg(x)  # Put all the running parameters in here.
-#'    density_estimate <- dlg(lg_object)
+#'    grid <- cbind(seq(-4, 4, 1), seq(-4, 4, 1), seq(-4, 4, 1))
+#'    density_estimate <- dlg(lg_object, grid = grid)
 #'
 #' @references
 #'
@@ -599,7 +600,7 @@ dlg <- function(lg_object, grid = NULL) {
 #'   lg_object <- lg(x)
 #'
 #'   # Estimate the conditional density of X1|X2 = 0, X3 = 1 on a small grid
-#'   cond_dens <- clg(lg_object, grid = -4:4, condition = c(0, 1))
+#'   cond_dens <- clg(lg_object, grid = matrix(-4:4, ncol = 1), condition = c(0, 1))
 #'
 #' @references
 #'
