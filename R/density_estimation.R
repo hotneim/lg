@@ -539,7 +539,7 @@ dlg <- function(lg_object, grid = NULL) {
 
     class(ret) <- "dlg"
 
-    retun(ret)
+    return(ret)
 
 }
 
