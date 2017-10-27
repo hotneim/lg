@@ -2,18 +2,93 @@
 % Please edit documentation in R/plotting.R
 \name{corplot}
 \alias{corplot}
-\title{Plot unconditional local correlations}
+\title{Plot unconditional local correlation maps}
 \usage{
-corplot(dlg_object, pair, plot_map = TRUE, gaussian_scale = FALSE,
+corplot(dlg_object, pair = 1, gaussian_scale = FALSE,
   plot_colormap = TRUE, plot_obs = FALSE, plot_labels = TRUE,
-  plot_legend = FALSE, alpha_tile = 0.5, alpha_point = 0.8,
-  low_color = "blue", high_color = "red", break_int = 0.2,
-  label_size = 3, font_family = "sans", point_size = NULL, xlab = NULL,
-  ylab = NULL, rholab = NULL, main = NULL, subtitle = NULL)
+  plot_legend = FALSE, plot_thres = 0, alpha_tile = 0.8,
+  alpha_point = 0.8, low_color = "blue", high_color = "red",
+  break_int = 0.2, label_size = 3, font_family = "sans",
+  point_size = NULL, xlab = NULL, ylab = NULL, rholab = NULL,
+  main = NULL, subtitle = NULL)
+}
+\arguments{
+\item{dlg_object}{The density estimation object produced by the dlg-function}
+
+\item{pair}{Integer indicating which pair of variables you want to plot. The
+function looks up the corresponding variables in the bandwidth object used
+to calculate the dlg object, and you can inspect this in
+\code{dlg_object$bw$joint}. Defaults to 1 (the first pair, usually variable
+1 against variable 2).}
+
+\item{gaussian_scale}{Logical, if \code{TRUE} the plot is produced on the
+marginal standard Gaussian scale.}
+
+\item{plot_colormap}{Logical, if \code{TRUE} the plot includes a colormap to
+visualize the value of the local correlation.}
+
+\item{plot_obs}{Logical, if \code{TRUE} the observations are plotted.}
+
+\item{plot_labels}{Logical, if \code{TRUE} character labels with local
+correlation values are plotted.}
+
+\item{plot_legend}{Logical, if \code{TRUE} a color legend is plotted.}
+
+\item{plot_thres}{A number between 0 and 1 indicating the threshold value to
+be used for not plotting the estimated local correlation in areas with no
+data. Uses a quick bivariate lernel density estimate a criterion, and skips
+plotting in areas with kernel density estimate less than the fraction
+plot_thres of the maximum density estimate. If 0 (default), everything is
+plotted, if 1 nothing is plotted. Typical values may be in the
+0.001-0.01-range.}
+
+\item{alpha_tile}{The alpha-value indicating the transparancy of the color
+tiles. Number between 0 (transparent) and 1 (not transparent).}
+
+\item{alpha_point}{he alpha-value indicating the transparancy of the
+observations. Number between 0 (transparent) and 1 (not transparent).}
+
+\item{low_color}{The color corresponding to correlation equal to -1 (default:
+blue).}
+
+\item{high_color}{The color corresponding to correlation equal to 1 (default:
+red).}
+
+\item{break_int}{Break interval in the color gradient.}
+
+\item{label_size}{Size of text labels, if plotted.}
+
+\item{font_family}{Font family used for text labels, if plotted.}
+
+\item{point_size}{Size of points used for plotting the observations.}
+
+\item{xlab}{x-label}
+
+\item{ylab}{y-label}
+
+\item{rholab}{Label for the legend, if plotted}
+
+\item{main}{Title of plot}
+
+\item{subtitle}{Subtitle of plot}
 }
 \description{
-blabla
+Plot the estimated local correlation map for a pair of variables
 }
 \details{
-blablajkaklajkl
+This function plots a map of estimated local Gaussian correlations of a
+specified pair (defaults to the first pair) of variables as produced by the
+dlg-function. This plot is heavily inspired by the local correlation plots
+produced by the 'localgauss'-package by Berentsen et. al (2014), but it is
+here more easily customized and specially adapted to the ecosystem within the
+\code{lg}-package. The plotting is carried out using the ggplot2-package
+(Wickham, 2009).
+}
+\references{
+Berentsen, G. D., Kleppe, T. S., & Tjøstheim, D. (2014). Introducing
+localgauss, an R package for estimating and visualizing local Gaussian
+correlation. Journal of Statistical Software, 56(1), 1-18.
+
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New
+York, 2009.
 }

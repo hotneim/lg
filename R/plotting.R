@@ -2,22 +2,76 @@
 # Functions for plotting the local correlations
 # ---------------------------------------------
 
-#' Plot unconditional local correlations
+#' Plot unconditional local correlation maps
 #'
-#' blabla
+#' Plot the estimated local correlation map for a pair of variables
 #'
-#' blablajkaklajkl
+#' This function plots a map of estimated local Gaussian correlations of a
+#' specified pair (defaults to the first pair) of variables as produced by the
+#' dlg-function. This plot is heavily inspired by the local correlation plots
+#' produced by the 'localgauss'-package by Berentsen et. al (2014), but it is
+#' here more easily customized and specially adapted to the ecosystem within the
+#' \code{lg}-package. The plotting is carried out using the ggplot2-package
+#' (Wickham, 2009).
 #'
-
+#' @param dlg_object The density estimation object produced by the dlg-function
+#' @param pair Integer indicating which pair of variables you want to plot. The
+#'   function looks up the corresponding variables in the bandwidth object used
+#'   to calculate the dlg object, and you can inspect this in
+#'   \code{dlg_object$bw$joint}. Defaults to 1 (the first pair, usually variable
+#'   1 against variable 2).
+#' @param gaussian_scale Logical, if \code{TRUE} the plot is produced on the
+#'   marginal standard Gaussian scale.
+#' @param plot_colormap Logical, if \code{TRUE} the plot includes a colormap to
+#'   visualize the value of the local correlation.
+#' @param plot_obs Logical, if \code{TRUE} the observations are plotted.
+#' @param plot_labels Logical, if \code{TRUE} character labels with local
+#'   correlation values are plotted.
+#' @param plot_legend Logical, if \code{TRUE} a color legend is plotted.
+#' @param plot_thres A number between 0 and 1 indicating the threshold value to
+#'   be used for not plotting the estimated local correlation in areas with no
+#'   data. Uses a quick bivariate lernel density estimate a criterion, and skips
+#'   plotting in areas with kernel density estimate less than the fraction
+#'   plot_thres of the maximum density estimate. If 0 (default), everything is
+#'   plotted, if 1 nothing is plotted. Typical values may be in the
+#'   0.001-0.01-range.
+#' @param alpha_tile The alpha-value indicating the transparancy of the color
+#'   tiles. Number between 0 (transparent) and 1 (not transparent).
+#' @param alpha_point he alpha-value indicating the transparancy of the
+#'   observations. Number between 0 (transparent) and 1 (not transparent).
+#' @param low_color The color corresponding to correlation equal to -1 (default:
+#'   blue).
+#' @param high_color The color corresponding to correlation equal to 1 (default:
+#'   red).
+#' @param break_int Break interval in the color gradient.
+#' @param label_size Size of text labels, if plotted.
+#' @param font_family Font family used for text labels, if plotted.
+#' @param point_size Size of points used for plotting the observations.
+#' @param xlab x-label
+#' @param ylab y-label
+#' @param rholab Label for the legend, if plotted
+#' @param main Title of plot
+#' @param subtitle Subtitle of plot
+#'
+#' @references
+#'
+#' Berentsen, G. D., Kleppe, T. S., & Tjøstheim, D. (2014). Introducing
+#' localgauss, an R package for estimating and visualizing local Gaussian
+#' correlation. Journal of Statistical Software, 56(1), 1-18.
+#'
+#' H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New
+#' York, 2009.
+#'
+#' @export
 corplot <- function(dlg_object,
-                    pair,
-                    plot_map = TRUE,
+                    pair = 1,
                     gaussian_scale = FALSE,
                     plot_colormap = TRUE,
                     plot_obs = FALSE,
                     plot_labels = TRUE,
                     plot_legend = FALSE,
-                    alpha_tile = .5,
+                    plot_thres = 0,
+                    alpha_tile = .8,
                     alpha_point = .8,
                     low_color = "blue",
                     high_color = "red",
@@ -63,23 +117,9 @@ corplot <- function(dlg_object,
     x = full_grid[distinct_grid, 1]
     y = full_grid[distinct_grid, 2]
 
-    # Extract the local correlations, or let them have an out-of-range
-    # value if we do not want to plot the color map.
-    if(plot_colormap) {
-        rho = dlg_object$loc_cor[distinct_grid, pair]
-    } else {
-        rho = rep(99, length(x))
-    }
-
     # Create the label for use in plot
     label = ifelse(!is.na(rho),
                    formatC(rho, digits = 2, format = "f", flag = "+"), "")
-
-    # Create the data frame containing this information
-    plot_data <- data.frame(x = x,
-                            y = y,
-                            rho = rho,
-                            label = label, stringsAsFactors = FALSE)
 
     # Create another data frame containing the observations
     if(gaussian_scale) {
@@ -92,11 +132,30 @@ corplot <- function(dlg_object,
                      y = dlg_object$x[, unlist(dlg_object$bw$joint[pair, 2])])
     }
 
+    # Set the alpha equal to zero if we do not want the color map. If we do,
+    # set selected grid points to no plot, because there is no data nearby.
+    if(!plot_colormap) {
+        alpha <- rep(0, length(x))
+    } else if(plot_thres == 0) {
+        alpha <- rep(alpha_tile, length(x))
+    } else {
+        kernel_density <- ks::kde(obs, eval.points = cbind(x, y))$estimate
+        alpha <- rep(alpha_tile, length(x))
+        alpha[kernel_density/max(kernel_density) < plot_thres] <- 0
+    }
+
+    # Create the data frame containing this information
+    plot_data <- data.frame(x = x,
+                            y = y,
+                            rho = rho,
+                            label = label,
+                            alpha = alpha, stringsAsFactors = FALSE)
+
+
     # Initialize the plot.
     g = ggplot2::ggplot() +
       ggplot2::geom_tile(data = plot_data,
-                         mapping = ggplot2:: aes(x = x, y = y, fill = rho),
-                         alpha = alpha_tile)
+                         mapping = ggplot2:: aes(x = x, y = y, fill = rho), alpha = alpha)
 
     # Add the color gradient
     gr = ggplot2::scale_fill_gradient2(midpoint = 0,
@@ -171,7 +230,8 @@ corplot <- function(dlg_object,
       g = g + ggplot2::geom_text(data = plot_data,
                                  mapping = ggplot2::aes(x = x, y = y, label = label),
                                  size = label_size,
-                                 family = font_family)
+                                 family = font_family,
+                                 alpha = ifelse(alpha == 0, 0, 1))
     }
 
     # Remove the legend, if requested
