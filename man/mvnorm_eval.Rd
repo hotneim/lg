@@ -9,20 +9,20 @@ mvnorm_eval(eval_points, loc_mean, loc_sd, loc_cor, pairs)
 \arguments{
 \item{eval_points}{A matrix of grid points}
 
-\item{loc_mean}{A matrix of local means, one row per grid point, one column 
+\item{loc_mean}{A matrix of local means, one row per grid point, one column
 per component}
 
 \item{loc_sd}{A  matrix of local standard deviations, one row per grid point,
 one column per component}
 
-\item{loc_cor}{A matrix of local correlations, one row per grid point, on 
+\item{loc_cor}{A matrix of local correlations, one row per grid point, on
 column per pair of variables}
 
-\item{pairs}{A data frame specifying the components that make up each pair, 
+\item{pairs}{A data frame specifying the components that make up each pair,
 two colimns names 'x1' and 'x2', one row per pair of components}
 }
 \description{
-Function that evaluates the multivariate normal distribution with local 
+Function that evaluates the multivariate normal distribution with local
 parameters
 }
 \details{
