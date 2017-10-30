@@ -39,16 +39,17 @@ library(lg)
 tt <- proc.time()
 lg_object.old.package <- lg(x,bw_method ="cv")
 proc.time()-tt
-
+#user  system elapsed
+#27.28    0.08   27.50
 
 all.equal(lg_object.par,lg_object)
 # TRUE
 all.equal(lg_object.par,lg_object.old.package)
-
+# TRUE
 
 
 ###############
 
 
-### CONCLUSION: The paralelized version is about 2.6 times faster than the non-parallelized version in a test using a 4 cores.
+### CONCLUSION: The paralelized version is about 2.4 times faster than the non-parallelized version in a test using a 4 cores.
 # The results are identical.

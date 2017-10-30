@@ -469,7 +469,7 @@ dlg <- function(lg_object, grid = NULL,num_cores = 1) {
     } else {  # And if not, we estimate the local correlation pairwise now
       if (num_cores==1){ # Runs the loop sequentially if num_cores==1
         for(i in 1:nrow(pairs)) {
-          loc_cor[,i] <- dlg_bivariate_loop_helpfunc(i,lg_object,marginal_estimates,pairs)
+          loc_cor[,i] <- dlg_bivariate_loop_helpfunc(i,x,x0,lg_object,marginal_estimates,pairs)
         }
       } else { # Or in parallell
 
@@ -481,7 +481,7 @@ dlg <- function(lg_object, grid = NULL,num_cores = 1) {
         doParallel::registerDoParallel(cl)
 
         loc_cor <- foreach::foreach(i = 1:nrow(pairs),.packages = "lg",.combine=cbind) %dopar% {
-          dlg_bivariate_loop_helpfunc(i,lg_object,marginal_estimates,pairs)
+          dlg_bivariate_loop_helpfunc(i,x,x0,lg_object,marginal_estimates,pairs)
         }
         dimnames(loc_cor) <- NULL # Removing names to make format identical to sequential version
       }

@@ -113,7 +113,7 @@ mvnorm_eval <- function(eval_points,
 #' Help function for concise looping in CV bandwidth selection
 #'
 #' No point in documenting the input
-bandwidth_selection_cv_loop_helpfunc <- function(i,joint_bandwidths,est_method,marginal_bandwidths,variables){
+bandwidth_selection_cv_loop_helpfunc <- function(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths){
 
   variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
 
@@ -137,7 +137,7 @@ bandwidth_selection_cv_loop_helpfunc <- function(i,joint_bandwidths,est_method,m
 #' Help function for concise looping in sequential bivariate density estimation
 #'
 #' No point in documenting the input
-dlg_bivariate_loop_helpfunc <- function(i,lg_object,marginal_estimates,pairs){
+dlg_bivariate_loop_helpfunc <- function(i,x,x0,lg_object,marginal_estimates,pairs){
   if(lg_object$est_method == "1par") {
     pairwise_marginal_estimates <- NA
   } else {

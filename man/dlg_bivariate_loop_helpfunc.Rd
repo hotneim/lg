@@ -4,7 +4,7 @@
 \alias{dlg_bivariate_loop_helpfunc}
 \title{Help function for concise looping in sequential bivariate density estimation}
 \usage{
-dlg_bivariate_loop_helpfunc(i, lg_object, marginal_estimates, pairs)
+dlg_bivariate_loop_helpfunc(i, x, x0, lg_object, marginal_estimates, pairs)
 }
 \description{
 No point in documenting the input

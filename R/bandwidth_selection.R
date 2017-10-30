@@ -328,7 +328,7 @@ bw_select <- function(x,
   } else if(bw_method=="cv"){
     if (num_cores==1){ # Running sequentially...
       for(i in 1:nrow(joint_bandwidths)) {  # Iterate over all the pairs
-        joint_bandwidths[i,c("bw1","bw2","convergence")] = bandwidth_selection_cv_loop_helpfunc(i,joint_bandwidths,est_method,marginal_bandwidths,variables)
+        joint_bandwidths[i,c("bw1","bw2","convergence")] = bandwidth_selection_cv_loop_helpfunc(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths)
       }
     } else { # Running in parallel
       if (num_cores==0) {
@@ -340,7 +340,7 @@ bw_select <- function(x,
 
       # Iterate over all the pairs
       joint_bandwidths2 <- foreach::foreach(i=1:nrow(joint_bandwidths),.packages="lg",.combine=rbind) %dopar% {
-        bandwidth_selection_cv_loop_helpfunc(i,joint_bandwidths,est_method,marginal_bandwidths,variables)
+        bandwidth_selection_cv_loop_helpfunc(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths)
       }
       joint_bandwidths[,c("bw1","bw2","convergence")]=joint_bandwidths2
     }

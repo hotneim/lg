@@ -4,8 +4,8 @@
 \alias{bandwidth_selection_cv_loop_helpfunc}
 \title{Help function for concise looping in CV bandwidth selection}
 \usage{
-bandwidth_selection_cv_loop_helpfunc(i, joint_bandwidths, est_method,
-  marginal_bandwidths, variables)
+bandwidth_selection_cv_loop_helpfunc(i, x, joint_bandwidths, tol_joint,
+  est_method, marginal_bandwidths)
 }
 \description{
 No point in documenting the input
