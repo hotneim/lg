@@ -78,5 +78,5 @@ all.equal(test2.2,test3.2)
 
 
 ### CONCLUSION: The non-parallelized new version maybe slightly faster than the original (or perhaps inaccurate measuring)
-### The parallelized new version is 2.4 times faster than the original using 4 cores.
+### The parallelized new version is about 2.4 times faster than the original using 4 cores.
 
