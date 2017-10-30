@@ -236,6 +236,11 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #'   the marginal bandwidths
 #' @param tol_joint The absolute tolerance in the optimization for finding the
 #'   joint bandwidths
+#' @param num_cores An integer specifying the number of cores to parallize the
+#' cross validation of the bivariate bandwidths estimation when bw_method=="cv".
+#' When num_cores = 1 (the default) everything is ran sequentially.
+#' num_cores= 0 means using the maximum number of available logical cores.
+#' Uses foreach and the doParallel backend.
 #'
 #' @return A List with three elements, \code{marginal}  contains the bandwidths
 #'   used for the marginal locally Gaussian estimation,
@@ -252,6 +257,9 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #' Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
 #' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
+#' @import parallel
+#' @import doParallel
+#' @import foreach
 #' @export
 bw_select <- function(x,
                       bw_method = "plugin",
@@ -261,94 +269,109 @@ bw_select <- function(x,
                       plugin_constant_joint = 1.75,
                       plugin_exponent_joint = -1/6,
                       tol_marginal = 10^(-3),
-                      tol_joint = 10^(-3)) {
+                      tol_joint = 10^(-3),
+                      num_cores = 1) {
 
-    # Do some sanity checks of the inputs
-    x <- check_data(x, type = "data")
-    check_bw_method(bw_method)
-    check_est_method(est_method)
+  # Do some sanity checks of the inputs
+  x <- check_data(x, type = "data")
+  check_bw_method(bw_method)
+  check_est_method(est_method)
 
-    # Dimension and sample size
-    d <- ncol(x)
-    n <- nrow(x)
+  # Dimension and sample size
+  d <- ncol(x)
+  n <- nrow(x)
 
-    # Initialize the vectors and matrices
-    marginal_bandwidths <- rep(NA, d)
-    marginal_convergence <- rep(NA, d)
+  # Initialize the vectors and matrices
+  marginal_bandwidths <- rep(NA, d)
+  marginal_convergence <- rep(NA, d)
 
-    # If the estimation method is "5par_marginals_fixed" we must first find the
-    # marginal bandwidths
-    if(est_method == "5par_marginals_fixed") {
+  # If the estimation method is "5par_marginals_fixed" we must first find the
+  # marginal bandwidths
+  if(est_method == "5par_marginals_fixed") {
 
-        for(i in 1:d) {
-            if(bw_method == "cv") {
-                result <- bw_select_cv_univariate(x[, i], tol = tol_marginal)
-                marginal_bandwidths[i] <- result$bw
-                marginal_convergence[i] <- result$convergence
+    for(i in 1:d) { # This is fast, so do not bother to parallelize this routine
+      if(bw_method == "cv") {
+        result <- bw_select_cv_univariate(x[, i], tol = tol_marginal)
+        marginal_bandwidths[i] <- result$bw
+        marginal_convergence[i] <- result$convergence
 
-                # Print a warning if the convergence is not ok
-                if(result$convergence != 0)
-                    warning(paste("Cross valdidation for marginal bandwidth",
-                                  as.character(i),
-                                  "did not converge properly"))
+        # Print a warning if the convergence is not ok
+        if(result$convergence != 0)
+          warning(paste("Cross valdidation for marginal bandwidth",
+                        as.character(i),
+                        "did not converge properly"))
 
-            } else if(bw_method == "plugin") {
-                marginal_bandwidths[i] <-
-                    bw_select_plugin_univariate(n = n,
-                                                c = plugin_constant_marginal,
-                                                a = plugin_exponent_marginal)
+      } else if(bw_method == "plugin") {
+        marginal_bandwidths[i] <-
+          bw_select_plugin_univariate(n = n,
+                                      c = plugin_constant_marginal,
+                                      a = plugin_exponent_marginal)
 
-            }
-        }
+      }
     }
+  }
 
-    # Find the joint bandwidths
-    joint_bandwidths <- data.frame(t(combn(c(1:d), 2)), 0*t(combn(c(1:d), 2)))
-    joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
-    colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
+  # Find the joint bandwidths
+  joint_bandwidths <- data.frame(t(combn(c(1:d), 2)), 0*t(combn(c(1:d), 2)))
+  joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
+  colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
 
-    # Iterate over all the pairs
-    for(i in 1:nrow(joint_bandwidths)) {
+  # Creating a help function of cross validated bandwidth selection
+  bandwidth_selection_cv_loop_helpfunc <- function(i,joint_bandwidths,est_method,marginal_bandwidths,variables){
 
-        variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
+    variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
 
-        # Extract the pairs of variables
-        bivariate_data <- x[, variables]
+    # Extract the pairs of variables
+    bivariate_data <- x[, variables]
 
-        if(bw_method == "cv") {
 
-            result <- bw_select_cv_bivariate(x = bivariate_data,
-                                             tol = tol_joint,
-                                             est_method = est_method,
-                                             bw_marginal = marginal_bandwidths[variables])
+    result <- bw_select_cv_bivariate(x = bivariate_data,
+                                     tol = tol_joint,
+                                     est_method = est_method,
+                                     bw_marginal = marginal_bandwidths[variables])
 
-            if(result$convergence != 0)
-                    warning(paste("Cross valdidation for joint bandwidths",
-                                  as.character(variables[1]), "and",  as.character(variables[2]),
-                                  "did not converge properly"))
+    if(result$convergence != 0)
+      warning(paste("Cross valdidation for joint bandwidths",
+                    as.character(variables[1]), "and",  as.character(variables[2]),
+                    "did not converge properly"))
 
-            joint_bandwidths$bw1[i] <- result$bw[1]
-            joint_bandwidths$bw2[i] <- result$bw[2]
-            joint_bandwidths$convergence[i] <- result$convergence
+    return(c(result$bw[1],result$bw[2],result$convergence))
+  }
 
-        } else if(bw_method == "plugin") {
+  if (bw_method=="plugin"){
+    bw <- bw_select_plugin_multivariate(n = n,
+                                        c = plugin_constant_joint,
+                                        a = plugin_exponent_joint)
+    joint_bandwidths$bw1 <- bw
+    joint_bandwidths$bw2 <- bw
+    joint_bandwidths$convergence <- NA
 
-            bw <- bw_select_plugin_multivariate(n = n,
-                                             c = plugin_constant_joint,
-                                             a = plugin_exponent_joint)
-            joint_bandwidths$bw1 <- bw
-            joint_bandwidths$bw2 <- bw
-            joint_bandwidths$convergence <- NA
+  } else if(bw_method=="cv"){
+    if (num_cores==1){ # Running sequentially...
+      for(i in 1:nrow(joint_bandwidths)) {  # Iterate over all the pairs
+        joint_bandwidths[i,c("bw1","bw2","convergence")] = bandwidth_selection_cv_loop_helpfunc(i,joint_bandwidths,est_method,marginal_bandwidths,variables)
+      }
+    } else { # Running in parallel
+      if (num_cores==0) {
+        num_cores <- parallel::detectCores(logical=T) #  Using all (logical) cores if cum.cores is set to 0
+      }
 
-        }
+      cl <- parallel::makeCluster(num_cores)
+      doParallel:: registerDoParallel(cl)
 
+      # Iterate over all the pairs
+      joint_bandwidths2 <- foreach::foreach(i=1:nrow(joint_bandwidths),.packages="lg",.combine=rbind) %dopar% {
+        bandwidth_selection_cv_loop_helpfunc(i,joint_bandwidths,est_method,marginal_bandwidths,variables)
+      }
+      joint_bandwidths[,c("bw1","bw2","convergence")]=joint_bandwidths2
     }
+  }
 
-    ret <- list(marginal = marginal_bandwidths,
-                marginal_convergence = marginal_convergence,
-                joint = joint_bandwidths)
+  ret <- list(marginal = marginal_bandwidths,
+              marginal_convergence = marginal_convergence,
+              joint = joint_bandwidths)
 
-    return(ret)
+  return(ret)
 
 }
 
@@ -382,7 +405,7 @@ bw_select <- function(x,
 #'   marginal bandwidths
 #' @param tol_joint The absolute tolerance in the optimization for finding the
 #'   joint bandwidths
-#' @param num.cores An integer specifying the number of cores to parallize over.
+#' @param num_cores An integer specifying the number of cores to parallize over.
 #' Defaults to 1. Putting 0 means using the maximum number of available logical cores.
 #'
 #' @import parallel
@@ -398,7 +421,7 @@ bw_select_par <- function(x,
                       plugin_exponent_joint = -1/6,
                       tol_marginal = 10^(-3),
                       tol_joint = 10^(-3),
-                      num.cores = 1) {
+                      num_cores = 1) {
 
   # Do some sanity checks of the inputs
   x <- check_data(x, type = "data")
@@ -406,8 +429,8 @@ bw_select_par <- function(x,
   check_est_method(est_method)
 
   # Using all (logical) cores if cum.cores is set to 0
-  if (num.cores==0) {
-    num.cores <- detectCores(logical=T)
+  if (num_cores==0) {
+    num_cores <- detectCores(logical=T)
   }
 
   # Dimension and sample size
@@ -449,7 +472,7 @@ bw_select_par <- function(x,
   joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
   colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
 
-  cl <- makeCluster(num.cores)
+  cl <- makeCluster(num_cores)
   registerDoParallel(cl)
 
   # Iterate over all the pairs

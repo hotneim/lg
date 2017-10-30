@@ -7,7 +7,7 @@ library(lg)
 
 #### Test setup ####
 set.seed(123)
-n <- 500
+n <- 1000
 n.grid <- 1000
 dim.data <- 10
 
@@ -25,21 +25,21 @@ lg_object <- lg(x)
 ### Running the tests
 
 tt <- proc.time()
-test1.1=dlg(lg_object,grid)
+test1.1=dlg(lg_object,grid,num_cores = 1)
 proc.time()-tt
 #user  system elapsed
 #15.01    0.00   15.04
-test1.2=dlg(lg_object,grid+0.5)
+test1.2=dlg(lg_object,grid+0.5,num_cores = 1)
 proc.time()-tt
 #user  system elapsed
 #30.47    0.00   30.52
 
 tt <- proc.time()
-test2.1=dlg_par(lg_object,grid,num.cores = 4)
+test2.1=dlg(lg_object,grid,num_cores = 4)
 proc.time()-tt
 #user  system elapsed
 #1.00    0.01    6.30
-test2.2=dlg_par(lg_object,grid+0.5,num.cores=4)
+test2.2=dlg(lg_object,grid+0.5,num_cores=4)
 proc.time()-tt
 #user  system elapsed
 #2.21    0.04   13.01

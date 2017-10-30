@@ -2,7 +2,7 @@
 
 rm(list=ls())
 library(devtools)
-#install_github("martinju/lg")
+install_github("martinju/lg")
 library(lg)
 
 #### Test setup ####
@@ -20,23 +20,32 @@ for (i in 1:dim.data){
 
 ### Running the tests
 
-
-
 aa=proc.time()
-lg_object.par <- lg(x,bw_method = "cv",parallelize = "cv",num.cores = 4)
+lg_object.par <- lg(x,bw_method = "cv",num_cores_bw_cv = 4)
 proc.time()-aa
 #user  system elapsed
-#0.59    0.03   22.83
-
+#0.21    0.01   12.06
 
 aa=proc.time()
-lg_object <- lg(x,bw_method ="cv",parallelize = NULL)
+lg_object <- lg(x,bw_method ="cv")
 proc.time()-aa
 #user  system elapsed
-#58.64    0.22   59.40
+#28.30    0.35   29.19
+
+detach("package:lg", unload=TRUE)
+library(devtools)
+install_github("hotneim/lg")
+library(lg)
+tt <- proc.time()
+lg_object.old.package <- lg(x,bw_method ="cv")
+proc.time()-tt
+
 
 all.equal(lg_object.par,lg_object)
 # TRUE
+all.equal(lg_object.par,lg_object.old.package)
+
+
 
 ###############
 

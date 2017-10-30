@@ -7,7 +7,7 @@
 bw_select(x, bw_method = "plugin", est_method = "1par",
   plugin_constant_marginal = 1.75, plugin_exponent_marginal = -1/5,
   plugin_constant_joint = 1.75, plugin_exponent_joint = -1/6,
-  tol_marginal = 10^(-3), tol_joint = 10^(-3))
+  tol_marginal = 10^(-3), tol_joint = 10^(-3), num_cores = 1)
 }
 \arguments{
 \item{x}{A matrix or data frame with data, on column per variable, one row
@@ -41,6 +41,12 @@ the marginal bandwidths}
 
 \item{tol_joint}{The absolute tolerance in the optimization for finding the
 joint bandwidths}
+
+\item{num_cores}{An integer specifying the number of cores to parallize the
+cross validation of the bivariate bandwidths estimation when bw_method=="cv".
+When num_cores = 1 (the default) everything is ran sequentially.
+num_cores= 0 means using the maximum number of available logical cores.
+Uses foreach and the doParallel backend.}
 }
 \value{
 A List with three elements, \code{marginal}  contains the bandwidths

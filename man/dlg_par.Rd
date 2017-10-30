@@ -4,7 +4,7 @@
 \alias{dlg_par}
 \title{The locally Gaussian density estimator (LGDE)}
 \usage{
-dlg_par(lg_object, grid = NULL, num.cores = 1)
+dlg_par(lg_object, grid = NULL, num_cores = 1)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -13,7 +13,7 @@ dlg_par(lg_object, grid = NULL, num.cores = 1)
 \item{grid}{A matrix of grid points, where we want to evaluate the density
 estimate}
 
-\item{num.cores}{An integer specifying the number of cores to parallize over.
+\item{num_cores}{An integer specifying the number of cores to parallize over.
 Defaults to 1. Putting 0 means using the maximum number of available logical cores.}
 }
 \value{

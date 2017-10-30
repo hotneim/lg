@@ -359,7 +359,11 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'   \code{lg}-function
 #' @param grid A matrix of grid points, where we want to evaluate the density
 #'   estimate
-#'
+#' @param num_cores An integer specifying the number of cores to parallize the
+#' bivariate density estimation over, when est_method=="1par" in the lg_object.
+#' When num_cores = 1 (the default) everything is ran sequentially.
+#' num_cores= 0 means using the maximum number of available logical cores.
+#' Uses foreach and the doParallel backend.
 #' @return A list containing the density estimate as well as all the running
 #'   parameters that has been used. The elements are:
 #'
@@ -385,6 +389,8 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'           original scale.
 #'     \item \code{transformed_grid}: The grid where the estimation was
 #'           performed, on the marginal standard normal scale.
+#'     \item \code{num_cores}: The number of cores used for parallelizing the
+#'           bivariate density estimation.
 #'  }
 #'
 #' @examples
@@ -398,8 +404,11 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'    Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
 #'    multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
+#' @import parallel
+#' @import doParallel
+#' @import foreach
 #' @export
-dlg <- function(lg_object, grid = NULL) {
+dlg <- function(lg_object, grid = NULL,num_cores = 1) {
 
     # Do some checks first
     check_lg(lg_object)
@@ -458,24 +467,45 @@ dlg <- function(lg_object, grid = NULL) {
                         estimate$par_est[, "sig_2"])
         loc_cor[,1] <- estimate$par_est[, "rho"]
     } else {  # And if not, we estimate the local correlation pairwise now
-        for(i in 1:nrow(pairs)) {
-            if(lg_object$est_method == "1par") {
-                pairwise_marginal_estimates <- NA
-            } else {
-                pairwise_marginal_estimates <- list(marginal_estimates[[pairs$x1[i]]],
-                                                    marginal_estimates[[pairs$x2[i]]])
-            }
-
-            pairwise_estimate <-
-                dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
-                              eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
-                              bw = c(lg_object$bw$joint[i, "bw1"],
-                                     lg_object$bw$joint[i, "bw2"]),
-                              est_method = lg_object$est_method,
-                              marginal_estimates = pairwise_marginal_estimates)
-
-            loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
+      # Define a help function for the code chunk within the below loop
+      dlg_bivariate_loop_helpfunc <- function(i,lg_object,marginal_estimates,pairs){
+        if(lg_object$est_method == "1par") {
+          pairwise_marginal_estimates <- NA
+        } else {
+          pairwise_marginal_estimates <- list(marginal_estimates[[pairs$x1[i]]],
+                                              marginal_estimates[[pairs$x2[i]]])
         }
+
+        pairwise_estimate <-
+          dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
+                        eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
+                        bw = c(lg_object$bw$joint[i, "bw1"],
+                               lg_object$bw$joint[i, "bw2"]),
+                        est_method = lg_object$est_method,
+                        marginal_estimates = pairwise_marginal_estimates)
+
+        return(pairwise_estimate$par_est[, "rho"])
+      }
+
+      # Runs the loop sequentially if num_cores==1
+      if (num_cores==1){
+        for(i in 1:nrow(pairs)) {
+          loc_cor[,i] <- dlg_bivariate_loop_helpfunc(i,lg_object,marginal_estimates,pairs)
+        }
+      } else { # Or in parallell
+
+        #Using all (logical) cores if cum.cores is set to 0
+        if (num_cores==0) {
+          num_cores <- parallel::detectCores(logical=T)
+        }
+        cl <- parallel::makeCluster(num_cores)
+        doParallel::registerDoParallel(cl)
+
+        loc_cor <- foreach::foreach(i = 1:nrow(pairs),.packages = "lg",.combine=cbind) %dopar% {
+          dlg_bivariate_loop_helpfunc(i,lg_object,marginal_estimates,pairs)
+        }
+        dimnames(loc_cor) <- NULL # Removing names to make format identical to sequential version
+      }
     }
 
     # Evaluate the density estimate
@@ -501,7 +531,6 @@ dlg <- function(lg_object, grid = NULL) {
     class(ret) <- "dlg"
 
     return(ret)
-
 }
 
 #' The locally Gaussian density estimator (LGDE)
@@ -518,7 +547,7 @@ dlg <- function(lg_object, grid = NULL) {
 #'   \code{lg}-function
 #' @param grid A matrix of grid points, where we want to evaluate the density
 #'   estimate
-#' @param num.cores An integer specifying the number of cores to parallize over.
+#' @param num_cores An integer specifying the number of cores to parallize over.
 #' Defaults to 1. Putting 0 means using the maximum number of available logical cores.
 #'
 #' @return A list containing the density estimate as well as all the running
@@ -564,7 +593,7 @@ dlg <- function(lg_object, grid = NULL) {
 #' @import foreach
 #' @export
 #'
-dlg_par <- function(lg_object, grid = NULL,num.cores = 1) {
+dlg_par <- function(lg_object, grid = NULL,num_cores = 1) {
 
   # Do some checks first
   check_lg(lg_object)
@@ -574,9 +603,9 @@ dlg_par <- function(lg_object, grid = NULL,num.cores = 1) {
                        type = "grid")
   }
   # Using all (logical) cores if cum.cores is set to 0
-  if (num.cores==0) {
-    num.cores <- detectCores(logical=T)
-    }
+  if (num_cores==0) {
+    num_cores <- detectCores(logical=T)
+  }
 
   # Sample size and number of variables
   n <- nrow(lg_object$x)
@@ -628,7 +657,7 @@ dlg_par <- function(lg_object, grid = NULL,num.cores = 1) {
     loc_cor[,1] <- estimate$par_est[, "rho"]
   } else {  # And if not, we estimate the local correlation pairwise now
 
-    cl <- makeCluster(num.cores)
+    cl <- makeCluster(num_cores)
     registerDoParallel(cl)
 
     loc_cor <- foreach(i = 1:nrow(pairs),.packages = "lg",.combine=cbind) %dopar% {
@@ -662,18 +691,22 @@ dlg_par <- function(lg_object, grid = NULL,num.cores = 1) {
     apply(normalizing_constants, 1, prod)
 
   # Return
-  return(list(f_est = f_est,
-              loc_mean = loc_mean,
-              loc_sd = loc_sd,
-              loc_cor = loc_cor,
-              x = lg_object$x,
-              bw = lg_object$bw,
-              transformed_data = lg_object$transformed_data,
-              normalizing_constants = normalizing_constants,
-              grid = grid,
-              transformed_grid = x0))
+  ret = list(f_est = f_est,
+             loc_mean = loc_mean,
+             loc_sd = loc_sd,
+             loc_cor = loc_cor,
+             x = lg_object$x,
+             bw = lg_object$bw,
+             transformed_data = lg_object$transformed_data,
+             normalizing_constants = normalizing_constants,
+             grid = grid,
+             transformed_grid = x0)
 
+  class(ret) = "dlg"
+
+  return(ret)
 }
+
 
 #' The locally Gaussian conditional density estimator
 #'
