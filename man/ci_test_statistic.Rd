@@ -7,10 +7,10 @@
 ci_test_statistic(lg_object, h = function(x) x^2)
 }
 \arguments{
+\item{lg_object}{An object of type \code{lg}, as produced by the \code{lg}-function}
+
 \item{h}{The \code{h}-function used in the calulation of the test statistic. The default
 value is \code{h(x) = x^2}.}
-
-\item{lg__object}{An object of type \code{lg}, as produced by the \code{lg}-function}
 }
 \description{
 Calculate the test statistic in the test for conditional independence between the first

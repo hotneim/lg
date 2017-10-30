@@ -54,7 +54,8 @@ grid of points where the density estimate should be estimated.
 \examples{
    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
    lg_object <- lg(x)  # Put all the running parameters in here.
-   density_estimate <- dlg(lg_object)
+   grid <- cbind(seq(-4, 4, 1), seq(-4, 4, 1), seq(-4, 4, 1))
+   density_estimate <- dlg(lg_object, grid = grid)
 
 }
 \references{

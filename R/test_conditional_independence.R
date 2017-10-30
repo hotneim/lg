@@ -17,7 +17,6 @@
 #'   the range
 #' @param gaussian_scale Stay on the standard Gaussian scale, useful for the accept-reject
 #'   algorithm
-#' @export
 interpolate_conditional_density <- function(lg_object,
                                             condition,
                                             nodes,
@@ -90,6 +89,7 @@ interpolate_conditional_density <- function(lg_object,
 #' normal scale.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
+#' @param condition The value of the conditioning variables
 #' @param n_new The number of observations to generate
 #' @param nodes Either the number of equidistant nodes to generate, or a vector of nodes
 #'   supplied by the user
@@ -102,7 +102,6 @@ interpolate_conditional_density <- function(lg_object,
 #'   any replications.
 #' @param extend How far to extend the grid beyond the extreme data points when interpolating,
 #'   in share of the range
-#' @export
 accept_reject <- function(lg_object,
                           condition,
                           n_new,
@@ -280,7 +279,7 @@ local_conditional_covariance <- function(clg_object, coord = c(1, 2)) {
 #' Calculate the test statistic in the test for conditional independence between the first
 #' two variables in the data set, given the remaining variables.
 #'
-#' @param lg__object An object of type \code{lg}, as produced by the \code{lg}-function
+#' @param lg_object An object of type \code{lg}, as produced by the \code{lg}-function
 #' @param h The \code{h}-function used in the calulation of the test statistic. The default
 #' value is \code{h(x) = x^2}.
 ci_test_statistic <- function(lg_object, h = function(x) x^2) {

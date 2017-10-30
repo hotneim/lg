@@ -102,7 +102,7 @@
 #'   # conditional density estimate. Control the grid with the grid
 #'   # argument.
 #'   grid1 <- x[1:10,]
-#'   dens_est <- dlg(lg_object, grid = grid1)
+#'   dens_est <- dlg(lg_object1, grid = grid1)
 #'
 #'   # The conditional density of X1 given X2 = 1 and X2 = 0:
 #'   grid2 <- matrix(-3:3, ncol = 1)

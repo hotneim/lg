@@ -72,7 +72,7 @@ value of X2.
   lg_object <- lg(x)
 
   # Estimate the conditional density of X1|X2 = 0, X3 = 1 on a small grid
-  cond_dens <- clg(lg_object, grid = -4:4, condition = c(0, 1))
+  cond_dens <- clg(lg_object, grid = matrix(-4:4, ncol = 1), condition = c(0, 1))
 
 }
 \references{

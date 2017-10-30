@@ -82,4 +82,60 @@ flexible than \code{"1par"}. This method will estimate univariate local
 Gaussian fits to each marginal, thus producing local estmates of the local
 means: \eqn{\mu_i(x_i)} and \eqn{\sigma_i(x_i)} that will be held fixed in
 the next step when the \strong{pairwise} local correlations are estimated.
+This method can in many situations provide a better fit, even if the
+marginals are standard normal. It also opens up for creating a multivariate
+locally Gaussian fit to any density without having to transform the marginals
+if you for some reason want to avoid that.
+
+The third option is \code{est_method = "5par"}, which is a full nonparametric
+locally Gaussian fit of a bivariate density as laid out and used by Tjøstheim
+& Hufthammer (2013) and others. This is simply a wrapper for the
+\code{localgauss}-package by Berentsen et.al. (2014).
+}
+\examples{
+  x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+
+  # Quick example
+  lg_object1 <- lg(x, bw_method = "plugin", est_method = "1par")
+
+  # In the simulation experiments in Otneim & Tjøstheim (2017a),
+  # the cross-validation bandwidth selection is used:
+  lg_object2 <- lg(x, bw_method = "cv", est_method = "1par")
+
+  # If you do not wish to transform the data to standard normality,
+  # use the five parameter fit:
+  lg_object3 <- lg(x, est_method = "5par_marginals_fixed",
+                  transform_to_marginal_normality = FALSE)
+
+  # In the bivariate case, you can use the full nonparametric fit:
+  x_biv <- cbind(rnorm(100), rnorm(100))
+  lg_object4 <- lg(x_biv, est_method = "5par",
+                  transform_to_marginal_normality = FALSE)
+
+  # Whichever method you choose, the lg-object can now be passed on
+  # to the dlg- or clg-functions for evaluation of the density or
+  # conditional density estimate. Control the grid with the grid
+  # argument.
+  grid1 <- x[1:10,]
+  dens_est <- dlg(lg_object1, grid = grid1)
+
+  # The conditional density of X1 given X2 = 1 and X2 = 0:
+  grid2 <- matrix(-3:3, ncol = 1)
+  c_dens_est <- clg(lg_object1, grid = grid2, condition = c(1, 0))
+
+}
+\references{
+Berentsen, Geir Drage, Tore Selland Kleppe, and Dag Tjøstheim. "Introducing
+  localgauss, an R package for estimating and visualizing local Gaussian
+  correlation." Journal of Statistical Software 56.1 (2014): 1-18.
+
+  Hufthammer, Karl Ove, and Dag Tjøstheim. "Local Gaussian Likelihood and Local
+  Gaussian Correlation" PhD Thesis of Karl Ove Hufthammer, University of
+  Bergen, 2009.
+
+  Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+  multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
+
+  Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
+  the local Gaussian correlation" Statistics and Computing (2017b): 1-19.
 }

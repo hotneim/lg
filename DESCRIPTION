@@ -19,5 +19,7 @@ Imports:
     akima,
 	doParallel,
 	parallel,
-	foreach
+	foreach,
+    ggplot2,
+    ks
     

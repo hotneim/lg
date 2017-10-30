@@ -325,9 +325,9 @@ dlg_marginal <- function(x,
 #' @examples
 #'   data_matrix <- cbind(rnorm(100), rnorm(100))
 #'   eval_matrix <- cbind(seq(-4, 4, 1), seq(-4, 4, 1))
-#'   bw_vector <- c(1, 1)
+#'   bw <- c(1, 1)
 #'
-#'   estimate <- dlg_bivariate_wrapper(x, eval_points = eval_points, bw = bw)
+#'   estimate <- dlg_marginal_wrapper(data_matrix, eval_matrix = eval_matrix, bw = bw)
 #'
 #' @export
 dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
@@ -390,7 +390,8 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' @examples
 #'    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
 #'    lg_object <- lg(x)  # Put all the running parameters in here.
-#'    density_estimate <- dlg(lg_object)
+#'    grid <- cbind(seq(-4, 4, 1), seq(-4, 4, 1), seq(-4, 4, 1))
+#'    density_estimate <- dlg(lg_object, grid = grid)
 #'
 #' @references
 #'
@@ -486,7 +487,7 @@ dlg <- function(lg_object, grid = NULL) {
         apply(normalizing_constants, 1, prod)
 
     # Return
-    return(list(f_est = f_est,
+    ret <- list(f_est = f_est,
                 loc_mean = loc_mean,
                 loc_sd = loc_sd,
                 loc_cor = loc_cor,
@@ -495,7 +496,11 @@ dlg <- function(lg_object, grid = NULL) {
                 transformed_data = lg_object$transformed_data,
                 normalizing_constants = normalizing_constants,
                 grid = grid,
-                transformed_grid = x0))
+                transformed_grid = x0)
+
+    class(ret) <- "dlg"
+
+    return(ret)
 
 }
 
@@ -731,7 +736,7 @@ dlg_par <- function(lg_object, grid = NULL,num.cores = 1) {
 #'   lg_object <- lg(x)
 #'
 #'   # Estimate the conditional density of X1|X2 = 0, X3 = 1 on a small grid
-#'   cond_dens <- clg(lg_object, grid = -4:4, condition = c(0, 1))
+#'   cond_dens <- clg(lg_object, grid = matrix(-4:4, ncol = 1), condition = c(0, 1))
 #'
 #' @references
 #'
@@ -846,7 +851,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
     c_cov  <- lapply(estimate, "[[", 3)
 
     # Return the result
-    return(list(f_est = f_est,
+    ret <- list(f_est = f_est,
                 c_mean = c_mean,
                 c_cov = c_cov,
                 x = lg_object$x,
@@ -854,5 +859,9 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
                 transformed_data = lg_object$transformed_data,
                 normalizing_constants = density_object$normalizing_constants,
                 grid = grid,
-                transformed_grid = density_object$transformed_grid))
+                transformed_grid = density_object$transformed_grid)
+
+    class(ret) <- "clg"
+
+    return(ret)
 }
