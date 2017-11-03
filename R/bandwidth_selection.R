@@ -312,38 +312,42 @@ bw_select <- function(x,
   }
 
   # Find the joint bandwidths
-  joint_bandwidths <- data.frame(t(combn(c(1:d), 2)), 0*t(combn(c(1:d), 2)))
-  joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
-  colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
+  if(ncol(x) > 1) {
+    joint_bandwidths <- data.frame(t(combn(c(1:d), 2)), 0*t(combn(c(1:d), 2)))
+    joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
+    colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
 
 
-  if (bw_method=="plugin"){
-    bw <- bw_select_plugin_multivariate(n = n,
-                                        c = plugin_constant_joint,
-                                        a = plugin_exponent_joint)
-    joint_bandwidths$bw1 <- bw
-    joint_bandwidths$bw2 <- bw
-    joint_bandwidths$convergence <- NA
+    if (bw_method=="plugin"){
+      bw <- bw_select_plugin_multivariate(n = n,
+                                          c = plugin_constant_joint,
+                                          a = plugin_exponent_joint)
+      joint_bandwidths$bw1 <- bw
+      joint_bandwidths$bw2 <- bw
+      joint_bandwidths$convergence <- NA
 
-  } else if(bw_method=="cv"){
-    if (num_cores==1){ # Running sequentially...
-      for(i in 1:nrow(joint_bandwidths)) {  # Iterate over all the pairs
-        joint_bandwidths[i,c("bw1","bw2","convergence")] = bandwidth_selection_cv_loop_helpfunc(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths)
+    } else if(bw_method=="cv"){
+      if (num_cores==1){ # Running sequentially...
+        for(i in 1:nrow(joint_bandwidths)) {  # Iterate over all the pairs
+          joint_bandwidths[i,c("bw1","bw2","convergence")] = bandwidth_selection_cv_loop_helpfunc(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths)
+        }
+      } else { # Running in parallel
+        if (num_cores==0) {
+          num_cores <- parallel::detectCores(logical=T) #  Using all (logical) cores if cum.cores is set to 0
+        }
+
+        cl <- parallel::makeCluster(num_cores)
+        doParallel:: registerDoParallel(cl)
+
+        # Iterate over all the pairs
+        joint_bandwidths2 <- foreach::foreach(i=1:nrow(joint_bandwidths),.packages="lg",.combine=rbind) %dopar% {
+          bandwidth_selection_cv_loop_helpfunc(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths)
+        }
+        joint_bandwidths[,c("bw1","bw2","convergence")]=joint_bandwidths2
       }
-    } else { # Running in parallel
-      if (num_cores==0) {
-        num_cores <- parallel::detectCores(logical=T) #  Using all (logical) cores if cum.cores is set to 0
-      }
-
-      cl <- parallel::makeCluster(num_cores)
-      doParallel:: registerDoParallel(cl)
-
-      # Iterate over all the pairs
-      joint_bandwidths2 <- foreach::foreach(i=1:nrow(joint_bandwidths),.packages="lg",.combine=rbind) %dopar% {
-        bandwidth_selection_cv_loop_helpfunc(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths)
-      }
-      joint_bandwidths[,c("bw1","bw2","convergence")]=joint_bandwidths2
     }
+  } else {
+    joint_bandwidths <- NULL
   }
 
   ret <- list(marginal = marginal_bandwidths,

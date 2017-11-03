@@ -141,6 +141,8 @@ lg <- function(x,
                num_cores_bw_cv = 1) {
 
     # Sanity checks
+    # Convert to matrix if it is not already
+    if(is.atomic(x) & is.vector(x)) x <- matrix(x, ncol = 1)
     x <- check_data(x, type = "data")
     check_est_method(est_method)
     if((est_method == "5par") & (ncol(x) != 2)) {

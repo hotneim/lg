@@ -355,6 +355,8 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' \code{lg}-function (where all the running parameters are sepcified), and a
 #' grid of points where the density estimate should be estimated.
 #'
+#' Use \code{dlg_marginal()} for univariate locally Gaussian density estimation.
+#'
 #' @param lg_object An object of type \code{lg}, as produced by the
 #'   \code{lg}-function
 #' @param grid A matrix of grid points, where we want to evaluate the density

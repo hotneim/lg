@@ -58,6 +58,8 @@ density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
 The function takes as arguments an \code{lg}-object as produced by the main
 \code{lg}-function (where all the running parameters are sepcified), and a
 grid of points where the density estimate should be estimated.
+
+Use \code{dlg_marginal()} for univariate locally Gaussian density estimation.
 }
 \examples{
    x <- cbind(rnorm(100), rnorm(100), rnorm(100))

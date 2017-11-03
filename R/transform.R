@@ -13,7 +13,7 @@ trans_normal<- function(x) {
     # The sample size and the dimension
     n <- nrow(x)
     d <- ncol(x)
-                       
+
     # Estimate the marginals using the logspline
     estimate_marginal <- function(i) logspline::logspline(x[,i])
     marginal_estimates <- lapply(X = as.list(1:d), FUN = estimate_marginal)
@@ -23,6 +23,7 @@ trans_normal<- function(x) {
                                                               marginal_estimates[[i]]))
     transformed_data <- matrix(unlist(lapply(X = as.list(1:d),
                                              FUN = transform_data)), ncol = d)
+    colnames(transformed_data) <- colnames(x)
 
     # The list to be returned
     ret = list(transformed_data = transformed_data)
@@ -43,14 +44,14 @@ trans_normal<- function(x) {
                                                       FUN = calculate_normalizing_constants)),
                                         ncol = d)
 
-        
+
         transformed_grid <- matrix(unlist(lapply(X = as.list(1:d),
                                                  FUN = transform_grid)), ncol = d)
 
         return(list(trans = transformed_grid,
                     normalizing_constants = normalizing_constants))
     }
-    
+
     ret$trans_new <- trans_new
     return(ret)
 }
