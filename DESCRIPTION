@@ -17,6 +17,9 @@ Imports:
     localgauss,
     logspline,
     akima,
+	doParallel,
+	parallel,
+	foreach,
     ggplot2,
     ks
     

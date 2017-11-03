@@ -4,7 +4,7 @@
 \alias{dlg}
 \title{The locally Gaussian density estimator (LGDE)}
 \usage{
-dlg(lg_object, grid = NULL)
+dlg(lg_object, grid = NULL, num_cores = 1)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -12,6 +12,12 @@ dlg(lg_object, grid = NULL)
 
 \item{grid}{A matrix of grid points, where we want to evaluate the density
 estimate}
+
+\item{num_cores}{An integer specifying the number of cores to parallize the
+bivariate density estimation over, when est_method=="1par" in the lg_object.
+When num_cores = 1 (the default) everything is ran sequentially.
+num_cores= 0 means using the maximum number of available logical cores.
+Uses foreach and the doParallel backend.}
 }
 \value{
 A list containing the density estimate as well as all the running
@@ -39,6 +45,8 @@ A list containing the density estimate as well as all the running
           original scale.
     \item \code{transformed_grid}: The grid where the estimation was
           performed, on the marginal standard normal scale.
+    \item \code{num_cores}: The number of cores used for parallelizing the
+          bivariate density estimation.
  }
 }
 \description{

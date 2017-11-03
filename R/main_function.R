@@ -72,6 +72,11 @@
 #'   the marginal bandwidths, passed on to the \code{optim}-function.
 #' @param tol_joint The absolute tolerance in the optimization for finding the
 #'   joint bandwidths. Passed on to the \code{optim}-function.
+#' @param num_cores_bw_cv An integer specifying the number of cores to parallize the
+#' cross validation of the bivariate bandwidths estimation when bw_method=="cv".
+#' When num_cores = 1 (the default) everything is ran sequentially.
+#' num_cores= 0 means using the maximum number of available logical cores.
+#' Uses foreach and the doParallel backend.
 #'
 #' @examples
 #'   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
@@ -131,7 +136,9 @@ lg <- function(x,
                plugin_exponent_marginal = -1/5,
                plugin_exponent_joint = -1/6,
                tol_marginal = 10^(-3),
-               tol_joint = 10^(-3)) {
+               tol_joint = 10^(-3),
+               parallelize = NULL,
+               num_cores_bw_cv = 1) {
 
     # Sanity checks
     x <- check_data(x, type = "data")
@@ -170,7 +177,8 @@ lg <- function(x,
                         plugin_constant_joint = plugin_constant_joint,
                         plugin_exponent_joint = plugin_exponent_joint,
                         tol_marginal = tol_marginal,
-                        tol_joint = tol_joint)
+                        tol_joint = tol_joint,
+                        num_cores = num_cores_bw_cv)
     }
     ret$bw <- bw
 

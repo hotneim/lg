@@ -22,14 +22,14 @@ dmvnorm_wrapper_single <- function(x1, x2, mu_1, mu_2, sig_1, sig_2, rho) {
 }
 
 #' Wrapper for \code{dmvnorm}
-#' 
-#' \code{dmvnorm_wrapper} is a function that evaluates the bivariate normal 
+#'
+#' \code{dmvnorm_wrapper} is a function that evaluates the bivariate normal
 #' distribution in a matrix of evaluation points, with local parameters.
-#' 
-#' This functions takes as arguments a matrix of grid points, and vectors of 
-#' parameter values, and returns the bivariate normal density at these points, 
+#'
+#' This functions takes as arguments a matrix of grid points, and vectors of
+#' parameter values, and returns the bivariate normal density at these points,
 #' with these parameter values.
-#' 
+#'
 #' @param eval_points A \code{kx2} matrix with evaluation points
 #' @param mu_1 The first expectation vector
 #' @param mu_2 The second expectation vector
@@ -49,7 +49,7 @@ dmvnorm_wrapper <- function(eval_points,
     if(run_checks) {
         check_dmvnorm_arguments(eval_points, mu_1, mu_2, sig_1, sig_2, rho)
     }
-    
+
     # Collect the arguments in one matrix, so that we can apply the single
     # wrapper function
     arguments <- cbind(eval_points, mu_1, mu_2, sig_1, sig_2, rho)
@@ -61,26 +61,26 @@ dmvnorm_wrapper <- function(eval_points,
                                                            mu_2 = x[4],
                                                            sig_1 = x[5],
                                                            sig_2 = x[6],
-                                                           rho = x[7]))           
-              
+                                                           rho = x[7]))
+
 }
 
 #' Evaluate the multivariate normal
-#' 
-#' Function that evaluates the multivariate normal distribution with local 
+#'
+#' Function that evaluates the multivariate normal distribution with local
 #' parameters
-#' 
+#'
 #' Takes in a grid, where we want to evaluate the multivariate normal, and in
 #' each grid point we have a new set of parameters.
-#' 
+#'
 #' @param eval_points A matrix of grid points
-#' @param loc_mean A matrix of local means, one row per grid point, one column 
+#' @param loc_mean A matrix of local means, one row per grid point, one column
 #'   per component
 #' @param loc_sd A  matrix of local standard deviations, one row per grid point,
 #'   one column per component
-#' @param loc_cor A matrix of local correlations, one row per grid point, on 
+#' @param loc_cor A matrix of local correlations, one row per grid point, on
 #'   column per pair of variables
-#' @param pairs A data frame specifying the components that make up each pair, 
+#' @param pairs A data frame specifying the components that make up each pair,
 #'   two colimns names 'x1' and 'x2', one row per pair of components
 mvnorm_eval <- function(eval_points,
                         loc_mean,
@@ -107,3 +107,53 @@ mvnorm_eval <- function(eval_points,
     unlist(lapply(X = as.list(1:nrow(eval_points)),
                   FUN = single_eval))
 }
+
+
+
+#' Help function for concise looping in CV bandwidth selection
+#'
+#' No point in documenting the input
+bandwidth_selection_cv_loop_helpfunc <- function(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths){
+
+  variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
+
+  # Extract the pairs of variables
+  bivariate_data <- x[, variables]
+
+
+  result <- bw_select_cv_bivariate(x = bivariate_data,
+                                   tol = tol_joint,
+                                   est_method = est_method,
+                                   bw_marginal = marginal_bandwidths[variables])
+
+  if(result$convergence != 0)
+    warning(paste("Cross valdidation for joint bandwidths",
+                  as.character(variables[1]), "and",  as.character(variables[2]),
+                  "did not converge properly"))
+
+  return(c(result$bw[1],result$bw[2],result$convergence))
+}
+
+#' Help function for concise looping in sequential bivariate density estimation
+#'
+#' No point in documenting the input
+dlg_bivariate_loop_helpfunc <- function(i,x,x0,lg_object,marginal_estimates,pairs){
+  if(lg_object$est_method == "1par") {
+    pairwise_marginal_estimates <- NA
+  } else {
+    pairwise_marginal_estimates <- list(marginal_estimates[[pairs$x1[i]]],
+                                        marginal_estimates[[pairs$x2[i]]])
+  }
+
+  pairwise_estimate <-
+    dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
+                  eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
+                  bw = c(lg_object$bw$joint[i, "bw1"],
+                         lg_object$bw$joint[i, "bw2"]),
+                  est_method = lg_object$est_method,
+                  marginal_estimates = pairwise_marginal_estimates)
+
+  return(pairwise_estimate$par_est[, "rho"])
+}
+
+

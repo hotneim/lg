@@ -90,50 +90,11 @@ dlg_bivariate <- function(x,
 
     if((est_method == "1par")) {
 
-        # We declare a function that maximizes the local likelihood in one grid point.
-        maximize_likelihood = function(grid_point) {
-
-            x1_0 <- grid_point[1]
-            x2_0 <- grid_point[2]
-
-            # We need weights and some empirical moments in this grid point
-            W <- dnorm(x1, mean = x1_0, sd = h1)*dnorm(x2, mean = x2_0, sd = h2)
-
-            m1 <- mean(W)
-            m2 <- mean(W*x1^2)
-            m3 <- mean(W*x2^2)
-            m4 <- mean(W*x1*x2)
-
-            # The likelihood function
-            lik <- function(rho) {
-                - log(2*pi*sqrt(1 - rho^2))*m1 - m2/(2*(1 - rho^2)) - m3/(2*(1 - rho^2)) +
-                    rho*m4/(1 - rho^2) - 1/2*exp(-1/2*(x2_0^2*h1^2 + x1_0^2 + x1_0^2*h2^2 -
-                    2*x1_0*rho*x2_0 + x2_0^2)/(-rho^2 + h2^2 + 1 + h1^2 + h1^2*h2^2))/
-                    (pi*(-rho^2 + h2^2 + 1 + h1^2 + h1^2*h2^2)^(1/2))
-            }
-
-            # Return the maximum of the likelihood and the density estimate
-            opt <- try(optimise(lik,
-                                lower = -1,
-                                upper = 1,
-                                maximum = TRUE,
-                                tol = tol),
-                       silent = TRUE)
-
-            # Store the result if the optimization went alright. Return NA if not.
-            if(class(opt) != "try-error") {
-                return(c(opt$maximum,
-                         mvtnorm::dmvnorm(c(x1_0, x2_0), mean = c(0,0),
-                                          sigma = matrix(c(1, opt$maximum, opt$maximum, 1), 2))))
-            } else {
-                return(c(NA, NA))
-            }
-        }
-
         ## Send the grid points to 'maximize_likelihood'
         est <- cbind(do.call(rbind,
                              lapply(X = split(eval_points, row(eval_points)),
-                                    FUN = maximize_likelihood)))
+                                    FUN = maximize_likelihood_1par,
+                                    x1=x1,x2=x2,h1=h1,h2=h2,tol=tol)))
         par_est <- matrix(est[,1])
         f_est = as.vector(est[,2])
         colnames(par_est) <- c('rho')
@@ -398,7 +359,11 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'   \code{lg}-function
 #' @param grid A matrix of grid points, where we want to evaluate the density
 #'   estimate
-#'
+#' @param num_cores An integer specifying the number of cores to parallize the
+#' bivariate density estimation over, when est_method=="1par" in the lg_object.
+#' When num_cores = 1 (the default) everything is ran sequentially.
+#' num_cores= 0 means using the maximum number of available logical cores.
+#' Uses foreach and the doParallel backend.
 #' @return A list containing the density estimate as well as all the running
 #'   parameters that has been used. The elements are:
 #'
@@ -424,6 +389,8 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'           original scale.
 #'     \item \code{transformed_grid}: The grid where the estimation was
 #'           performed, on the marginal standard normal scale.
+#'     \item \code{num_cores}: The number of cores used for parallelizing the
+#'           bivariate density estimation.
 #'  }
 #'
 #' @examples
@@ -437,8 +404,11 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'    Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
 #'    multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
+#' @import parallel
+#' @import doParallel
+#' @import foreach
 #' @export
-dlg <- function(lg_object, grid = NULL) {
+dlg <- function(lg_object, grid = NULL,num_cores = 1) {
 
     # Do some checks first
     check_lg(lg_object)
@@ -497,24 +467,24 @@ dlg <- function(lg_object, grid = NULL) {
                         estimate$par_est[, "sig_2"])
         loc_cor[,1] <- estimate$par_est[, "rho"]
     } else {  # And if not, we estimate the local correlation pairwise now
+      if (num_cores==1){ # Runs the loop sequentially if num_cores==1
         for(i in 1:nrow(pairs)) {
-            if(lg_object$est_method == "1par") {
-                pairwise_marginal_estimates <- NA
-            } else {
-                pairwise_marginal_estimates <- list(marginal_estimates[[pairs$x1[i]]],
-                                                    marginal_estimates[[pairs$x2[i]]])
-            }
-
-            pairwise_estimate <-
-                dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
-                              eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
-                              bw = c(lg_object$bw$joint[i, "bw1"],
-                                     lg_object$bw$joint[i, "bw2"]),
-                              est_method = lg_object$est_method,
-                              marginal_estimates = pairwise_marginal_estimates)
-
-            loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
+          loc_cor[,i] <- dlg_bivariate_loop_helpfunc(i,x,x0,lg_object,marginal_estimates,pairs)
         }
+      } else { # Or in parallell
+
+        #Using all (logical) cores if cum.cores is set to 0
+        if (num_cores==0) {
+          num_cores <- parallel::detectCores(logical=T)
+        }
+        cl <- parallel::makeCluster(num_cores)
+        doParallel::registerDoParallel(cl)
+
+        loc_cor <- foreach::foreach(i = 1:nrow(pairs),.packages = "lg",.combine=cbind) %dopar% {
+          dlg_bivariate_loop_helpfunc(i,x,x0,lg_object,marginal_estimates,pairs)
+        }
+        dimnames(loc_cor) <- NULL # Removing names to make format identical to sequential version
+      }
     }
 
     # Evaluate the density estimate
@@ -540,8 +510,8 @@ dlg <- function(lg_object, grid = NULL) {
     class(ret) <- "dlg"
 
     return(ret)
-
 }
+
 
 #' The locally Gaussian conditional density estimator
 #'
