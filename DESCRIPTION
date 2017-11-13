@@ -11,15 +11,16 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Suggests: testthat
+Suggests: 
+    testthat,
+    doParallel,
+    parallel,
+    foreach,
 Imports:
     mvtnorm,
     localgauss,
     logspline,
     akima,
-	doParallel,
-	parallel,
-	foreach,
     ggplot2,
     ks
     
