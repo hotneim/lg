@@ -47,6 +47,8 @@
 #' @param label_size Size of text labels, if plotted.
 #' @param font_family Font family used for text labels, if plotted.
 #' @param point_size Size of points used for plotting the observations.
+#' @param xlim x-limits
+#' @param ylim y-limits
 #' @param xlab x-label
 #' @param ylab y-label
 #' @param rholab Label for the legend, if plotted
@@ -79,6 +81,8 @@ corplot <- function(dlg_object,
                     label_size = 3,
                     font_family = "sans",
                     point_size = NULL,
+                    xlim = NULL,
+                    ylim = NULL,
                     xlab = NULL,
                     ylab = NULL,
                     rholab = NULL,
@@ -113,9 +117,10 @@ corplot <- function(dlg_object,
     # Where do we find unique values in the pairwise grid?
     distinct_grid <- !duplicated(full_grid, MARG = 1)
 
-    # The data fram used for plotting the dependence map
+    # The data frame used for plotting the dependence map
     x = full_grid[distinct_grid, 1]
     y = full_grid[distinct_grid, 2]
+    rho <- dlg_object$loc_cor[distinct_grid, pair]
 
     # Create the label for use in plot
     label = ifelse(!is.na(rho),
@@ -166,7 +171,16 @@ corplot <- function(dlg_object,
                                        breaks = seq(-1, 1, by = break_int))
     g <- g + gr
 
-    # Set axis labels id they are not provided
+    # Set axes limits if provided
+    if(!is.null(xlim)) {
+      g <- g + ggplot2::xlim(xlim)
+    }
+
+    if(!is.null(ylim)) {
+      g <- g + ggplot2::ylim(ylim)
+    }
+
+    # Set axis labels if they are not provided
     if(is.null(xlab)) {
         if(is.null(colnames(dlg_object$x))) {
             x_label <- "X"
@@ -241,10 +255,3 @@ corplot <- function(dlg_object,
 
     return(g)
 }
-
-#' Plot all pairs and collect in grid
-
-arrange_corplots <- function(dlg_objects) {
-
-}
-
