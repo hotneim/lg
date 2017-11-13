@@ -461,7 +461,7 @@ dlg <- function(lg_object, grid = NULL) {
     } else {
         x <- lg_object$x
         x0 <- grid
-        normalizing_constants <- matrix(1, nrow = nrow(grid), ncol = 1)
+        normalizing_constants <- matrix(1, nrow = nrow(grid), ncol = d)
     }
 
     # Extract the pairs from the list of bandwidths

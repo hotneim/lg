@@ -9,8 +9,8 @@ corplot(dlg_object, pair = 1, gaussian_scale = FALSE,
   plot_legend = FALSE, plot_thres = 0, alpha_tile = 0.8,
   alpha_point = 0.8, low_color = "blue", high_color = "red",
   break_int = 0.2, label_size = 3, font_family = "sans",
-  point_size = NULL, xlab = NULL, ylab = NULL, rholab = NULL,
-  main = NULL, subtitle = NULL)
+  point_size = NULL, xlim = NULL, ylim = NULL, xlab = NULL,
+  ylab = NULL, rholab = NULL, main = NULL, subtitle = NULL)
 }
 \arguments{
 \item{dlg_object}{The density estimation object produced by the dlg-function}
@@ -61,6 +61,10 @@ red).}
 \item{font_family}{Font family used for text labels, if plotted.}
 
 \item{point_size}{Size of points used for plotting the observations.}
+
+\item{xlim}{x-limits}
+
+\item{ylim}{y-limits}
 
 \item{xlab}{x-label}
 
