@@ -137,7 +137,6 @@ lg <- function(x,
                plugin_exponent_joint = -1/6,
                tol_marginal = 10^(-3),
                tol_joint = 10^(-3),
-               parallelize = NULL,
                num_cores_bw_cv = 1) {
 
     # Sanity checks

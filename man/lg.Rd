@@ -8,8 +8,7 @@ lg(x, bw_method = "plugin", est_method = "1par",
   transform_to_marginal_normality = TRUE, bw = NULL,
   plugin_constant_marginal = 1.75, plugin_constant_joint = 1.75,
   plugin_exponent_marginal = -1/5, plugin_exponent_joint = -1/6,
-  tol_marginal = 10^(-3), tol_joint = 10^(-3), parallelize = NULL,
-  num_cores_bw_cv = 1)
+  tol_marginal = 10^(-3), tol_joint = 10^(-3), num_cores_bw_cv = 1)
 }
 \arguments{
 \item{x}{A matrix or data frame with data, on column per variable, one row

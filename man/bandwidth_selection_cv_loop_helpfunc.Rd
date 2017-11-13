@@ -2,11 +2,27 @@
 % Please edit documentation in R/helping_functions.R
 \name{bandwidth_selection_cv_loop_helpfunc}
 \alias{bandwidth_selection_cv_loop_helpfunc}
-\title{Help function for concise looping in CV bandwidth selection}
+\title{Helping function for concise looping in CV bandwidth selection}
 \usage{
 bandwidth_selection_cv_loop_helpfunc(i, x, joint_bandwidths, tol_joint,
   est_method, marginal_bandwidths)
 }
+\arguments{
+\item{i}{Indicate pair number}
+
+\item{x}{The bivariate data set}
+
+\item{joint_bandwidths}{Pairwise bandwidths}
+
+\item{tol_joint}{Tolerance in the cross validation of pairwise bandwidths}
+
+\item{est_method}{The estimation method, must either be "1par" for estimation
+with just the local correlation, or "5par"  for a full locally Gaussian fit
+with all 5 parameters}
+
+\item{marginal_bandwidths}{The marginal bandwidths, used in the optimization}
+}
 \description{
-No point in documenting the input
+Function that is used in order to accomodate parellell computing in bandwidth
+selection. This function is only used internally.
 }

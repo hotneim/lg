@@ -110,10 +110,25 @@ mvnorm_eval <- function(eval_points,
 
 
 
-#' Help function for concise looping in CV bandwidth selection
+#' Helping function for concise looping in CV bandwidth selection
 #'
-#' No point in documenting the input
-bandwidth_selection_cv_loop_helpfunc <- function(i,x,joint_bandwidths,tol_joint,est_method,marginal_bandwidths){
+#' Function that is used in order to accomodate parellell computing in bandwidth
+#' selection. This function is only used internally.
+#'
+#' @param i Indicate pair number
+#' @param x The bivariate data set
+#' @param joint_bandwidths Pairwise bandwidths
+#' @param tol_joint Tolerance in the cross validation of pairwise bandwidths
+#' @param est_method The estimation method, must either be "1par" for estimation
+#'   with just the local correlation, or "5par"  for a full locally Gaussian fit
+#'   with all 5 parameters
+#' @param marginal_bandwidths The marginal bandwidths, used in the optimization
+bandwidth_selection_cv_loop_helpfunc <- function(i,
+                                                 x,
+                                                 joint_bandwidths,
+                                                 tol_joint,
+                                                 est_method,
+                                                 marginal_bandwidths) {
 
   variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
 
@@ -136,8 +151,22 @@ bandwidth_selection_cv_loop_helpfunc <- function(i,x,joint_bandwidths,tol_joint,
 
 #' Help function for concise looping in sequential bivariate density estimation
 #'
-#' No point in documenting the input
-dlg_bivariate_loop_helpfunc <- function(i,x,x0,lg_object,marginal_estimates,pairs){
+#' Function that is used in accomodating paralell computing of locally Gaussian
+#' density estimation. This function is only used internally.
+#'
+#' @param i Indicate pair number
+#' @param x The bivariate data set
+#' @param x0 Evaluation points
+#' @param lg_object The \code{lg}-object calculated for this data set
+#' @param marginal_estimates The marginal density estimates
+#' @param pairs Matrix indicating the pairs of variables.
+dlg_bivariate_loop_helpfunc <- function(i,
+                                        x,
+                                        x0,
+                                        lg_object,
+                                        marginal_estimates,
+                                        pairs){
+
   if(lg_object$est_method == "1par") {
     pairwise_marginal_estimates <- NA
   } else {
@@ -154,6 +183,89 @@ dlg_bivariate_loop_helpfunc <- function(i,x,x0,lg_object,marginal_estimates,pair
                   marginal_estimates = pairwise_marginal_estimates)
 
   return(pairwise_estimate$par_est[, "rho"])
+}
+
+#' 1-parameter likelihood function for bivariate data
+#'
+#' Used for optimization, only used internally.
+#'
+#' @param rho The local Gaussian correlation, with respect to which we optimize
+#' @param m1 Empirical mean 1, used in the optimization
+#' @param m2 Empirical mean 2, used in the optimization
+#' @param m3 Empirical mean 3, used in the optimization
+#' @param m4 Empirical mean 4, used in the optimization
+#' @param x1_0 Grid point 1
+#' @param x2_0 Grid point 2
+#' @param h1 Bandwidth 1
+#' @param h2 Bandwidth 2
+#'
+#' @return The likelihood for the one-parameter case.
+
+lik_1par <- function(rho,m1,m2,m3,m4,x1_0,x2_0,h1,h2) {
+  - log(2*pi*sqrt(1 - rho^2))*m1 - m2/(2*(1 - rho^2)) - m3/(2*(1 - rho^2)) +
+    rho*m4/(1 - rho^2) - 1/2*exp(-1/2*(x2_0^2*h1^2 + x1_0^2 + x1_0^2*h2^2 -
+                                         2*x1_0*rho*x2_0 + x2_0^2)/(-rho^2 + h2^2 + 1 + h1^2 + h1^2*h2^2))/
+    (pi*(-rho^2 + h2^2 + 1 + h1^2 + h1^2*h2^2)^(1/2))
+}
+
+
+
+#' 1-parameter likelihood maximization function for bivariate data
+#'
+#' Optimization of the local likelihood function.
+#'
+#' @param grid_point Grid point
+#' @param x1 The first data vector
+#' @param x2 The second data vector
+#' @param h1 The first bandwidth
+#' @param h2 The second bandwidth
+#' @param tol The tolerance used by the \code{optim}-function
+#'
+#' @return The maximized likelihood for the one-parameter case.
+#'
+#' @export
+
+maximize_likelihood_1par = function(grid_point,
+                                    x1, x2,
+                                    h1, h2,
+                                    tol) {
+
+  x1_0 <- grid_point[1]
+  x2_0 <- grid_point[2]
+
+  # We need weights and some empirical moments in this grid point
+  W <- dnorm(x1, mean = x1_0, sd = h1)*dnorm(x2, mean = x2_0, sd = h2)
+
+  m1 <- mean(W)
+  m2 <- mean(W*x1^2)
+  m3 <- mean(W*x2^2)
+  m4 <- mean(W*x1*x2)
+
+
+  # Return the maximum of the likelihood and the density estimate
+  opt <- try(optimise(lik_1par,
+                      lower = -1,
+                      upper = 1,
+                      maximum = TRUE,
+                      tol = tol,
+                      m1 = m1,
+                      m2 = m2,
+                      m3 = m3,
+                      m4 = m4,
+                      x1_0 = x1_0,
+                      x2_0 = x2_0,
+                      h1 = h1,
+                      h2 = h2),
+             silent = TRUE)
+
+  # Store the result if the optimization went alright. Return NA if not.
+  if(class(opt) != "try-error") {
+    return(c(opt$maximum,
+             mvtnorm::dmvnorm(c(x1_0, x2_0), mean = c(0,0),
+                              sigma = matrix(c(1, opt$maximum, opt$maximum, 1), 2))))
+  } else {
+    return(c(NA, NA))
+  }
 }
 
 

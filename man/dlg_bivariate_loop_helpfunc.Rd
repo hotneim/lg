@@ -6,6 +6,20 @@
 \usage{
 dlg_bivariate_loop_helpfunc(i, x, x0, lg_object, marginal_estimates, pairs)
 }
+\arguments{
+\item{i}{Indicate pair number}
+
+\item{x}{The bivariate data set}
+
+\item{x0}{Evaluation points}
+
+\item{lg_object}{The \code{lg}-object calculated for this data set}
+
+\item{marginal_estimates}{The marginal density estimates}
+
+\item{pairs}{Matrix indicating the pairs of variables.}
+}
 \description{
-No point in documenting the input
+Function that is used in accomodating paralell computing of locally Gaussian
+density estimation. This function is only used internally.
 }
