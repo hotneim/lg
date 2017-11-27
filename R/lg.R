@@ -35,4 +35,5 @@
 #'
 #' @docType package
 #' @name lg
+#'
 NULL
