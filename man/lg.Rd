@@ -39,5 +39,9 @@ Assuming that the data set has \strong{p} variables, you can evaluate the \emph{
 \code{conditional_dens_est <- clg(lg_object, grid = grid, condition = condition)}.
 }
 \references{
+Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+  multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
 
+  Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
+  the local Gaussian correlation" Statistics and Computing (2017b): 1-19.
 }

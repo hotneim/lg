@@ -33,6 +33,12 @@
 #'
 #' @references
 #'
+#'   Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#'   multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
+#'
+#'   Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
+#'   the local Gaussian correlation" Statistics and Computing (2017b): 1-19.
+#'
 #' @docType package
 #' @name lg
 NULL
