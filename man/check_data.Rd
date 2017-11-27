@@ -14,8 +14,8 @@ check_data(x, dim_check = NA, type)
 \item{type}{Is it the "grid" or "data" for use in error messages.}
 }
 \description{
-Checks that the data or grid provided is of the correct form. This function 
-is an auxiliary function that can quickly check that a supplied data set or 
+Checks that the data or grid provided is of the correct form. This function
+is an auxiliary function that can quickly check that a supplied data set or
 grid is a matrix or a data frame, and that it has the correct dimension, as
 defined by the \code{dim_check} parameter. The \code{type} argument is simply
 a character vector "data" or "grid" that is used for printing error messages.
