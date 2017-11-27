@@ -8,7 +8,7 @@ clg(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
-\code{lg}-function}
+\code{lg_main}-function}
 
 \item{grid}{A matrix of grid points, where we want to evaluate the density
 estimate. Number of columns *must* be the same as number of variables in
@@ -52,7 +52,7 @@ approximations.
 \details{
 This function is the coditional version of the locally Gaussian density
 estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
-as arguments an \code{lg}-object as produced by the main \code{lg}- function,
+as arguments an \code{lg}-object as produced by the main \code{lg_main}- function,
 a grid of points where the density estimate should be estimated, and a set of
 conditions.
 
@@ -69,7 +69,7 @@ value of X2.
   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
 
   # Generate the lg-object with default settings
-  lg_object <- lg(x)
+  lg_object <- lg_main(x)
 
   # Estimate the conditional density of X1|X2 = 0, X3 = 1 on a small grid
   cond_dens <- clg(lg_object, grid = matrix(-4:4, ncol = 1), condition = c(0, 1))

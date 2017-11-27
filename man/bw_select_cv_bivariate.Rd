@@ -16,7 +16,7 @@ bw_select_cv_bivariate(x, tol = 10^(-3), est_method = "1par",
 \item{est_method}{The estimation method for the bivariate fit. If estimation
 method is \code{5par_marginals_fixed}, the marginal bandwidths must be
 supplied as well through the argument \code{bw_marginal}. This is
-automatically handled by the \code{lg} wrapper function.}
+automatically handled by the \code{lg_main} wrapper function.}
 
 \item{bw_marginal}{The bandwidths for estimation of the marginals if method
 \code{5par_fixed_marginals} is used}
@@ -39,7 +39,7 @@ bandwidth that maximizes \deqn{CV(h) = n^{-1} \sum_{i=1}^n \log
 \hat{f}_h^{(-i)}(x_i),} where \eqn{\hat{f}_h^{(-i)}} is the density estimate
 calculated without observation \eqn{x_i}.
 
-The recommended use of this function is through the \code{lg} wrapper
+The recommended use of this function is through the \code{lg_main} wrapper
 function.
 }
 \examples{

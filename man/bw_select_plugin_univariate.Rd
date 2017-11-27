@@ -29,7 +29,7 @@ real number \code{c*n^a}, which is a quick and dirty way of selecting a
 bandwidth for univariate locally Gaussian density estimation. The number
 \code{c} is by default set to \code{1.75}, and \code{c = -1/5} is the usual
 exponent that stems from the asymptotic convergence rate of the density
-estimate. Recommended use of this function is through the \code{lg} wrapper
+estimate. Recommended use of this function is through the \code{lg_main} wrapper
 function.
 }
 \examples{

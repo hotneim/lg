@@ -8,7 +8,7 @@ dlg(lg_object, grid = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
-\code{lg}-function}
+\code{lg_main}-function}
 
 \item{grid}{A matrix of grid points, where we want to evaluate the density
 estimate}
@@ -48,12 +48,12 @@ Estimate a mulivariate density function using locally Gaussian approximations
 This function does multivariate density estimation using the locally Gaussian
 density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
 The function takes as arguments an \code{lg}-object as produced by the main
-\code{lg}-function (where all the running parameters are sepcified), and a
+\code{lg_main}-function (where all the running parameters are sepcified), and a
 grid of points where the density estimate should be estimated.
 }
 \examples{
    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
-   lg_object <- lg(x)  # Put all the running parameters in here.
+   lg_object <- lg_main(x)  # Put all the running parameters in here.
    grid <- cbind(seq(-4, 4, 1), seq(-4, 4, 1), seq(-4, 4, 1))
    density_estimate <- dlg(lg_object, grid = grid)
 

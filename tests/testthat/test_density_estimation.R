@@ -73,23 +73,6 @@ test_that("dlg_bivariate gives proper errors", {
                  "Estimation method must be either '1par', '5par' or '5par_marginals_fixed'")
 })
 
-library(lgde)
-
-old_bivariate <- biLocal(data = test_matrix_2col,
-                         grid = test_matrix_2col,
-                         h = test_bw_ok)
-new_bivariate <- dlg_bivariate(x = test_matrix_2col,
-                               eval_points = test_matrix_2col,
-                               bw = test_bw_ok,
-                               est_method = test_estmethod1)
-
-test_that("dlg_bivariate returns the same values as the old code", {
-    expect_equal(old_bivariate$data, new_bivariate$x)
-    expect_equal(old_bivariate$grid, new_bivariate$eval_points)
-    expect_equal(old_bivariate$par.est, new_bivariate$par_est)
-    expect_equal(as.vector(old_bivariate$f.est), new_bivariate$f_est)
-})
-
 test_that("dlg_bivariate returns the same grid for the two estimation methods", {
     expect_equal(dlg_bivariate(x = test_matrix_2col, grid_size = 15, est_method = "1par")$eval_points,
                  dlg_bivariate(x = test_matrix_2col, grid_size = 15, est_method = "5par")$eval_points)
@@ -119,7 +102,7 @@ n <- 100
 x <- mvtnorm::rmvt(n, df = 10, sigma = diag(3))
 grid <- cbind(c(1,2,3), c(1,2,3), c(1,2,3))
 
-lg_object <- lg(x)
+lg_object <- lg_main(x)
 density_estimate <- dlg(lg_object, grid = grid)
 
 lg_object_wrong <- grid

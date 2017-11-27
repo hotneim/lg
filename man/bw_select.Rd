@@ -58,7 +58,7 @@ This is the main bandwidth selection function within the framework of locally
 Gaussian distributions as described in Otneim and Tjøstheim (2017). This
 function takes in a data set of arbitrary dimension, and calculates the
 bandwidths needed to find the pairwise local Gaussian correlations, and
-serves as an intermediate step for the main \code{lg} wrapper function by
+serves as an intermediate step for the main \code{lg_main} wrapper function by
 choosing the appropriate method.
 }
 \examples{
