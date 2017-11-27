@@ -16,7 +16,6 @@ Imports:
     mvtnorm,
     localgauss,
     logspline,
-    akima,
     ggplot2,
     ks
     
