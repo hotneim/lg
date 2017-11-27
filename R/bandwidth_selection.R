@@ -70,7 +70,7 @@ bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 #' \hat{f}_h^{(-i)}(x_i),} where \eqn{\hat{f}_h^{(-i)}} is the density estimate
 #' calculated without observation \eqn{x_i}.
 #'
-#' The recommended use of this function is through the \code{lg} wrapper
+#' The recommended use of this function is through the \code{lg_main} wrapper
 #' function.
 #'
 #' @param x The matrix of data points.
@@ -79,7 +79,7 @@ bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 #' @param est_method The estimation method for the bivariate fit. If estimation
 #'   method is \code{5par_marginals_fixed}, the marginal bandwidths must be
 #'   supplied as well through the argument \code{bw_marginal}. This is
-#'   automatically handled by the \code{lg} wrapper function.
+#'   automatically handled by the \code{lg_main} wrapper function.
 #' @param bw_marginal The bandwidths for estimation of the marginals if method
 #'   \code{5par_fixed_marginals} is used
 #'
@@ -147,7 +147,7 @@ bw_select_cv_bivariate <- function(x,
 #' bandwidth for univariate locally Gaussian density estimation. The number
 #' \code{c} is by default set to \code{1.75}, and \code{c = -1/5} is the usual
 #' exponent that stems from the asymptotic convergence rate of the density
-#' estimate. Recommended use of this function is through the \code{lg} wrapper
+#' estimate. Recommended use of this function is through the \code{lg_main} wrapper
 #' function.
 #' @param x The data vector.
 #' @param n The number of data points. Can provide only this if we do not want
@@ -180,7 +180,7 @@ bw_select_plugin_univariate <- function(x = NULL,
 #' bandwidth for locally Gaussian density estimation. The number  \code{c} is by
 #' default set to \code{1.75}, and \code{c = -1/5} is the usual exponent, that
 #' stems from the asymptotic convergence rate of the density estimate. This
-#' function is usually called from the \code{lg} wrapper function.
+#' function is usually called from the \code{lg_main} wrapper function.
 #' @param x The data matrix.
 #' @param n The number of data points. Can provide only this if we do not want
 #'   to supply the entire data vector.
@@ -211,7 +211,7 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #' Gaussian distributions as described in Otneim and Tjøstheim (2017). This
 #' function takes in a data set of arbitrary dimension, and calculates the
 #' bandwidths needed to find the pairwise local Gaussian correlations, and
-#' serves as an intermediate step for the main \code{lg} wrapper function by
+#' serves as an intermediate step for the main \code{lg_main} wrapper function by
 #' choosing the appropriate method.
 #' @param x A matrix or data frame with data, on column per variable, one row
 #'   per observation

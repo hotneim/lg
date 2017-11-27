@@ -77,20 +77,20 @@
 #'   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
 #'
 #'   # Quick example
-#'   lg_object1 <- lg(x, bw_method = "plugin", est_method = "1par")
+#'   lg_object1 <- lg_main(x, bw_method = "plugin", est_method = "1par")
 #'
 #'   # In the simulation experiments in Otneim & Tjøstheim (2017a),
 #'   # the cross-validation bandwidth selection is used:
-#'   lg_object2 <- lg(x, bw_method = "cv", est_method = "1par")
+#'   lg_object2 <- lg_main(x, bw_method = "cv", est_method = "1par")
 #'
 #'   # If you do not wish to transform the data to standard normality,
 #'   # use the five parameter fit:
-#'   lg_object3 <- lg(x, est_method = "5par_marginals_fixed",
+#'   lg_object3 <- lg_main(x, est_method = "5par_marginals_fixed",
 #'                   transform_to_marginal_normality = FALSE)
 #'
 #'   # In the bivariate case, you can use the full nonparametric fit:
 #'   x_biv <- cbind(rnorm(100), rnorm(100))
-#'   lg_object4 <- lg(x_biv, est_method = "5par",
+#'   lg_object4 <- lg_main(x_biv, est_method = "5par",
 #'                   transform_to_marginal_normality = FALSE)
 #'
 #'   # Whichever method you choose, the lg-object can now be passed on
@@ -121,7 +121,7 @@
 #'   the local Gaussian correlation" Statistics and Computing (2017b): 1-19.
 #'
 #' @export
-lg <- function(x,
+lg_main <- function(x,
                bw_method = "plugin",
                est_method = "1par",
                transform_to_marginal_normality = TRUE,

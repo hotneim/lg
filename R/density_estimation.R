@@ -391,11 +391,11 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' This function does multivariate density estimation using the locally Gaussian
 #' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
 #' The function takes as arguments an \code{lg}-object as produced by the main
-#' \code{lg}-function (where all the running parameters are sepcified), and a
+#' \code{lg_main}-function (where all the running parameters are sepcified), and a
 #' grid of points where the density estimate should be estimated.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the
-#'   \code{lg}-function
+#'   \code{lg_main}-function
 #' @param grid A matrix of grid points, where we want to evaluate the density
 #'   estimate
 #'
@@ -428,7 +428,7 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'
 #' @examples
 #'    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
-#'    lg_object <- lg(x)  # Put all the running parameters in here.
+#'    lg_object <- lg_main(x)  # Put all the running parameters in here.
 #'    grid <- cbind(seq(-4, 4, 1), seq(-4, 4, 1), seq(-4, 4, 1))
 #'    density_estimate <- dlg(lg_object, grid = grid)
 #'
@@ -550,7 +550,7 @@ dlg <- function(lg_object, grid = NULL) {
 #'
 #' This function is the coditional version of the locally Gaussian density
 #' estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
-#' as arguments an \code{lg}-object as produced by the main \code{lg}- function,
+#' as arguments an \code{lg}-object as produced by the main \code{lg_main}- function,
 #' a grid of points where the density estimate should be estimated, and a set of
 #' conditions.
 #'
@@ -563,7 +563,7 @@ dlg <- function(lg_object, grid = NULL) {
 #' value of X2.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the
-#'   \code{lg}-function
+#'   \code{lg_main}-function
 #' @param grid A matrix of grid points, where we want to evaluate the density
 #'   estimate. Number of columns *must* be the same as number of variables in
 #'   X1.
@@ -601,7 +601,7 @@ dlg <- function(lg_object, grid = NULL) {
 #'   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
 #'
 #'   # Generate the lg-object with default settings
-#'   lg_object <- lg(x)
+#'   lg_object <- lg_main(x)
 #'
 #'   # Estimate the conditional density of X1|X2 = 0, X3 = 1 on a small grid
 #'   cond_dens <- clg(lg_object, grid = matrix(-4:4, ncol = 1), condition = c(0, 1))

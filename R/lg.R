@@ -6,7 +6,7 @@
 #' Gaussian correlation as presented in Otneim & Tjøstheim (2017a) and Otneim &
 #' Tjøstheim (2017b).
 #'
-#' The main function is called \code{lg}, and takes as argument a data set
+#' The main function is called \code{lg_main}, and takes as argument a data set
 #' (represented by a matrix or data frame) as well as various (optional)
 #' configurations that is described in detail in the articles mentioned above,
 #' as well as in the documentation of this package. In particular, this function
@@ -16,10 +16,10 @@
 #' the default configuration, that can be used for density estimation
 #' afterwards:
 #'
-#' \code{lg_object <- lg(x)}
+#' \code{lg_object <- lg_main(x)}
 #'
 #' You can change estimation method, bandwidth selection method and other
-#' parameters by using the arguments of the \code{lg} function.
+#' parameters by using the arguments of the \code{lg_main} function.
 #'
 #' You can evaluate the multivariate density estimate on a \code{grid} as
 #' described in Otneim & Tjøstheim (2017a) using the \code{dlg}-function as
@@ -35,5 +35,4 @@
 #'
 #' @docType package
 #' @name lg
-#'
 NULL
