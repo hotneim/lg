@@ -9,7 +9,7 @@
 #' The main function is called \code{lg_main}, and takes as argument a data set
 #' (represented by a matrix or data frame) as well as various (optional)
 #' configurations that is described in detail in the articles mentioned above,
-#' as well as in the documentation of this package. In particular, this function
+#' and in the documentation of this package. In particular, this function
 #' will calculate the bandwidths used for estimation, using either a plugin
 #' estimate (default), or a cross validation estimate. If \code{x} is the data
 #' set, then the following line of code will create an \code{lg} object using

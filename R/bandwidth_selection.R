@@ -81,7 +81,7 @@ bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 #'   supplied as well through the argument \code{bw_marginal}. This is
 #'   automatically handled by the \code{lg_main} wrapper function.
 #' @param bw_marginal The bandwidths for estimation of the marginals if method
-#'   \code{5par_fixed_marginals} is used
+#'   \code{5par_fixed_marginals} is used.
 #'
 #' @return The function returns a list with two elements: \code{bw} is the
 #'   selected bandwidths, and \code{convergence} is the convergence flag returned
@@ -166,7 +166,7 @@ bw_select_cv_bivariate <- function(x,
 bw_select_plugin_univariate <- function(x = NULL,
                                         n = length(x),
                                         c = 1.75,
-                                        a = -.2) {
+                                        a = -1/5) {
     c*n^a
 }
 
@@ -178,7 +178,7 @@ bw_select_plugin_univariate <- function(x = NULL,
 #' This function takes in a data matrix with \code{n} rows, and returns a the
 #' real number \code{c*n^a}, which is a quick and dirty way of selecting a
 #' bandwidth for locally Gaussian density estimation. The number  \code{c} is by
-#' default set to \code{1.75}, and \code{c = -1/5} is the usual exponent, that
+#' default set to \code{1.75}, and \code{c = -1/6} is the usual exponent, that
 #' stems from the asymptotic convergence rate of the density estimate. This
 #' function is usually called from the \code{lg_main} wrapper function.
 #' @param x The data matrix.
@@ -211,15 +211,14 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #' Gaussian distributions as described in Otneim and Tjøstheim (2017). This
 #' function takes in a data set of arbitrary dimension, and calculates the
 #' bandwidths needed to find the pairwise local Gaussian correlations, and
-#' serves as an intermediate step for the main \code{lg_main} wrapper function by
-#' choosing the appropriate method.
-#' @param x A matrix or data frame with data, on column per variable, one row
-#'   per observation
+#' is mainly used by the main \code{lg_main} wrapper function.
+#' @param x A matrix or data frame with data, one column per variable, one row
+#'   per observation.
 #' @param bw_method The method used for bandwidth selection. Must be either
 #'   \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"}
-#'   (fast, but crude)
+#'   (fast, but crude).
 #' @param est_method The estimation method, must be either "1par", "5par" or
-#'   "5par_marginals_fixed"
+#'   "5par_marginals_fixed", see \code{\link{lg_main}}.
 #' @param plugin_constant_marginal The constant \code{c} in \code{cn^a} used for
 #'   finding the plugin bandwidth for locally Gaussian marginal density
 #'   estimates, which we need if estimation method is "5par_marginals_fixed".
@@ -233,11 +232,11 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #'   finding the plugin bandwidth for estimating the pairwise local Gaussian
 #'   correlation between two variables.
 #' @param tol_marginal The absolute tolerance in the optimization for finding
-#'   the marginal bandwidths
+#'   the marginal bandwidths when using cross validation.
 #' @param tol_joint The absolute tolerance in the optimization for finding the
-#'   joint bandwidths
+#'   joint bandwidths when using cross-validation.
 #'
-#' @return A List with three elements, \code{marginal}  contains the bandwidths
+#' @return A list with three elements, \code{marginal}  contains the bandwidths
 #'   used for the marginal locally Gaussian estimation,
 #'   \code{marginal_convergence} contains the convergence flags for the marginal
 #'   banwidths, as returned by the \code{optim} function, and \code{joint}

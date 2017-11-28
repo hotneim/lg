@@ -11,9 +11,9 @@
 #' This is the main function in the package. It lets the user supply a data set
 #' and set a number of options, which is then used to prepare an \code{lg}
 #' object that can be supplied to other functions in the package, such as
-#' \code{dlg} (density estimation), \code{clg} (conditional density estimation),
-#' or other tasks in the locally Gaussian universe. The details has been laid
-#' out in Otneim & Tjøstheim (2017a) and Otneim & Tjøstheim (2017b).
+#' \code{dlg} (density estimation), \code{clg} (conditional density estimation).
+#' The details has been laid out in Otneim & Tjøstheim (2017a) and Otneim &
+#' Tjøstheim (2017b).
 #'
 #' The papers mentioned above deal with the estimation of multivariate density
 #' functions and conditional density functions. The idea is to fit a
@@ -45,16 +45,16 @@
 #' \code{localgauss}-package by Berentsen et.al. (2014).
 #'
 #' @param x A matrix or data frame with data, on column per variable, one row
-#'   per observation
+#'   per observation.
 #' @param bw_method The method used for bandwidth selection. Must be either
 #'   \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"}
-#'   (fast, but crude)
+#'   (fast, but crude).
 #' @param est_method The estimation method, must be either "1par", "5par" or
-#'   "5par_marginals_fixed" (see details)
-#' @param transform_to_marginal_normality Logical true if we want to transform
-#'   our data to marginal standard normality. This is assumed by method "1par",
-#'   but can of course be skipped using this argument if it has been done
-#'   already.
+#'   "5par_marginals_fixed" (see details).
+#' @param transform_to_marginal_normality Logical, \code{TRUE} if we want to
+#'   transform our data to marginal standard normality. This is assumed by
+#'   method "1par", but can of course be skipped using this argument if it has
+#'   been done already.
 #' @param bw Bandwidth object if it has already been calculated.
 #' @param plugin_constant_marginal The constant \code{c} in \code{cn^a} used for
 #'   finding the plugin bandwidth for locally Gaussian marginal density
@@ -106,19 +106,19 @@
 #'
 #' @references
 #'
-#'   Berentsen, Geir Drage, Tore Selland Kleppe, and Dag Tjøstheim. "Introducing
-#'   localgauss, an R package for estimating and visualizing local Gaussian
-#'   correlation." Journal of Statistical Software 56.1 (2014): 1-18.
+#' Berentsen, Geir Drage, Tore Selland Kleppe, and Dag Tjøstheim. "Introducing
+#' localgauss, an R package for estimating and visualizing local Gaussian
+#' correlation." Journal of Statistical Software 56.1 (2014): 1-18.
 #'
-#'   Hufthammer, Karl Ove, and Dag Tjøstheim. "Local Gaussian Likelihood and Local
-#'   Gaussian Correlation" PhD Thesis of Karl Ove Hufthammer, University of
-#'   Bergen, 2009.
+#' Hufthammer, Karl Ove, and Dag Tjøstheim. "Local Gaussian Likelihood and Local
+#' Gaussian Correlation" PhD Thesis of Karl Ove Hufthammer, University of
+#' Bergen, 2009.
 #'
-#'   Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
-#'   multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
+#' Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#' multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
 #'
-#'   Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
-#'   the local Gaussian correlation" Statistics and Computing (2017b): 1-19.
+#' Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using the
+#' local Gaussian correlation" Statistics and Computing (2017b): 1-19.
 #'
 #' @export
 lg_main <- function(x,

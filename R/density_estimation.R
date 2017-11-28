@@ -14,26 +14,26 @@
 #' bandwidths, \code{bw}, with two elements, and an estimation method
 #' \code{est_method}
 #'
-#' @param x The data matrix (or data frame). Must have exactly 2 columns
+#' @param x The data matrix (or data frame). Must have exactly 2 columns.
 #' @param eval_points The grid where the density should be estimated. Must have
-#'   exactly 2 columns
+#'   exactly 2 columns.
 #' @param grid_size If \code{eval_points} is not supplied, then the function
 #'   will create a suitable grid diagonally through the data, with this many
-#'   grid points
-#' @param bw The two bandwidths, a numeric vector of length 2
+#'   grid points.
+#' @param bw The two bandwidths, a numeric vector of length 2.
 #' @param est_method The estimation method, must either be "1par" for estimation
 #'   with just the local correlation, or "5par"  for a full locally Gaussian fit
-#'   with all 5 parameters
-#' @param tol The numerical tolerance to be used in the optimization. Opnly
-#'   applicable in the 1-parameter optimization
+#'   with all 5 parameters.
+#' @param tol The numerical tolerance to be used in the optimization. Only
+#'   applicable in the 1-parameter optimization.
 #' @param run_checks Logical. Should sanity checks be run on the arguments?
 #'   Useful to disable this when doing cross-validation for example.
 #' @param marginal_estimates Provide the marginal estimates here if estimation
 #'   method is "\code{5par_marginals_fixed}", and the marginal estimates have
 #'   already been found. Useful for cross-valdiation. List with two elements as
-#'   returned by \code{dlg_marginal_wrapper}
+#'   returned by \code{dlg_marginal_wrapper}.
 #' @param bw_marginal Vector of bandwidths used to estimate the marginal
-#'   distributions
+#'   distributions.
 #'
 #' @return A list including the data set \code{$x}, the grid
 #'   \code{$eval_points}, the bandwidths \code{$bw}, as well as a matrix of the
@@ -341,7 +341,7 @@ dlg_marginal <- function(x,
 
 #' Marginal estimates for multivariate data
 #'
-#' Estimates the marginal locally Gaussian parameter estimates for a
+#' Estimates the marginal locally Gaussian parameters for a
 #' multivariate data set
 #'
 #' This function takes in a matrix of observations, a matrix of evaluation
@@ -395,9 +395,9 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' grid of points where the density estimate should be estimated.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the
-#'   \code{lg_main}-function
+#'   \code{lg_main}-function.
 #' @param grid A matrix of grid points, where we want to evaluate the density
-#'   estimate
+#'   estimate.
 #'
 #' @return A list containing the density estimate as well as all the running
 #'   parameters that has been used. The elements are:
@@ -554,7 +554,7 @@ dlg <- function(lg_object, grid = NULL) {
 #' a grid of points where the density estimate should be estimated, and a set of
 #' conditions.
 #'
-#' The variables must be sorted befor they are supplied to this function. It
+#' The variables must be sorted before they are supplied to this function. It
 #' will always assume that the free variables come before the conditioning
 #' variables.
 #'
@@ -563,16 +563,15 @@ dlg <- function(lg_object, grid = NULL) {
 #' value of X2.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the
-#'   \code{lg_main}-function
+#'   \code{lg_main}-function.
 #' @param grid A matrix of grid points, where we want to evaluate the density
 #'   estimate. Number of columns *must* be the same as number of variables in
 #'   X1.
 #' @param condition A vector with conditions for the variables that we condition
 #'   upon. Length of this vector *must* be the same as the number of variables
 #'   in X2. The function will throw an arrow of there is any discrepancy in the
-#'   dimensions of \code{grid} and \code{condition}.
-#' @param fixed_grid Used by the conditional independence test to calculate the
-#'   test statistic (please ignore this).
+#'   dimensions of the \code{grid}, \code{condition} and data set.
+#' @param fixed_grid Not used presently.
 #'
 #' @return A list containing the conditional density estimate as well as all the
 #'   running parameters that has been used. The elements are:
@@ -586,10 +585,10 @@ dlg <- function(lg_object, grid = NULL) {
 #'     \item \code{x}: The data set.
 #'     \item \code{bw}: The bandwidth object.
 #'     \item \code{transformed_data}: The data transformed to approximate
-#'           marginal standard normality.
+#'           marginal standard normality (if selected).
 #'     \item \code{normalizing_constants}: The normalizing constants used to
 #'           transform data and grid back and forth to the marginal standard
-#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
+#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017) (if selected).
 #'     \item \code{grid}: The grid where the estimation was performed, on the
 #'           original scale.
 #'     \item \code{transformed_grid}: The grid where the estimation was

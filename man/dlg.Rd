@@ -8,10 +8,10 @@ dlg(lg_object, grid = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
-\code{lg_main}-function}
+\code{lg_main}-function.}
 
 \item{grid}{A matrix of grid points, where we want to evaluate the density
-estimate}
+estimate.}
 }
 \value{
 A list containing the density estimate as well as all the running

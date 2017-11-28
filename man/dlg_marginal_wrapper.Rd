@@ -20,7 +20,7 @@ A list with marginal parameter and density estimates as provided by
   the \code{dlg_bivariate}-function. One element per column in the data.
 }
 \description{
-Estimates the marginal locally Gaussian parameter estimates for a
+Estimates the marginal locally Gaussian parameters for a
 multivariate data set
 }
 \details{

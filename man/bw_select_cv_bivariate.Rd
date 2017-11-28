@@ -19,7 +19,7 @@ supplied as well through the argument \code{bw_marginal}. This is
 automatically handled by the \code{lg_main} wrapper function.}
 
 \item{bw_marginal}{The bandwidths for estimation of the marginals if method
-\code{5par_fixed_marginals} is used}
+\code{5par_fixed_marginals} is used.}
 }
 \value{
 The function returns a list with two elements: \code{bw} is the

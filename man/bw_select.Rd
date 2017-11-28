@@ -10,15 +10,15 @@ bw_select(x, bw_method = "plugin", est_method = "1par",
   tol_marginal = 10^(-3), tol_joint = 10^(-3))
 }
 \arguments{
-\item{x}{A matrix or data frame with data, on column per variable, one row
-per observation}
+\item{x}{A matrix or data frame with data, one column per variable, one row
+per observation.}
 
 \item{bw_method}{The method used for bandwidth selection. Must be either
 \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"}
-(fast, but crude)}
+(fast, but crude).}
 
 \item{est_method}{The estimation method, must be either "1par", "5par" or
-"5par_marginals_fixed"}
+"5par_marginals_fixed", see \code{\link{lg_main}}.}
 
 \item{plugin_constant_marginal}{The constant \code{c} in \code{cn^a} used for
 finding the plugin bandwidth for locally Gaussian marginal density
@@ -37,13 +37,13 @@ finding the plugin bandwidth for estimating the pairwise local Gaussian
 correlation between two variables.}
 
 \item{tol_marginal}{The absolute tolerance in the optimization for finding
-the marginal bandwidths}
+the marginal bandwidths when using cross validation.}
 
 \item{tol_joint}{The absolute tolerance in the optimization for finding the
-joint bandwidths}
+joint bandwidths when using cross-validation.}
 }
 \value{
-A List with three elements, \code{marginal}  contains the bandwidths
+A list with three elements, \code{marginal}  contains the bandwidths
   used for the marginal locally Gaussian estimation,
   \code{marginal_convergence} contains the convergence flags for the marginal
   banwidths, as returned by the \code{optim} function, and \code{joint}
@@ -58,8 +58,7 @@ This is the main bandwidth selection function within the framework of locally
 Gaussian distributions as described in Otneim and Tjøstheim (2017). This
 function takes in a data set of arbitrary dimension, and calculates the
 bandwidths needed to find the pairwise local Gaussian correlations, and
-serves as an intermediate step for the main \code{lg_main} wrapper function by
-choosing the appropriate method.
+is mainly used by the main \code{lg_main} wrapper function.
 }
 \examples{
   x <- cbind(rnorm(100), rnorm(100), rnorm(100))

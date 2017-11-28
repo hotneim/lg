@@ -8,7 +8,7 @@ clg(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
-\code{lg_main}-function}
+\code{lg_main}-function.}
 
 \item{grid}{A matrix of grid points, where we want to evaluate the density
 estimate. Number of columns *must* be the same as number of variables in
@@ -17,10 +17,9 @@ X1.}
 \item{condition}{A vector with conditions for the variables that we condition
 upon. Length of this vector *must* be the same as the number of variables
 in X2. The function will throw an arrow of there is any discrepancy in the
-dimensions of \code{grid} and \code{condition}.}
+dimensions of the \code{grid}, \code{condition} and data set.}
 
-\item{fixed_grid}{Used by the conditional independence test to calculate the
-test statistic (please ignore this).}
+\item{fixed_grid}{Not used presently.}
 }
 \value{
 A list containing the conditional density estimate as well as all the
@@ -35,10 +34,10 @@ A list containing the conditional density estimate as well as all the
     \item \code{x}: The data set.
     \item \code{bw}: The bandwidth object.
     \item \code{transformed_data}: The data transformed to approximate
-          marginal standard normality.
+          marginal standard normality (if selected).
     \item \code{normalizing_constants}: The normalizing constants used to
           transform data and grid back and forth to the marginal standard
-          normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
+          normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017) (if selected).
     \item \code{grid}: The grid where the estimation was performed, on the
           original scale.
     \item \code{transformed_grid}: The grid where the estimation was
@@ -56,7 +55,7 @@ as arguments an \code{lg}-object as produced by the main \code{lg_main}- functio
 a grid of points where the density estimate should be estimated, and a set of
 conditions.
 
-The variables must be sorted befor they are supplied to this function. It
+The variables must be sorted before they are supplied to this function. It
 will always assume that the free variables come before the conditioning
 variables.
 

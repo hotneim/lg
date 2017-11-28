@@ -4,8 +4,7 @@ Version: 0.1.0
 Authors@R: person("Håkon", "Otneim", email = "hakon.otneim@nhh.no", role = c("aut", "cre"))
 Description: An implementation of locally Gaussian distributions in R. It provides methods for
     implementing the locally Gaussian density estimator (LGDE), as well as the corresponding
-    estimator for conditional density functions. Further, functions for conditional independence
-    tests and classification using local Gaussian correlations are included.
+    estimator for conditional density functions. 
 Depends: R (>= 3.2.3)
 License: GPL-3
 Encoding: UTF-8
