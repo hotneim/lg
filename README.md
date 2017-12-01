@@ -14,7 +14,7 @@ Let us illustrate the use of this package by looking at the built-in data set of
 data(EuStockMarkets)
 x <- apply(EuStockMarkets, 2, function(x) diff(log(x)))
 
-# Remove the days where at leas one index did not move at all
+# Remove the days where at least one index did not move at all
 x <- x[!apply(x, 1, function(x) any(x == 0)),]
 ```
 
@@ -22,8 +22,8 @@ When using this package, the first task is always to create an lg-object using t
 
 -   **The bandwidth selection method**: The bandwidth selection method is controlled through the argument *bw\_method*. It can take one of two values:
     -   Use *bw\_method = "cv"* to use the cross-validation routine described by Otneim and Tjøstheim (2017a). Depending on your system, this method is fairly slow and may take several minutes even for moderately sized data sets.
-    -   Use *bw\_method = "plugin"* for plugin bandwidths. This is the **default** method and very quick. It simply sets all bandwidths equal to 1.75*n^(-1/6), which is derived from the asymptotic convergence rates for the local Gaussian correlations. Both numbers (1.75 and -1/6) can be set manually (see documentation of the *lg\_main()\*-function).
--   **The estimation method:** The method of estimation is controlled through the argument *est\_method*. It can tak one of three values:
+    -   Use *bw\_method = "plugin"* for plugin bandwidths. This is the **default** method and very quick. It simply sets all bandwidths equal to 1.75\*n^(-1/6), which is derived from the asymptotic convergence rates for the local Gaussian correlations. Both numbers (1.75 and -1/6) can be set manually (see documentation of the lg\_main()-function).
+-   **The estimation method:** The method of estimation is controlled through the argument *est\_method*. It can take one of three values:
     -   Otneim and Tjøstheim (2017a) uses a simplified method for multivariate density estimation. The density estimate is a locally Gaussian distribution, with correlations being estimated *locally* and *pairwise*. The data is transformed for marginal standard normality (see next point) and as a consequence, we fix the means and standard deviations to 0 and 1 respectively. To use this estimation method, write *est\_method = "1par"*. This is the **default** method.
     -   Set *est\_method = "5par\_marginals\_fixed"* to estimate local means and local standard deviations marginally, as well as the pairwise local correlations. This is a more flexible method, but its theoretical properties are not (yet) fully understood. This configuration allows for the estimation of multivariate density functions without having to transform the data.
     -   The option *est\_method = "5par"* is reserved to bivariate problems, and is a fully nonparametric estimation method as laid out by Tjøstheim & Hufthammer (2013). This will simply invoke the *localgauss* package (Berentsen et. al., ).
@@ -53,7 +53,7 @@ plot(grid[,1], density_estimate$f_est, type = "l",
 Estimation of conditional densities
 ===================================
 
-If we want to calculate conditional density functions, we must take to notice the *order* of the columns in our data set (x). This is because the estimations routine, implemented in the *clg()*-function, will always assume that the independent variables come first. Looking at the top of our data set:
+If we want to calculate conditional density functions, we must take care to notice the *order* of the columns in our data set. This is because the estimation routine, implemented in the *clg()*-function, will always assume that the independent variables come first. Looking at the top of our data set:
 
 ``` r
 head(x)
