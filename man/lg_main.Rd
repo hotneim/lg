@@ -11,20 +11,20 @@ lg_main(x, bw_method = "plugin", est_method = "1par",
   tol_marginal = 10^(-3), tol_joint = 10^(-3))
 }
 \arguments{
-\item{x}{A matrix or data frame with data, on column per variable, one row
-per observation.}
+\item{x}{A matrix or data frame with data, on column per variable, one row per
+observation.}
 
 \item{bw_method}{The method used for bandwidth selection. Must be either
-\code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"}
-(fast, but crude).}
+\code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
+but crude).}
 
 \item{est_method}{The estimation method, must be either "1par", "5par" or
 "5par_marginals_fixed" (see details).}
 
 \item{transform_to_marginal_normality}{Logical, \code{TRUE} if we want to
-transform our data to marginal standard normality. This is assumed by
-method "1par", but can of course be skipped using this argument if it has
-been done already.}
+transform our data to marginal standard normality. This is assumed by method
+"1par", but can of course be skipped using this argument if it has been done
+already.}
 
 \item{bw}{Bandwidth object if it has already been calculated.}
 
@@ -44,8 +44,8 @@ estimates, which we need if estimation method is "5par_marginals_fixed".}
 finding the plugin bandwidth for estimating the pairwise local Gaussian
 correlation between two variables.}
 
-\item{tol_marginal}{The absolute tolerance in the optimization for finding
-the marginal bandwidths, passed on to the \code{optim}-function.}
+\item{tol_marginal}{The absolute tolerance in the optimization for finding the
+marginal bandwidths, passed on to the \code{optim}-function.}
 
 \item{tol_joint}{The absolute tolerance in the optimization for finding the
 joint bandwidths. Passed on to the \code{optim}-function.}
@@ -57,35 +57,35 @@ correlation and for testing purposes.
 }
 \details{
 This is the main function in the package. It lets the user supply a data set
-and set a number of options, which is then used to prepare an \code{lg}
-object that can be supplied to other functions in the package, such as
-\code{dlg} (density estimation), \code{clg} (conditional density estimation).
-The details has been laid out in Otneim & Tjøstheim (2017a) and Otneim &
-Tjøstheim (2017b).
+and set a number of options, which is then used to prepare an \code{lg} object
+that can be supplied to other functions in the package, such as \code{dlg}
+(density estimation), \code{clg} (conditional density estimation). The details
+has been laid out in Otneim & Tjøstheim (2017a) and Otneim & Tjøstheim
+(2017b).
 
 The papers mentioned above deal with the estimation of multivariate density
-functions and conditional density functions. The idea is to fit a
-multivariate Normal locally to the unknown density function by first
-transforming the data to marginal standard normality, and then estimate the
-local correlations \strong{pairwise}. The local means and local standard
-deviations are held fixed and constantly equal to 0 and 1 respectively to
-reflect the knowledge that the marginals are approximetaly standard normal.
-Use \code{est_method = "1par"} for this strategy, which means that we only
-estimate one local parameter (the correlation) for each pair, and note that
-this method requires marginally standard normal data. If \code{est_method =
-"1par"} and \code{transform_to_marginal_normality = FALSE} the function will
-throw a warning. It might be okay though, if you know that the data are
-marginally standard normal already.
+functions and conditional density functions. The idea is to fit a multivariate
+Normal locally to the unknown density function by first transforming the data
+to marginal standard normality, and then estimate the local correlations
+\strong{pairwise}. The local means and local standard deviations are held
+fixed and constantly equal to 0 and 1 respectively to reflect the knowledge
+that the marginals are approximetaly standard normal. Use \code{est_method =
+"1par"} for this strategy, which means that we only estimate one local
+parameter (the correlation) for each pair, and note that this method requires
+marginally standard normal data. If \code{est_method = "1par"} and
+\code{transform_to_marginal_normality = FALSE} the function will throw a
+warning. It might be okay though, if you know that the data are marginally
+standard normal already.
 
 The second option is \code{est_method = "5par_marginals_fixed"} which is more
 flexible than \code{"1par"}. This method will estimate univariate local
 Gaussian fits to each marginal, thus producing local estmates of the local
-means: \eqn{\mu_i(x_i)} and \eqn{\sigma_i(x_i)} that will be held fixed in
-the next step when the \strong{pairwise} local correlations are estimated.
-This method can in many situations provide a better fit, even if the
-marginals are standard normal. It also opens up for creating a multivariate
-locally Gaussian fit to any density without having to transform the marginals
-if you for some reason want to avoid that.
+means: \eqn{\mu_i(x_i)} and \eqn{\sigma_i(x_i)} that will be held fixed in the
+next step when the \strong{pairwise} local correlations are estimated. This
+method can in many situations provide a better fit, even if the marginals are
+standard normal. It also opens up for creating a multivariate locally Gaussian
+fit to any density without having to transform the marginals if you for some
+reason want to avoid that.
 
 The third option is \code{est_method = "5par"}, which is a full nonparametric
 locally Gaussian fit of a bivariate density as laid out and used by Tjøstheim
@@ -130,12 +130,15 @@ localgauss, an R package for estimating and visualizing local Gaussian
 correlation." Journal of Statistical Software 56.1 (2014): 1-18.
 
 Hufthammer, Karl Ove, and Dag Tjøstheim. "Local Gaussian Likelihood and Local
-Gaussian Correlation" PhD Thesis of Karl Ove Hufthammer, University of
-Bergen, 2009.
+Gaussian Correlation" PhD Thesis of Karl Ove Hufthammer, University of Bergen,
+2009.
 
 Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
 multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
 
 Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using the
 local Gaussian correlation" Statistics and Computing (2017b): 1-19.
+
+Tjøstheim, D., & Hufthammer, K. O. (2013). Local Gaussian correlation: a new
+measure of dependence. Journal of Econometrics, 172(1), 33-48.
 }
