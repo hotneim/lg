@@ -8,6 +8,13 @@ Otneim and Tjøstheim (2017a) describes a new method for estimating multivariate
 Example
 =======
 
+Let us illustrate the use of this package by looking at the built-in data set of daily closing prices of 4 major European stock indices in the period 1991-1998. We load the data and transform them to daily returns:
+
+``` r
+data(EuStockMarkets)
+x <- apply(EuStockMarkets, 2, function(x) diff(log(x)))
+```
+
 Installation instructions
 =========================
 

@@ -39,6 +39,8 @@
 #'   Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
 #'   the local Gaussian correlation" Statistics and Computing (2017b): 1-19.
 #'
+#' @importFrom stats dnorm optim optimise qnorm quantile
+#' @importFrom utils combn
 #' @docType package
 #' @name lg
 NULL
