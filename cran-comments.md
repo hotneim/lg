@@ -1,5 +1,5 @@
 ## Test environments
-* local Ubuntu 16.04.1 LTS, R 3.2.3
+* local Ubuntu 16.04.1 LTS, R 3.4.3
 * win-builder
 
 ## R CMD check results
