@@ -45,7 +45,7 @@ plotted, if 1 nothing is plotted. Typical values may be in the
 \item{alpha_tile}{The alpha-value indicating the transparency of the color
 tiles. Number between 0 (transparent) and 1 (not transparent).}
 
-\item{alpha_point}{he alpha-value indicating the transparancy of the
+\item{alpha_point}{he alpha-value indicating the transparency of the
 observations. Number between 0 (transparent) and 1 (not transparent).}
 
 \item{low_color}{The color corresponding to correlation equal to -1 (default:

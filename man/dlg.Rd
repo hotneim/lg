@@ -42,7 +42,7 @@ A list containing the density estimate as well as all the running
  }
 }
 \description{
-Estimate a mulivariate density function using locally Gaussian approximations
+Estimate a multivariate density function using locally Gaussian approximations
 }
 \details{
 This function does multivariate density estimation using the locally Gaussian

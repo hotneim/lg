@@ -37,7 +37,7 @@
 #'   0.001-0.01-range.
 #' @param alpha_tile The alpha-value indicating the transparency of the color
 #'   tiles. Number between 0 (transparent) and 1 (not transparent).
-#' @param alpha_point he alpha-value indicating the transparancy of the
+#' @param alpha_point he alpha-value indicating the transparency of the
 #'   observations. Number between 0 (transparent) and 1 (not transparent).
 #' @param low_color The color corresponding to correlation equal to -1 (default:
 #'   blue).

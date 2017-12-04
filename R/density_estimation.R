@@ -386,7 +386,7 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 
 #' The locally Gaussian density estimator (LGDE)
 #'
-#' Estimate a mulivariate density function using locally Gaussian approximations
+#' Estimate a multivariate density function using locally Gaussian approximations
 #'
 #' This function does multivariate density estimation using the locally Gaussian
 #' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
