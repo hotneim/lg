@@ -48,7 +48,7 @@ Estimate a mulivariate density function using locally Gaussian approximations
 This function does multivariate density estimation using the locally Gaussian
 density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
 The function takes as arguments an \code{lg}-object as produced by the main
-\code{lg_main}-function (where all the running parameters are sepcified), and a
+\code{lg_main}-function (where all the running parameters are specified), and a
 grid of points where the density estimate should be estimated.
 }
 \examples{

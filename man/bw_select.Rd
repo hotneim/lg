@@ -46,7 +46,7 @@ joint bandwidths when using cross-validation.}
 A list with three elements, \code{marginal}  contains the bandwidths
   used for the marginal locally Gaussian estimation,
   \code{marginal_convergence} contains the convergence flags for the marginal
-  banwidths, as returned by the \code{optim} function, and \code{joint}
+  bandwidths, as returned by the \code{optim} function, and \code{joint}
   contains the pairwise bandwidths and convergence flags.
 }
 \description{

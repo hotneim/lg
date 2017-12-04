@@ -49,7 +49,7 @@ Estimate a conditional density function using locally Gaussian
 approximations.
 }
 \details{
-This function is the coditional version of the locally Gaussian density
+This function is the conditional version of the locally Gaussian density
 estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
 as arguments an \code{lg}-object as produced by the main \code{lg_main}- function,
 a grid of points where the density estimate should be estimated, and a set of
@@ -60,7 +60,7 @@ will always assume that the free variables come before the conditioning
 variables.
 
 Assume that X is a stochastic vector with two components X1 and X2. This
-function will thus estimate the consitional density of X1 given a speciefied
+function will thus estimate the conditional density of X1 given a specified
 value of X2.
 }
 \examples{

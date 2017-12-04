@@ -4,7 +4,7 @@
 
 #' Cross-validation for univariate distributions
 #'
-#' Uses cross-valdiation to find the optimal bandwidth for a univariate locally
+#' Uses cross-validation to find the optimal bandwidth for a univariate locally
 #' Gaussian fit
 #'
 #' This function provides the univariate version of the Cross Validation
@@ -59,7 +59,7 @@ bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 
 #' Cross-validation for bivariate distributions
 #'
-#' Uses cross-valdiation to find the optimal bandwidth for a bivariate locally
+#' Uses cross-validation to find the optimal bandwidth for a bivariate locally
 #' Gaussian fit
 #'
 #' This function provides an implementation for the Cross Validation algorithm
@@ -239,7 +239,7 @@ bw_select_plugin_multivariate <- function(x = NULL,
 #' @return A list with three elements, \code{marginal}  contains the bandwidths
 #'   used for the marginal locally Gaussian estimation,
 #'   \code{marginal_convergence} contains the convergence flags for the marginal
-#'   banwidths, as returned by the \code{optim} function, and \code{joint}
+#'   bandwidths, as returned by the \code{optim} function, and \code{joint}
 #'   contains the pairwise bandwidths and convergence flags.
 #'
 #' @examples
@@ -287,7 +287,7 @@ bw_select <- function(x,
 
                 # Print a warning if the convergence is not ok
                 if(result$convergence != 0)
-                    warning(paste("Cross valdidation for marginal bandwidth",
+                    warning(paste("Cross validation for marginal bandwidth",
                                   as.character(i),
                                   "did not converge properly"))
 

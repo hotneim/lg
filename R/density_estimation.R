@@ -30,7 +30,7 @@
 #'   Useful to disable this when doing cross-validation for example.
 #' @param marginal_estimates Provide the marginal estimates here if estimation
 #'   method is "\code{5par_marginals_fixed}", and the marginal estimates have
-#'   already been found. Useful for cross-valdiation. List with two elements as
+#'   already been found. Useful for cross-validation. List with two elements as
 #'   returned by \code{dlg_marginal_wrapper}.
 #' @param bw_marginal Vector of bandwidths used to estimate the marginal
 #'   distributions.
@@ -391,7 +391,7 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' This function does multivariate density estimation using the locally Gaussian
 #' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
 #' The function takes as arguments an \code{lg}-object as produced by the main
-#' \code{lg_main}-function (where all the running parameters are sepcified), and a
+#' \code{lg_main}-function (where all the running parameters are specified), and a
 #' grid of points where the density estimate should be estimated.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the
@@ -548,7 +548,7 @@ dlg <- function(lg_object, grid = NULL) {
 #' Estimate a conditional density function using locally Gaussian
 #' approximations.
 #'
-#' This function is the coditional version of the locally Gaussian density
+#' This function is the conditional version of the locally Gaussian density
 #' estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
 #' as arguments an \code{lg}-object as produced by the main \code{lg_main}- function,
 #' a grid of points where the density estimate should be estimated, and a set of
@@ -559,7 +559,7 @@ dlg <- function(lg_object, grid = NULL) {
 #' variables.
 #'
 #' Assume that X is a stochastic vector with two components X1 and X2. This
-#' function will thus estimate the consitional density of X1 given a speciefied
+#' function will thus estimate the conditional density of X1 given a specified
 #' value of X2.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the

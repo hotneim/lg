@@ -18,7 +18,7 @@ The function returns a list with two elements: \code{bw} is the
   by the \code{optim}-function.
 }
 \description{
-Uses cross-valdiation to find the optimal bandwidth for a univariate locally
+Uses cross-validation to find the optimal bandwidth for a univariate locally
 Gaussian fit
 }
 \details{

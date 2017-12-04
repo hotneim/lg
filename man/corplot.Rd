@@ -36,13 +36,13 @@ correlation values are plotted.}
 
 \item{plot_thres}{A number between 0 and 1 indicating the threshold value to
 be used for not plotting the estimated local correlation in areas with no
-data. Uses a quick bivariate lernel density estimate a criterion, and skips
+data. Uses a quick bivariate kernel density estimate a criterion, and skips
 plotting in areas with kernel density estimate less than the fraction
 plot_thres of the maximum density estimate. If 0 (default), everything is
 plotted, if 1 nothing is plotted. Typical values may be in the
 0.001-0.01-range.}
 
-\item{alpha_tile}{The alpha-value indicating the transparancy of the color
+\item{alpha_tile}{The alpha-value indicating the transparency of the color
 tiles. Number between 0 (transparent) and 1 (not transparent).}
 
 \item{alpha_point}{he alpha-value indicating the transparancy of the

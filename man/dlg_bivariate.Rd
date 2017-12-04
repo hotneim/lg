@@ -32,7 +32,7 @@ Useful to disable this when doing cross-validation for example.}
 
 \item{marginal_estimates}{Provide the marginal estimates here if estimation
 method is "\code{5par_marginals_fixed}", and the marginal estimates have
-already been found. Useful for cross-valdiation. List with two elements as
+already been found. Useful for cross-validation. List with two elements as
 returned by \code{dlg_marginal_wrapper}.}
 
 \item{bw_marginal}{Vector of bandwidths used to estimate the marginal

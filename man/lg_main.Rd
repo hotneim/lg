@@ -51,7 +51,7 @@ marginal bandwidths, passed on to the \code{optim}-function.}
 joint bandwidths. Passed on to the \code{optim}-function.}
 }
 \description{
-Create an \code{lg}-object, that can be used to estimate local Gussian
+Create an \code{lg}-object, that can be used to estimate local Gaussian
 correlations, unconditional and conditional densities, local partial
 correlation and for testing purposes.
 }
@@ -69,7 +69,7 @@ Normal locally to the unknown density function by first transforming the data
 to marginal standard normality, and then estimate the local correlations
 \strong{pairwise}. The local means and local standard deviations are held
 fixed and constantly equal to 0 and 1 respectively to reflect the knowledge
-that the marginals are approximetaly standard normal. Use \code{est_method =
+that the marginals are approximately standard normal. Use \code{est_method =
 "1par"} for this strategy, which means that we only estimate one local
 parameter (the correlation) for each pair, and note that this method requires
 marginally standard normal data. If \code{est_method = "1par"} and
@@ -79,7 +79,7 @@ standard normal already.
 
 The second option is \code{est_method = "5par_marginals_fixed"} which is more
 flexible than \code{"1par"}. This method will estimate univariate local
-Gaussian fits to each marginal, thus producing local estmates of the local
+Gaussian fits to each marginal, thus producing local estimates of the local
 means: \eqn{\mu_i(x_i)} and \eqn{\sigma_i(x_i)} that will be held fixed in the
 next step when the \strong{pairwise} local correlations are estimated. This
 method can in many situations provide a better fit, even if the marginals are
