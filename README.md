@@ -44,11 +44,9 @@ We can then specify a set of grid points and estimate the probability density fu
 ``` r
 grid <- matrix(rep(seq(-.03, .03, length.out = 100), 4), ncol = 4, byrow = FALSE)
 density_estimate <- dlg(lg_object = lg_object, grid = grid)
-plot(grid[,1], density_estimate$f_est, type = "l",
-     xlab = "Diagonal grid point", ylab = "Estimated density")
+# plot(grid[,1], density_estimate$f_est, type = "l",
+#     xlab = "Diagonal grid point", ylab = "Estimated density")
 ```
-
-![](README-estimate-density-1.png)
 
 Estimation of conditional densities
 ===================================
@@ -74,11 +72,9 @@ condition <- c(0, 0, 0)                                      # Value of dependen
 cond_dens_est <- clg(lg_object = lg_object, 
                      grid = grid,
                      condition = condition)
-plot(grid, cond_dens_est$f_est, type = "l",
-     xlab = "DAX", ylab = "Estimated conditional density")
+# plot(grid, cond_dens_est$f_est, type = "l",
+#     xlab = "DAX", ylab = "Estimated conditional density")
 ```
-
-![](README-conditional-1.png)
 
 If we want to estimate the conditional density of CAC and FTSE given DAX and SMI, for example, we must first shuffle the data so that CAC and FTSE come first, and supply the conditional value for DAX and SMI through the vector *condition*, now having two elements.
 
