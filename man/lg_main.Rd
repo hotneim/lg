@@ -100,7 +100,9 @@ locally Gaussian fit of a bivariate density as laid out and used by Tjøstheim
 
   # In the simulation experiments in Otneim & Tjøstheim (2017a),
   # the cross-validation bandwidth selection is used:
+  \dontrun{
   lg_object2 <- lg_main(x, bw_method = "cv", est_method = "1par")
+  }
 
   # If you do not wish to transform the data to standard normality,
   # use the five parameter fit:
