@@ -106,3 +106,17 @@ mvnorm_eval <- function(eval_points,
     unlist(lapply(X = as.list(1:nrow(eval_points)),
                   FUN = single_eval))
 }
+
+#' Auxilliary function for calculating the local score function u
+#'
+#' Auxilliary function for calculating the local score function u
+#'
+#' This function is used to estimate the asymptotic variance of the estimates.
+#'
+#' @param z1 z1
+#' @param z2 z2
+#' @param rho rho
+
+u <- function(z1, z2, rho) {
+  (rho^3 - z1*z2*(1 + rho^2) + (z1^2 + z2^2 - 1)*rho)/((1 - rho^2)^2)
+}

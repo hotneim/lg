@@ -386,45 +386,41 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 
 #' The locally Gaussian density estimator (LGDE)
 #'
-#' Estimate a multivariate density function using locally Gaussian approximations
+#' Estimate a multivariate density function using locally Gaussian
+#' approximations
 #'
 #' This function does multivariate density estimation using the locally Gaussian
 #' density estimator (LGDE), that was introduced by Otneim & Tjøstheim (2017).
 #' The function takes as arguments an \code{lg}-object as produced by the main
-#' \code{lg_main}-function (where all the running parameters are specified), and a
-#' grid of points where the density estimate should be estimated.
+#' \code{lg_main}-function (where all the running parameters are specified), and
+#' a grid of points where the density estimate should be estimated.
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the
 #'   \code{lg_main}-function.
 #' @param grid A matrix of grid points, where we want to evaluate the density
 #'   estimate.
+#' @param level Specify a level if asymptotic standard deviations and confidence
+#'   intervals should be returned.
 #'
 #' @return A list containing the density estimate as well as all the running
 #'   parameters that has been used. The elements are:
 #'
-#'   \itemize{
-#'     \item \code{f_est}: The estimated multivariate density.
-#'     \item \code{loc_mean}: The estimated local means if \code{est_method}
-#'           is "5par" or "5par_marginals_fixed", a matrix of zeros if
-#'           \code{est_method} is "1par".
-#'     \item \code{loc_sd}: The estimated local st. deviations if
-#'           \code{est_method} is "5par" or "5par_marginals_fixed", a matrix
-#'            of ones if \code{est_method} is "1par".
-#'     \item \code{loc_cor}: Matrix of estimated local correlations, one column
-#'           for each pair of variables, in the same order as specified in the
-#'           bandwidth object.
-#'     \item \code{x}: The data set.
-#'     \item \code{bw}: The bandwidth object.
-#'     \item \code{transformed_data}: The data transformed to approximate
-#'           marginal standard normality.
-#'     \item \code{normalizing_constants}: The normalizing constants used to
-#'           transform data and grid back and forth to the marginal standard
-#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
-#'     \item \code{grid}: The grid where the estimation was performed, on the
-#'           original scale.
-#'     \item \code{transformed_grid}: The grid where the estimation was
-#'           performed, on the marginal standard normal scale.
-#'  }
+#'   \itemize{ \item \code{f_est}: The estimated multivariate density. \item
+#'   \code{loc_mean}: The estimated local means if \code{est_method} is "5par"
+#'   or "5par_marginals_fixed", a matrix of zeros if \code{est_method} is
+#'   "1par". \item \code{loc_sd}: The estimated local st. deviations if
+#'   \code{est_method} is "5par" or "5par_marginals_fixed", a matrix of ones if
+#'   \code{est_method} is "1par". \item \code{loc_cor}: Matrix of estimated
+#'   local correlations, one column for each pair of variables, in the same
+#'   order as specified in the bandwidth object. \item \code{x}: The data set.
+#'   \item \code{bw}: The bandwidth object. \item \code{transformed_data}: The
+#'   data transformed to approximate marginal standard normality. \item
+#'   \code{normalizing_constants}: The normalizing constants used to transform
+#'   data and grid back and forth to the marginal standard normality scale, as
+#'   seen in eq. (8) of Otneim & Tjøstheim (2017). \item \code{grid}: The grid
+#'   where the estimation was performed, on the original scale. \item
+#'   \code{transformed_grid}: The grid where the estimation was performed, on
+#'   the marginal standard normal scale. }
 #'
 #' @examples
 #'    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
@@ -434,11 +430,11 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'
 #' @references
 #'
-#'    Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
-#'    multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
+#' Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
 #' @export
-dlg <- function(lg_object, grid = NULL) {
+dlg <- function(lg_object, grid = NULL, level = NULL) {
 
     # Do some checks first
     check_lg(lg_object)
@@ -536,6 +532,79 @@ dlg <- function(lg_object, grid = NULL) {
                 normalizing_constants = normalizing_constants,
                 grid = grid,
                 transformed_grid = x0)
+
+    # If the level-argument is provided, we also calculate the standard
+    # deviations based on asymptotic formulas with corresponding confidence
+    # intervals for the local correlations and the density estimates.
+    if(!is.null(level)) {
+
+      # x is the data, or the transformed data. x0 is the grid
+      # where we do estimation, transformed or not.
+
+      # We need to evaluate the density estimate in the observations, and do
+      # that by running the dlg-function.
+      density_object_obs <- dlg(lg_object, grid = lg_object$x)
+
+      # We initialize a matrix for the asymptotic standard deviation for
+      # the local correlations. It will have the same dimension as the matrix of
+      # estimates:
+      loc_cor_sd <- NA*loc_cor
+
+      # We approximate the J- and M integrals by Monte Carlo an d the LLN, using
+      # locally Gaussian estimates in the observations. This has to be done for
+      # each pair of variables.
+      for(i in 1:nrow(pairs)) {
+
+        # We first calculate the J- and M integrals. The result are big
+        # matrices, with one column per grid point.
+        integrand_J <- apply(x0[, unlist(c(pairs[i,]))],
+                             1,
+                             function(t) mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
+                                                          sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
+                                                                         lg_object$bw$joint$bw2[i]^2)))*
+                               u(x[,pairs[i,1]],
+                                 x[,pairs[i,2]],
+                                 c(density_object_obs$loc_cor[,i]))^2)
+
+        integrand_M1 <- apply(x0[, unlist(c(pairs[i,]))],
+                              1,
+                              function(t)
+                                mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
+                                                 sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
+                                                                lg_object$bw$joint$bw2[i]^2)))^2*
+                                u(x[,pairs[i,1]],
+                                  x[,pairs[i,2]],
+                                  c(density_object_obs$loc_cor[,i]))^2)
+
+        integrand_M2 <- apply(x0[, unlist(c(pairs[i,]))],
+                              1,
+                              function(t)
+                                mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
+                                                 sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
+                                                                lg_object$bw$joint$bw2[i]^2)))*
+                                u(x[,pairs[i,1]],
+                                  x[,pairs[i,2]],
+                                  c(density_object_obs$loc_cor[,i])))
+
+        # We approximate the J and the two parts of the M matrices by a Monte
+        # Carlo approximation:
+        J  <- colMeans(integrand_J)
+        M1 <- lg_object$bw$joint$bw1[i] * lg_object$bw$joint$bw2[i] * colMeans(integrand_M1)
+        M2 <- lg_object$bw$joint$bw1[i] * lg_object$bw$joint$bw2[i] * colMeans(integrand_M2)^2
+
+        # The final estimate of the standard deviation will be the the expression below:
+        loc_cor_sd[, i] <- sqrt( (M1 - M2)^2/(J*
+                                                nrow(x)*
+                                                lg_object$bw$joint$bw1[i]*
+                                                lg_object$bw$joint$bw2[i])  )
+
+
+      }
+
+      # Add the asymptotic standard deviations to the list that we return:
+      ret$loc_cor_sd <- loc_cor_sd
+
+    }
 
     class(ret) <- "dlg"
 
