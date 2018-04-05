@@ -4,7 +4,7 @@
 \alias{dlg}
 \title{The locally Gaussian density estimator (LGDE)}
 \usage{
-dlg(lg_object, grid = NULL, level = NULL)
+dlg(lg_object, grid = NULL, level = 0.95)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

@@ -434,7 +434,7 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
 #' @export
-dlg <- function(lg_object, grid = NULL, level = NULL) {
+dlg <- function(lg_object, grid = NULL, level = 0.95) {
 
     # Do some checks first
     check_lg(lg_object)
@@ -543,7 +543,7 @@ dlg <- function(lg_object, grid = NULL, level = NULL) {
 
       # We need to evaluate the density estimate in the observations, and do
       # that by running the dlg-function.
-      density_object_obs <- dlg(lg_object, grid = lg_object$x)
+      density_object_obs <- dlg(lg_object, grid = lg_object$x, level = NULL)
 
       # We initialize a matrix for the asymptotic standard deviation for
       # the local correlations. It will have the same dimension as the matrix of
@@ -593,17 +593,20 @@ dlg <- function(lg_object, grid = NULL, level = NULL) {
         M2 <- lg_object$bw$joint$bw1[i] * lg_object$bw$joint$bw2[i] * colMeans(integrand_M2)^2
 
         # The final estimate of the standard deviation will be the the expression below:
-        loc_cor_sd[, i] <- sqrt( (M1 - M2)^2/(J*
-                                                nrow(x)*
-                                                lg_object$bw$joint$bw1[i]*
-                                                lg_object$bw$joint$bw2[i])  )
-
-
+        loc_cor_sd[, i] <- sqrt( (M1 - M2)/(J^2*
+                                              nrow(x)*
+                                              lg_object$bw$joint$bw1[i]*
+                                              lg_object$bw$joint$bw2[i])  )
       }
 
-      # Add the asymptotic standard deviations to the list that we return:
-      ret$loc_cor_sd <- loc_cor_sd
+      # Calculate the confidence limits based on the asymptotic normality:
+      loc_cor_lower <- loc_cor + qnorm((1 - level)/2) * loc_cor_sd
+      loc_cor_upper <- loc_cor - qnorm((1 - level)/2) * loc_cor_sd
 
+      # Add the asymptotic standard deviations and confidence limits to the list that we return:
+      ret$loc_cor_sd <- loc_cor_sd
+      ret$loc_cor_lower <- loc_cor_lower
+      ret$loc_cor_upper <- loc_cor_upper
     }
 
     class(ret) <- "dlg"
