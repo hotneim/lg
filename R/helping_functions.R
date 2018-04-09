@@ -120,3 +120,27 @@ mvnorm_eval <- function(eval_points,
 u <- function(z1, z2, rho) {
   (rho^3 - z1*z2*(1 + rho^2) + (z1^2 + z2^2 - 1)*rho)/((1 - rho^2)^2)
 }
+
+make_C <- function(r, pairs, p) {
+
+  R <- diag(p)
+
+  for(j in 1:nrow(pairs)) { # For each pair of variables
+
+    var1 <- pairs[j,1]      #| The variables
+    var2 <- pairs[j,2]      #|
+
+    R[var1, var2] <- R[var2, var1] <- r[j]
+  }
+
+  R22 <- R[3:ncol(R), 3:ncol(R)]
+  R21 <- R[3:ncol(R), 1:2]
+
+  solve(R22) %*% R21
+
+}
+
+gradient <- function(sigma, sigma_k) {
+  (sigma[1,1]*sigma[2,2]*sigma_k[1,2] - sigma[1,2]*(sigma_k[1,1]*sigma[2,2] + sigma[1,1]*sigma_k[2,2]))/
+    (sigma[1,1]*sigma[2,2])^2
+}

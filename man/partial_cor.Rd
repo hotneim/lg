@@ -4,7 +4,7 @@
 \alias{partial_cor}
 \title{Calculate the local Gaussian partial correlation}
 \usage{
-partial_cor(lg_object, grid = NULL, condition = NULL)
+partial_cor(lg_object, grid = NULL, condition = NULL, level = 0.95)
 }
 \description{
 A function that calculates the local Gaussian partial correlation for a pair

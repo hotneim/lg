@@ -9,8 +9,8 @@
 #'
 #' Explanation....
 #'
-#'
-partial_cor <- function(lg_object, grid = NULL, condition = NULL) {
+#'@export
+partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = 0.95) {
 
   # The local partial correlation is (currently) only defined for *pairs* of
   # variables, given a *set* of variables. As in the conditional density
@@ -36,11 +36,114 @@ partial_cor <- function(lg_object, grid = NULL, condition = NULL) {
 
   # We use the function for conditional density estimation to extract the
   # conditional (or partial) covariance matrices.
-  clg_object <- clg(lg_object = lg_object, grid = grid, condition = condition)
+  clg_object <- clg(lg_object = lg_object, grid = grid, condition = condition, level = level)
 
   # The element c_cov in the clg_object is now a list of the local covariance
   # matrices, which we translate into correlation matrices and pick out the
   # off-diagonal element.
   partial_correlations <- unlist(lapply(clg_object$c_cov, function(S) stats::cov2cor(S)[1,2]))
+
+  # When calculating the gradient, we need the estimated local partial
+  # covariance matrices, and they are returned by the clg-function.
+  partial_cov <- clg_object$c_cov
+
+  # Return
+  ret = list(grid = clg_object$grid,
+             partial_correlations = partial_correlations,
+             cond_density = clg_object$f_est,
+             transformed_grid = clg_object$transformed_grid,
+             x = lg_object$x,
+             transformed_data = lg_object$transformed_data)
+
+  # Calculate the asymptotic standard deviation and confidence limits if the
+  # level-argument is provided.
+  if(!is.null(level)) {
+
+    # Build a list of asymptotic covariance matrices for the *ordinary* local
+    # correlations. One element per grid point.
+    omega <- lapply(as.list(data.frame(t(clg_object$density_object$loc_cor_sd^2))),
+                    diag)
+
+    # In the derivation of the gradient of the transformation to partial
+    # correlation, we saw that there are three categories of elements. We need
+    # to identify them.
+    pairs <- clg_object$density_object$pairs
+    pair_category <- rep(NA, nrow(clg_object$density_object$pairs))
+
+    # Category 1, the pair (1, 2)
+    pair_category[apply((pairs == 1) | (pairs == 2 ), 1, all)] <- 1
+
+    # Category 2, *one* element in the peir is either 1 or 2
+    pair_category[apply((pairs == 1) | (pairs == 2 ), 1, any) & !apply((pairs == 1) | (pairs == 2 ), 1, all)] <- 2
+
+    # Category 3, no element is either 1 or 2
+    pair_category[!apply((pairs == 1) | (pairs == 2 ), 1, any)] <- 3
+
+    # Initialize the gradient vector. One row per grid point, one column per pair.
+    g_grad <- matrix(NA, nrow = nrow(clg_object$grid), ncol = nrow(pairs))
+
+    # Calculate the C-matrices in each grid point.
+    C_list <- lapply(as.list(data.frame(t(clg_object$density_object$loc_cor))),
+                     make_C,
+                     pairs = pairs,
+                     p = ncol(lg_object$x))
+
+    # Replace the category 1 entries with the value of the gradient, which is just 1:
+    g_grad[, pair_category == 1] <- 1
+
+    # Replace the category 2 entries with the value of the gradient there. We loop over the pairs:
+    for(i in (1:nrow(pairs))[pair_category == 2]) {
+
+      # We need the dR12-matrix, defined in the partial correlation paper. It is
+      # zero everywhere, except in the position of the correlation in question.
+      dR <- matrix(0, nrow = ncol(lg_object$x), ncol = ncol(lg_object$x))
+      dR[pairs[i, 1], pairs[i, 2]] <- dR[pairs[i, 2], pairs[i, 1]] <- 1
+      dR12 <- dR[1:2, 3:ncol(dR)]
+      dR12_list <- lapply(1:nrow(g_grad), function(a) dR12)
+
+      # We then calculate the derivative of the partial covariance matrix with
+      # respect to the local Gaussian correlation in question, in the paper
+      # denoted by Sigma^(k).
+      sigma_k_list <- Map('+', Map('%*%', dR12_list, C_list), Map('%*%', lapply(C_list, t), lapply(dR12_list, t)))
+
+      # Finally, we calculate the gradient from the list of partial covariances
+      # and its derivative, using the formula in the paper.
+      g_grad[, i] <- unlist(Map(gradient, partial_cov, sigma_k_list))
+
+    }
+
+    # Replace the category 3 enstries with the value of the gradient there. We loop over the pairs:
+    for(i in (1:nrow(pairs))[pair_category == 3]) {
+
+      # We need the dR3-matrix, defined in the partial correlation paper. It is
+      # zero everywhere, except in the position of the correlation in question.
+      dR <- matrix(0, nrow = ncol(lg_object$x), ncol = ncol(lg_object$x))
+      dR[pairs[i, 1], pairs[i, 2]] <- dR[pairs[i, 2], pairs[i, 1]] <- 1
+      dR3 <- dR[3:ncol(dR), 3:ncol(dR)]
+      dR3_list <- lapply(1:nrow(g_grad), function(a) dR3)
+
+      # We then calculate the derivative of the partial covariance matrix with
+      # respect to the local Gaussian correlation in question, in the paper
+      # denoted by Sigma^(k).
+      sigma_k_list <- lapply(Map('%*%', Map('%*%', lapply(C_list, t), dR3_list), C_list), '-')
+
+      # Finally, we calculate the gradient from the list of partial covariances
+      # and its derivative, using the formula in the paper.
+      g_grad[, i] <- unlist(Map(gradient, partial_cov, sigma_k_list))
+
+    }
+
+    # We now have the value of the gradient of g, and we can calculate the
+    # asymptotic variance of the estimated local partial correlation.
+    g_grad_list <- lapply(unname(as.list(data.frame(t(g_grad)))), matrix, ncol = 1)
+
+    partial_correlations_sd <-
+      sqrt(unlist(Map('%*%', Map('%*%', lapply(g_grad_list, t), omega), g_grad_list)))
+
+    ret$partial_correlations_sd <- partial_correlations_sd
+
+  }
+
+  ret
 
 }

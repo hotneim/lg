@@ -531,7 +531,8 @@ dlg <- function(lg_object, grid = NULL, level = 0.95) {
                 transformed_data = lg_object$transformed_data,
                 normalizing_constants = normalizing_constants,
                 grid = grid,
-                transformed_grid = x0)
+                transformed_grid = x0,
+                pairs = pairs)
 
     # If the level-argument is provided, we also calculate the standard
     # deviations based on asymptotic formulas with corresponding confidence
@@ -683,7 +684,7 @@ dlg <- function(lg_object, grid = NULL, level = 0.95) {
 #'   the local Gaussian correlation" Statistics and Computing (2017): 1-19.
 #'
 #' @export
-clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
+clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL, level = NULL) {
 
     # Extract some basic info
     n  <- nrow(lg_object$x)        # Sample size
@@ -717,7 +718,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
     }
 
     # Estimate the local correlation in these points using the density function
-    density_object <- dlg(lg_object, grid = estimation_grid)
+    density_object <- dlg(lg_object, grid = estimation_grid, level = level)
 
     # In each grid point, we need to calculate the conditional mean vector and
     # covariance matrix in order to calculate the conditional density estimate.
@@ -798,7 +799,8 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
                 transformed_data = lg_object$transformed_data,
                 normalizing_constants = density_object$normalizing_constants,
                 grid = grid,
-                transformed_grid = density_object$transformed_grid)
+                transformed_grid = density_object$transformed_grid,
+                density_object = density_object)
 
     class(ret) <- "clg"
 
