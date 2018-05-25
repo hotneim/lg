@@ -53,7 +53,8 @@ partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = 0.95) 
              cond_density = clg_object$f_est,
              transformed_grid = clg_object$transformed_grid,
              x = lg_object$x,
-             transformed_data = lg_object$transformed_data)
+             transformed_data = lg_object$transformed_data,
+             bw = lg_object$bw)
 
   # Calculate the asymptotic standard deviation and confidence limits if the
   # level-argument is provided.
@@ -144,6 +145,9 @@ partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = 0.95) 
 
   }
 
+
+
+  class(ret) <- "partial"
   ret
 
 }

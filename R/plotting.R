@@ -90,16 +90,30 @@ corplot <- function(dlg_object,
                     subtitle = NULL) {
 
     # First, we chack that the supplied dlg_object actually comes from the
-    # dlg-function:
-    if(class(dlg_object) != "dlg") {
-        stop("dlg_object needs to have class 'dlg'")
+    # dlg- or partial_cor function:
+    if(!(class(dlg_object) %in% c("dlg", "partial"))) {
+        stop("dlg_object needs to have class 'dlg' or 'partial'")
+    }
+
+    # If the object is 'partial', then we need to put the partial correlations
+    # into a loc_cor-position in order to use the same code below as for the
+    # ordinary local correlations.
+    if(class(dlg_object) == "partial") {
+      dlg_object$loc_cor <- matrix(dlg_object$partial_correlations, ncol = 1)
+
     }
 
     # We also check that the pair number is actually a pair in this model
-    if(!(pair %in% 1:nrow(dlg_object$bw$joint))) {
-      stop(paste("'pair' must be an integer between 1 and ",
-                 nrow(dlg_object$bw$joint),
-                 " (the number of pairs in the model"))
+    if(class(dlg_object) == "dlg") {
+      if(!(pair %in% 1:nrow(dlg_object$bw$joint))) {
+        stop(paste("'pair' must be an integer between 1 and ",
+                   nrow(dlg_object$bw$joint),
+                   " (the number of pairs in the model"))
+      }
+    } else {
+      if(pair != 1) {
+        stop("When plotting partial correlations, the 'pair'-parameter must be equal to 1.")
+      }
     }
 
     # Next, we construct the data frame that contains the local correlations.
@@ -107,12 +121,13 @@ corplot <- function(dlg_object,
     # because the pairwise local correlation will only depend on the pairwise
     # grid points.
     if(gaussian_scale) {
-        full_grid <-
-          dlg_object$transformed_grid[, unlist(dlg_object$bw$joint[pair, c(1, 2)])]
+      full_grid <-
+        dlg_object$transformed_grid[, unlist(dlg_object$bw$joint[pair, c(1, 2)])]
     } else {
-        full_grid <-
-          dlg_object$grid[, unlist(dlg_object$bw$joint[pair, c(1, 2)])]
+      full_grid <-
+        dlg_object$grid[, unlist(dlg_object$bw$joint[pair, c(1, 2)])]
     }
+
 
     # Where do we find unique values in the pairwise grid?
     distinct_grid <- !duplicated(full_grid, MARG = 1)
@@ -202,13 +217,23 @@ corplot <- function(dlg_object,
     }
 
     if(is.null(main)) {
-        main_label <- paste("Local correlations for pair ",
-                             pair,
-                             " (variables ",
-                             dlg_object$bw$joint[pair, 1],
-                             " and ",
-                             dlg_object$bw$joint[pair, 2],
-                             ")", sep = "")
+        if(class(dlg_object) == "dlg") {
+          main_label <- paste("Local correlations for pair ",
+                              pair,
+                              " (variables ",
+                              dlg_object$bw$joint[pair, 1],
+                              " and ",
+                              dlg_object$bw$joint[pair, 2],
+                              ")", sep = "")
+        } else {
+          main_label <- paste("Local partial correlations for pair ",
+                              pair,
+                              " (variables ",
+                              dlg_object$bw$joint[pair, 1],
+                              " and ",
+                              dlg_object$bw$joint[pair, 2],
+                              ")", sep = "")
+        }
     } else {
       main_label <- main
     }
