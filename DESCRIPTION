@@ -6,7 +6,7 @@ Description: An implementation of locally Gaussian distributions. It provides me
     implementing the locally Gaussian density estimator (LGDE) by Otneim and Tjøstheim (2017) 
     <doi:10.1007/s11222-016-9706-6>, as well as the corresponding estimator for conditional 
     density functions by Otneim and Tjøstheim (2018) <doi:10.1007/s11222-017-9732-z>. 
-Depends: R (>= 3.5.1)
+Depends: R (>= 3.5)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
