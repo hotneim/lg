@@ -1,12 +1,12 @@
 Package: lg
 Title: Locally Gaussian Distributions: Estimation and Methods 
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Håkon", "Otneim", email = "hakon.otneim@nhh.no", role = c("aut", "cre"))
 Description: An implementation of locally Gaussian distributions. It provides methods for
-    implementing the locally Gaussian density estimator (LGDE) by Otneim and Tjøstheim (2017a) 
+    implementing the locally Gaussian density estimator (LGDE) by Otneim and Tjøstheim (2017) 
     <doi:10.1007/s11222-016-9706-6>, as well as the corresponding estimator for conditional 
-    density functions by Otneim and Tjøstheim (2017b) <doi:10.1007/s11222-017-9732-z>. 
-Depends: R (>= 3.2.3)
+    density functions by Otneim and Tjøstheim (2018) <doi:10.1007/s11222-017-9732-z>. 
+Depends: R (>= 3.5.1)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
