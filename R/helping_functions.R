@@ -121,6 +121,15 @@ u <- function(z1, z2, rho) {
   (rho^3 - z1*z2*(1 + rho^2) + (z1^2 + z2^2 - 1)*rho)/((1 - rho^2)^2)
 }
 
+#' Auxiliary function for calculating the asymptotic standard deviations for the
+#' local Gaussian correlations
+#'
+#' Auxiliary function for calculating the asymptotic standard deviations for the
+#' local Gaussian correlations
+#'
+#' @param r r
+#' @param pairs pairs
+#' @param p p
 make_C <- function(r, pairs, p) {
 
   R <- diag(p)
@@ -140,6 +149,14 @@ make_C <- function(r, pairs, p) {
 
 }
 
+#' Auxiliary function for calculating the asymptotic standard deviations for the
+#' local Gaussian correlations
+#'
+#' Auxiliary function for calculating the asymptotic standard deviations for the
+#' local Gaussian correlations
+#'
+#' @param sigma sigma
+#' @param sigma_k sigma_k
 gradient <- function(sigma, sigma_k) {
   (sigma[1,1]*sigma[2,2]*sigma_k[1,2] - sigma[1,2]*(sigma_k[1,1]*sigma[2,2] + sigma[1,1]*sigma_k[2,2]))/
     (sigma[1,1]*sigma[2,2])^2

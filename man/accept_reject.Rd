@@ -4,8 +4,9 @@
 \alias{accept_reject}
 \title{Generate sample from a conditional density estimate}
 \usage{
-accept_reject(lg_object, condition, n_new, nodes, M = NULL, M_sim = 1500,
-  M_corr = 1.5, n_corr = 1.2, return_just_M = FALSE, extend = 0.3)
+accept_reject(lg_object, condition, n_new, nodes, M = NULL,
+  M_sim = 1500, M_corr = 1.5, n_corr = 1.2, return_just_M = FALSE,
+  extend = 0.3)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

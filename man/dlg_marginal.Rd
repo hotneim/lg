@@ -4,8 +4,8 @@
 \alias{dlg_marginal}
 \title{Marginal density estimation}
 \usage{
-dlg_marginal(x, bw = 1, eval_points = seq(quantile(x, 0.01), quantile(x,
-  0.99), length.out = grid_size), grid_size = 15)
+dlg_marginal(x, bw = 1, eval_points = seq(quantile(x, 0.01),
+  quantile(x, 0.99), length.out = grid_size), grid_size = 15)
 }
 \arguments{
 \item{x}{The data vector.}

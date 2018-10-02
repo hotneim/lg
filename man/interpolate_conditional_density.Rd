@@ -4,7 +4,8 @@
 \alias{interpolate_conditional_density}
 \title{Interpolate a univariate conditional density function}
 \usage{
-interpolate_conditional_density(lg_object, condition, nodes, extend = 0.3,
+interpolate_conditional_density(lg_object, condition, nodes,
+  extend = 0.3,
   gaussian_scale = lg_object$transform_to_marginal_normality)
 }
 \arguments{

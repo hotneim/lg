@@ -4,9 +4,10 @@
 \alias{dmvnorm_wrapper}
 \title{Wrapper for \code{dmvnorm}}
 \usage{
-dmvnorm_wrapper(eval_points, mu_1 = rep(0, nrow(eval_points)), mu_2 = rep(0,
-  nrow(eval_points)), sig_1 = rep(1, nrow(eval_points)), sig_2 = rep(1,
-  nrow(eval_points)), rho = rep(0, nrow(eval_points)), run_checks = TRUE)
+dmvnorm_wrapper(eval_points, mu_1 = rep(0, nrow(eval_points)),
+  mu_2 = rep(0, nrow(eval_points)), sig_1 = rep(1, nrow(eval_points)),
+  sig_2 = rep(1, nrow(eval_points)), rho = rep(0, nrow(eval_points)),
+  run_checks = TRUE)
 }
 \arguments{
 \item{eval_points}{A \code{kx2} matrix with evaluation points}

@@ -4,7 +4,8 @@
 \alias{bw_select_plugin_multivariate}
 \title{Plugin bandwidth selection for multivariate data}
 \usage{
-bw_select_plugin_multivariate(x = NULL, n = nrow(x), c = 1.75, a = -1/6)
+bw_select_plugin_multivariate(x = NULL, n = nrow(x), c = 1.75,
+  a = -1/6)
 }
 \arguments{
 \item{x}{The data matrix.}

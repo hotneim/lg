@@ -405,22 +405,29 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' @return A list containing the density estimate as well as all the running
 #'   parameters that has been used. The elements are:
 #'
-#'   \itemize{ \item \code{f_est}: The estimated multivariate density. \item
-#'   \code{loc_mean}: The estimated local means if \code{est_method} is "5par"
-#'   or "5par_marginals_fixed", a matrix of zeros if \code{est_method} is
-#'   "1par". \item \code{loc_sd}: The estimated local st. deviations if
-#'   \code{est_method} is "5par" or "5par_marginals_fixed", a matrix of ones if
-#'   \code{est_method} is "1par". \item \code{loc_cor}: Matrix of estimated
-#'   local correlations, one column for each pair of variables, in the same
-#'   order as specified in the bandwidth object. \item \code{x}: The data set.
-#'   \item \code{bw}: The bandwidth object. \item \code{transformed_data}: The
-#'   data transformed to approximate marginal standard normality. \item
-#'   \code{normalizing_constants}: The normalizing constants used to transform
-#'   data and grid back and forth to the marginal standard normality scale, as
-#'   seen in eq. (8) of Otneim & Tjøstheim (2017). \item \code{grid}: The grid
-#'   where the estimation was performed, on the original scale. \item
-#'   \code{transformed_grid}: The grid where the estimation was performed, on
-#'   the marginal standard normal scale. }
+#'   \itemize{
+#'     \item \code{f_est}: The estimated multivariate density.
+#'     \item \code{loc_mean}: The estimated local means if \code{est_method}
+#'            is "5par" or "5par_marginals_fixed", a matrix of zeros if
+#'            \code{est_method} is "1par".
+#'     \item \code{loc_sd}: The estimated local st. deviations if
+#'           \code{est_method} is "5par" or "5par_marginals_fixed", a matrix
+#'           of ones if \code{est_method} is "1par".
+#'     \item \code{loc_cor}: Matrix of estimated local correlations, one
+#'           column for each pair of variables, in the same order as specified
+#'           in the bandwidth object.
+#'     \item \code{x}: The data set.
+#'     \item \code{bw}: The bandwidth object.
+#'     \item \code{transformed_data}: The data transformed to approximate
+#'            marginal standard normality.
+#'     \item \code{normalizing_constants}: The normalizing constants used to
+#'           transform data and grid back and forth to the marginal standard
+#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017).
+#'     \item \code{grid}: The grid where the estimation was performed, on the
+#'           original scale.
+#'     \item \code{transformed_grid}: The grid where the estimation was
+#'           performed, on the marginal standard normal scale.
+#'    }
 #'
 #' @examples
 #'    x <- cbind(rnorm(100), rnorm(100), rnorm(100))
@@ -622,7 +629,7 @@ dlg <- function(lg_object, grid = NULL, level = 0.95) {
 #' approximations.
 #'
 #' This function is the conditional version of the locally Gaussian density
-#' estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
+#' estimator (LGDE), described in Otneim & Tjøstheim (2018). The function takes
 #' as arguments an \code{lg}-object as produced by the main \code{lg_main}- function,
 #' a grid of points where the density estimate should be estimated, and a set of
 #' conditions.
@@ -661,7 +668,8 @@ dlg <- function(lg_object, grid = NULL, level = 0.95) {
 #'           marginal standard normality (if selected).
 #'     \item \code{normalizing_constants}: The normalizing constants used to
 #'           transform data and grid back and forth to the marginal standard
-#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017) (if selected).
+#'           normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017)
+#'           (if selected).
 #'     \item \code{grid}: The grid where the estimation was performed, on the
 #'           original scale.
 #'     \item \code{transformed_grid}: The grid where the estimation was
@@ -681,10 +689,11 @@ dlg <- function(lg_object, grid = NULL, level = 0.95) {
 #' @references
 #'
 #'   Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
-#'   the local Gaussian correlation" Statistics and Computing (2017): 1-19.
+#'   the local Gaussian correlation" Statistics and Computing 28, no. 2 (2018):
+#'   303-321.
 #'
 #' @export
-clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL, level = NULL) {
+clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL) {
 
     # Extract some basic info
     n  <- nrow(lg_object$x)        # Sample size
@@ -718,7 +727,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL, lev
     }
 
     # Estimate the local correlation in these points using the density function
-    density_object <- dlg(lg_object, grid = estimation_grid, level = level)
+    density_object <- dlg(lg_object, grid = estimation_grid)
 
     # In each grid point, we need to calculate the conditional mean vector and
     # covariance matrix in order to calculate the conditional density estimate.

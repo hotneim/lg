@@ -4,8 +4,7 @@
 \alias{clg}
 \title{The locally Gaussian conditional density estimator}
 \usage{
-clg(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL,
-  level = NULL)
+clg(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -38,7 +37,8 @@ A list containing the conditional density estimate as well as all the
           marginal standard normality (if selected).
     \item \code{normalizing_constants}: The normalizing constants used to
           transform data and grid back and forth to the marginal standard
-          normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017) (if selected).
+          normality scale, as seen in eq. (8) of Otneim & Tjøstheim (2017)
+          (if selected).
     \item \code{grid}: The grid where the estimation was performed, on the
           original scale.
     \item \code{transformed_grid}: The grid where the estimation was
@@ -51,7 +51,7 @@ approximations.
 }
 \details{
 This function is the conditional version of the locally Gaussian density
-estimator (LGDE), described in Otneim & Tjøstheim (2017). The function takes
+estimator (LGDE), described in Otneim & Tjøstheim (2018). The function takes
 as arguments an \code{lg}-object as produced by the main \code{lg_main}- function,
 a grid of points where the density estimate should be estimated, and a set of
 conditions.
@@ -77,5 +77,6 @@ value of X2.
 }
 \references{
 Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
-  the local Gaussian correlation" Statistics and Computing (2017): 1-19.
+  the local Gaussian correlation" Statistics and Computing 28, no. 2 (2018):
+  303-321.
 }

@@ -5,8 +5,8 @@
 \title{Test for conditional independence}
 \usage{
 ci_test(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000,
-  M = NULL, M_sim = 1500, M_corr = 1.5, n_corr = 1.2, extend = 0.3,
-  return_time = TRUE)
+  M = NULL, M_sim = 1500, M_corr = 1.5, n_corr = 1.2,
+  extend = 0.3, return_time = TRUE)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

@@ -4,7 +4,8 @@
 \alias{bw_select_plugin_univariate}
 \title{Plugin bandwidth selection for univariate data}
 \usage{
-bw_select_plugin_univariate(x = NULL, n = length(x), c = 1.75, a = -1/5)
+bw_select_plugin_univariate(x = NULL, n = length(x), c = 1.75,
+  a = -1/5)
 }
 \arguments{
 \item{x}{The data vector.}

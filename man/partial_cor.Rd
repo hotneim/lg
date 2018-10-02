@@ -4,12 +4,74 @@
 \alias{partial_cor}
 \title{Calculate the local Gaussian partial correlation}
 \usage{
-partial_cor(lg_object, grid = NULL, condition = NULL, level = 0.95)
+partial_cor(lg_object, grid = NULL, condition = NULL)
+}
+\arguments{
+\item{lg_object}{An object of type \code{lg}, as produced by the
+\code{lg_main}-function.}
+
+\item{grid}{A matrix of grid points, where we want to evaluate the density
+estimate. Number of columns *must* be equal to 2.}
+
+\item{condition}{A vector with conditions for the variables that we condition
+upon. Length of this vector *must* be the same as the number of variables in
+X3. The function will throw an arrow of there is any discrepancy in the
+dimensions of the \code{grid}, \code{condition} and data set.}
+}
+\value{
+A list conaining the local partial Gaussian correlations as well as all the
+  running parameters that has been used. The elements are:
+
+  \itemize{
+    \item \code{grid} The grid where the estimation was performed, on the
+          original scale.
+    \item \code{partial_correlations} The estimated local partial Gaussian
+          correlations.
+    \item \code{cond_density} The estimated conditional density of X1 and X2 given
+          X3, as described by Otneim & Tjøstheim (2018).
+    \item \code{transformed_grid}: The grid where the estimation was
+          performed, on the marginal standard normal scale.
+    \item \code{bw}: The bandwidth object.
+    \item \code{partial_correlations_sd} Estimated standard deviations of the local
+          partial Gaussian correlations, as described in a forthcoming paper.
+  }
 }
 \description{
 A function that calculates the local Gaussian partial correlation for a pair
 of variables, given the values of some conditionaing variables.
 }
 \details{
-Explanation....
+This function is a wrapper for the \code{clg}-function (for conditional
+density estimation) that returns the local conditional, or partial,
+correlations described by Otneim & Tjøstheim (2018). The function takes as
+arguments an \code{lg}-object as produced by the main \code{lg_main}-
+function, a grid of points where the density estimate should be estimated, and
+a set of conditions.
+
+The variables must be sorted before they are supplied to this function. It
+will always assume that the free variables come before the conditioning
+variables, see \code{?clg} for details.
+
+Assume that X is a stochastic vector with scalar components X1 and X2, and a
+possibly d-dimensional component X3. This function will thus compute the local
+*partial* correlation between X1 and X2 given X3 = x3.
+}
+\examples{
+  # A 3 variate example
+  x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+
+  # Generate the lg-object with default settings
+  lg_object <- lg_main(x)
+
+  # Estimate the local partial Gaussian correlation between X1 and X2 given X3 = 1 on
+  # a small grid
+  partial_correlations <- partial_cor(lg_object,
+                                     grid = cbind(-4:4, -4:4),
+                                     condition = 1)
+
+}
+\references{
+Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
+  the local Gaussian correlation" Statistics and Computing 28, no. 2 (2018):
+  303-321.
 }
