@@ -4,7 +4,7 @@
 \alias{partial_cor}
 \title{Calculate the local Gaussian partial correlation}
 \usage{
-partial_cor(lg_object, grid = NULL, condition = NULL)
+partial_cor(lg_object, grid = NULL, condition = NULL, level = 0.95)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -17,6 +17,9 @@ estimate. Number of columns *must* be equal to 2.}
 upon. Length of this vector *must* be the same as the number of variables in
 X3. The function will throw an arrow of there is any discrepancy in the
 dimensions of the \code{grid}, \code{condition} and data set.}
+
+\item{level}{Specify a level if asymptotic standard deviations and confidence
+intervals should be returned. If not, set to \code{NULL}.}
 }
 \value{
 A list conaining the local partial Gaussian correlations as well as all the
@@ -34,6 +37,10 @@ A list conaining the local partial Gaussian correlations as well as all the
     \item \code{bw}: The bandwidth object.
     \item \code{partial_correlations_sd} Estimated standard deviations of the local
           partial Gaussian correlations, as described in a forthcoming paper.
+    \item \code{partial_correlations_lower} Lower confidence limit based on the
+          asymptotic standard deviation.
+    \item \code{partial_correlations_upper} Upper confidence limit based on the
+          asymptotic standard deviation.
   }
 }
 \description{

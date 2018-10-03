@@ -4,7 +4,8 @@
 \alias{clg}
 \title{The locally Gaussian conditional density estimator}
 \usage{
-clg(lg_object, grid = NULL, condition = NULL, fixed_grid = NULL)
+clg(lg_object, grid = NULL, condition = NULL,
+  normalization_points = NULL, fixed_grid = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -18,6 +19,9 @@ X1.}
 upon. Length of this vector *must* be the same as the number of variables
 in X2. The function will throw an arrow of there is any discrepancy in the
 dimensions of the \code{grid}, \code{condition} and data set.}
+
+\item{normalization_points}{How many grid points for approximating the integral
+of the density estimate, to use for normalization?}
 
 \item{fixed_grid}{Not used presently.}
 }
@@ -43,6 +47,14 @@ A list containing the conditional density estimate as well as all the
           original scale.
     \item \code{transformed_grid}: The grid where the estimation was
           performed, on the marginal standard normal scale.
+    \item \code{normalization_points} Number of grid points used
+          to appriximate the integral of the density estimate, in order to
+          normalize?
+    \item \code{normalization_constant} If approximated, the integral of the
+          non-normalized density estimate. NA if not normalized.
+    \item \code{density_normalized} Logical, indicates whether the final
+          density estimate (containd in f_est) has been approximately
+          normalized to have unit integral.
  }
 }
 \description{

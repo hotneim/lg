@@ -4,7 +4,8 @@
 \alias{dlg}
 \title{The locally Gaussian density estimator (LGDE)}
 \usage{
-dlg(lg_object, grid = NULL, level = 0.95)
+dlg(lg_object, grid = NULL, level = 0.95,
+  normalization_points = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -15,6 +16,9 @@ estimate.}
 
 \item{level}{Specify a level if asymptotic standard deviations and confidence
 intervals should be returned.}
+
+\item{normalization_points}{How many grid points for approximating the integral
+of the density estimate, to use for normalization?}
 }
 \value{
 A list containing the density estimate as well as all the running
@@ -42,6 +46,20 @@ A list containing the density estimate as well as all the running
           original scale.
     \item \code{transformed_grid}: The grid where the estimation was
           performed, on the marginal standard normal scale.
+    \item \code{normalization_points} Number of grid points used
+          to appriximate the integral of the density estimate, in order to
+          normalize?
+    \item \code{normalization_constant} If approximated, the integral of the
+          non-normalized density estimate. NA if not normalized.
+    \item \code{density_normalized} Logical, indicates whether the final
+          density estimate (containd in f_est) has been approximately
+          normalized to have unit integral.
+    \item \code{loc_cor_sd} Estimated asymptotic standard deviation for the
+          local correlations.
+    \item \code{loc_cor_lower} Lower confidence limit based on the asymptotic
+          standard deviation.
+    \item \code{loc_cor_upper} Upper confidence limit based on the asymptotic
+          standard deviation.
    }
 }
 \description{
