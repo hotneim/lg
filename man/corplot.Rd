@@ -87,7 +87,7 @@ dlg-function. This plot is heavily inspired by the local correlation plots
 produced by the 'localgauss'-package by Berentsen et. al (2014), but it is
 here more easily customized and specially adapted to the ecosystem within the
 \code{lg}-package. The plotting is carried out using the ggplot2-package
-(Wickham, 2009). THis function now also accepts objects created by the
+(Wickham, 2009). This function now also accepts objects created by the
 \code{partial_cor()}-function, in order to create local \emph{partial}
 correlation maps.
 }

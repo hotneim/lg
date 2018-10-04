@@ -2,7 +2,7 @@
 % Please edit documentation in R/helping_functions.R
 \name{u}
 \alias{u}
-\title{Auxilliary function for calculating the local score function u}
+\title{Auxiliary function for calculating the local score function u}
 \usage{
 u(z1, z2, rho)
 }
@@ -14,7 +14,7 @@ u(z1, z2, rho)
 \item{rho}{rho}
 }
 \description{
-Auxilliary function for calculating the local score function u
+Auxiliary function for calculating the local score function u
 }
 \details{
 This function is used to estimate the asymptotic variance of the estimates.

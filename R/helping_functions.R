@@ -107,9 +107,9 @@ mvnorm_eval <- function(eval_points,
                   FUN = single_eval))
 }
 
-#' Auxilliary function for calculating the local score function u
+#' Auxiliary function for calculating the local score function u
 #'
-#' Auxilliary function for calculating the local score function u
+#' Auxiliary function for calculating the local score function u
 #'
 #' This function is used to estimate the asymptotic variance of the estimates.
 #'

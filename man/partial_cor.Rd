@@ -22,7 +22,7 @@ dimensions of the \code{grid}, \code{condition} and data set.}
 intervals should be returned. If not, set to \code{NULL}.}
 }
 \value{
-A list conaining the local partial Gaussian correlations as well as all the
+A list containing the local partial Gaussian correlations as well as all the
   running parameters that has been used. The elements are:
 
   \itemize{
@@ -45,7 +45,7 @@ A list conaining the local partial Gaussian correlations as well as all the
 }
 \description{
 A function that calculates the local Gaussian partial correlation for a pair
-of variables, given the values of some conditionaing variables.
+of variables, given the values of some conditioning variables.
 }
 \details{
 This function is a wrapper for the \code{clg}-function (for conditional

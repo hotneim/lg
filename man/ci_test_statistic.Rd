@@ -11,7 +11,7 @@ ci_test_statistic(lg_object, h = function(x) x^2)
 \item{lg_object}{An object of type \code{lg}, as produced by the
 \code{lg_main}-function}
 
-\item{h}{The \code{h}-function used in the calulation of the test statistic.
+\item{h}{The \code{h}-function used in the calculation of the test statistic.
 The default value is \code{h(x) = x^2}.}
 }
 \description{

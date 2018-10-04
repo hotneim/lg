@@ -47,12 +47,12 @@ A list containing the density estimate as well as all the running
     \item \code{transformed_grid}: The grid where the estimation was
           performed, on the marginal standard normal scale.
     \item \code{normalization_points} Number of grid points used
-          to appriximate the integral of the density estimate, in order to
+          to approximate the integral of the density estimate, in order to
           normalize?
     \item \code{normalization_constant} If approximated, the integral of the
           non-normalized density estimate. NA if not normalized.
     \item \code{density_normalized} Logical, indicates whether the final
-          density estimate (containd in f_est) has been approximately
+          density estimate (contained in f_est) has been approximately
           normalized to have unit integral.
     \item \code{loc_cor_sd} Estimated asymptotic standard deviation for the
           local correlations.
