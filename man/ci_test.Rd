@@ -12,7 +12,7 @@ ci_test(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000,
 \item{lg_object}{An object of type \code{lg}, as produced by the
 \code{lg_main}-function}
 
-\item{h}{The \code{h}-function used in the calulation of the test statistic.
+\item{h}{The \code{h}-function used in the calculation of the test statistic.
 The default value is \code{h(x) = x^2}.}
 
 \item{n_rep}{The number of replicated bootstrap samples}

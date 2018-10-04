@@ -305,7 +305,7 @@ ci_test_statistic <- function(lg_object, h = function(x) x^2) {
 #'
 #' @param lg_object An object of type \code{lg}, as produced by the
 #'   \code{lg_main}-function
-#' @param h The \code{h}-function used in the calulation of the test statistic.
+#' @param h The \code{h}-function used in the calculation of the test statistic.
 #'   The default value is \code{h(x) = x^2}.
 #' @param n_rep The number of replicated bootstrap samples
 #' @param nodes Either the number of equidistant nodes to generate, or a vector
