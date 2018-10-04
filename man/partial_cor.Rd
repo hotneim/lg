@@ -15,7 +15,7 @@ estimate. Number of columns *must* be equal to 2.}
 
 \item{condition}{A vector with conditions for the variables that we condition
 upon. Length of this vector *must* be the same as the number of variables in
-X3. The function will throw an arrow of there is any discrepancy in the
+X3. The function will throw an error of there is any discrepancy in the
 dimensions of the \code{grid}, \code{condition} and data set.}
 
 \item{level}{Specify a level if asymptotic standard deviations and confidence

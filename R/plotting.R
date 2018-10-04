@@ -2,9 +2,10 @@
 # Functions for plotting the local correlations
 # ---------------------------------------------
 
-#' Plot unconditional local correlation maps
+#' Plot local correlation maps
 #'
-#' Plot the estimated local correlation map for a pair of variables
+#' Plot the estimated local correlation map (or local \emph{partial} correlation
+#' map) for a pair of variables
 #'
 #' This function plots a map of estimated local Gaussian correlations of a
 #' specified pair (defaults to the first pair) of variables as produced by the
@@ -12,7 +13,9 @@
 #' produced by the 'localgauss'-package by Berentsen et. al (2014), but it is
 #' here more easily customized and specially adapted to the ecosystem within the
 #' \code{lg}-package. The plotting is carried out using the ggplot2-package
-#' (Wickham, 2009).
+#' (Wickham, 2009). THis function now also accepts objects created by the
+#' \code{partial_cor()}-function, in order to create local \emph{partial}
+#' correlation maps.
 #'
 #' @param dlg_object The density estimation object produced by the dlg-function
 #' @param pair Integer indicating which pair of variables you want to plot. The
@@ -262,7 +265,6 @@ corplot <- function(dlg_object,
                                     size = point_size)
       }
     }
-
 
     # Add the labels, if requested
     if(plot_labels) {

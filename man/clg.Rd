@@ -17,7 +17,7 @@ X1.}
 
 \item{condition}{A vector with conditions for the variables that we condition
 upon. Length of this vector *must* be the same as the number of variables
-in X2. The function will throw an arrow of there is any discrepancy in the
+in X2. The function will throw an error of there is any discrepancy in the
 dimensions of the \code{grid}, \code{condition} and data set.}
 
 \item{normalization_points}{How many grid points for approximating the integral

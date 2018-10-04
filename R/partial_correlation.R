@@ -28,7 +28,7 @@
 #'  estimate. Number of columns *must* be equal to 2.
 #'@param condition A vector with conditions for the variables that we condition
 #'  upon. Length of this vector *must* be the same as the number of variables in
-#'  X3. The function will throw an arrow of there is any discrepancy in the
+#'  X3. The function will throw an error of there is any discrepancy in the
 #'  dimensions of the \code{grid}, \code{condition} and data set.
 #'@param level Specify a level if asymptotic standard deviations and confidence
 #'   intervals should be returned. If not, set to \code{NULL}.
@@ -105,7 +105,8 @@ partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = 0.95) 
   # The element c_cov in the clg_object is now a list of the local covariance
   # matrices, which we translate into correlation matrices and pick out the
   # off-diagonal element.
-  partial_correlations <- unlist(lapply(clg_object$c_cov, function(S) stats::cov2cor(S)[1,2]))
+  partial_correlations <-
+    unlist(lapply(clg_object$c_cov, function(S) stats::cov2cor(S)[1,2]))
 
   # When calculating the gradient, we need the estimated local partial
   # covariance matrices, and they are returned by the clg-function.

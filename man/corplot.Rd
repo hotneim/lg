@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{corplot}
 \alias{corplot}
-\title{Plot unconditional local correlation maps}
+\title{Plot local correlation maps}
 \usage{
 corplot(dlg_object, pair = 1, gaussian_scale = FALSE,
   plot_colormap = TRUE, plot_obs = FALSE, plot_labels = TRUE,
@@ -77,7 +77,8 @@ red).}
 \item{subtitle}{Subtitle of plot}
 }
 \description{
-Plot the estimated local correlation map for a pair of variables
+Plot the estimated local correlation map (or local \emph{partial} correlation
+map) for a pair of variables
 }
 \details{
 This function plots a map of estimated local Gaussian correlations of a
@@ -86,7 +87,9 @@ dlg-function. This plot is heavily inspired by the local correlation plots
 produced by the 'localgauss'-package by Berentsen et. al (2014), but it is
 here more easily customized and specially adapted to the ecosystem within the
 \code{lg}-package. The plotting is carried out using the ggplot2-package
-(Wickham, 2009).
+(Wickham, 2009). THis function now also accepts objects created by the
+\code{partial_cor()}-function, in order to create local \emph{partial}
+correlation maps.
 }
 \references{
 Berentsen, G. D., Kleppe, T. S., & Tjøstheim, D. (2014). Introducing

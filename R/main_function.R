@@ -12,8 +12,7 @@
 #'and set a number of options, which is then used to prepare an \code{lg} object
 #'that can be supplied to other functions in the package, such as \code{dlg}
 #'(density estimation), \code{clg} (conditional density estimation). The details
-#'has been laid out in Otneim & Tjøstheim (2017a) and Otneim & Tjøstheim
-#'(2017b).
+#'has been laid out in Otneim & Tjøstheim (2017) and Otneim & Tjøstheim (2018).
 #'
 #'The papers mentioned above deal with the estimation of multivariate density
 #'functions and conditional density functions. The idea is to fit a multivariate
@@ -117,10 +116,11 @@
 #'2009.
 #'
 #'Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
-#'multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
+#'multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
-#'Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using the
-#'local Gaussian correlation" Statistics and Computing (2017b): 1-19.
+#'Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
+#'the local Gaussian correlation" Statistics and Computing 28, no. 2 (2018):
+#'303-321.
 #'
 #'Tjøstheim, D., & Hufthammer, K. O. (2013). Local Gaussian correlation: a new
 #'measure of dependence. Journal of Econometrics, 172(1), 33-48.

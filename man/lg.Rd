@@ -9,8 +9,8 @@ multivariate applications.}
 \description{
 The \code{lg} package provides implementations for the multivariate density
 estimation and the conditional density estimation methods using local
-Gaussian correlation as presented in Otneim & Tjøstheim (2017a) and Otneim &
-Tjøstheim (2017b).
+Gaussian correlation as presented in Otneim & Tjøstheim (2017) and Otneim &
+Tjøstheim (2018).
 }
 \details{
 The main function is called \code{lg_main}, and takes as argument a data set
@@ -29,7 +29,7 @@ You can change estimation method, bandwidth selection method and other
 parameters by using the arguments of the \code{lg_main} function.
 
 You can evaluate the multivariate density estimate on a \code{grid} as
-described in Otneim & Tjøstheim (2017a) using the \code{dlg}-function as
+described in Otneim & Tjøstheim (2017) using the \code{dlg}-function as
 follows:
 
 \code{dens_est <- dlg(lg_object, grid = grid).}
@@ -40,8 +40,9 @@ Assuming that the data set has \strong{p} variables, you can evaluate the \emph{
 }
 \references{
 Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
-  multivariate data." Statistics and Computing 27, no. 6 (2017a): 1595-1616.
+  multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 
   Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
-  the local Gaussian correlation" Statistics and Computing (2017b): 1-19.
+  the local Gaussian correlation" Statistics and Computing 28, no. 2 (2018):
+  303-321.
 }
