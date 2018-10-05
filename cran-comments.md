@@ -1,15 +1,14 @@
+## Resubmission
+This is a resubmission. In this version I have
+
+*  replaced akima::aspline() with stats::splinefun(). 
+
 ## Test environments
 * local Ubuntu 16.04.1 LTS, R 3.5.1
 * win-builder
 
 ## R CMD check results
-There was 1 NOTE on the local system:
-
-* Package has a FOSS license but eventually depends on the following
-  package which restricts use:
-    akima
-  
-  Need the akima package for the new test for conditional independence. 
+There were no ERRORs, WARNINGs or NOTEs
 
 There was 1 NOTE on win-builder.
 
