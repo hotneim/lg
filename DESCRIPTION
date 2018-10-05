@@ -17,5 +17,4 @@ Imports:
     localgauss,
     logspline,
     ggplot2,
-    ks,
-    akima
+    ks
