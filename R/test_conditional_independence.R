@@ -71,7 +71,8 @@ interpolate_conditional_density <- function(lg_object,
 
     conditional_density <- function(t) {
       exp(stats::splinefun(x = x[!(log(y) == Inf | log(y) == -Inf)],
-                           y = log(y)[!(log(y) == Inf | log(y) == -Inf)])(t))
+                           y = log(y)[!(log(y) == Inf | log(y) == -Inf)],
+                           method = "natural")(t))
     }
 
     return(list(conditional_density = conditional_density,
