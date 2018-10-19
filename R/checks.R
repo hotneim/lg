@@ -37,6 +37,16 @@ check_data <- function(x, dim_check = NA, type) {
                        " variables", sep = ""))
         }
     }
+
+    # Remove NAs, but issue message if any is found
+    x <- na.omit(x)
+    if(class(attributes(x)$na.action) == "omit") {
+      message(paste("Number of NA observations removed from the data: ",
+                    length((attributes(x)$na.action)),
+                    ".",
+                    sep = ""))
+    }
+
     return(x)
 }
 

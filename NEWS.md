@@ -9,4 +9,6 @@
    * Local (partial) correlations now comes with approximate confidence 
      intervals.
 
-# lg 0.1.0 * Initial release
+# lg 0.1.0 
+
+   * Initial release

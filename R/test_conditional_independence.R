@@ -123,15 +123,22 @@ accept_reject <- function(lg_object,
 
     # Calculate M for use in the accept-reject algorithm
     if(is.null(M)){
+      # For some extreme observations, the estimated conditional density
+      # is identically equal to zero. Skip these points.
+      if(int_object$var == 0) {
+        M <- 0
+      } else {
         test_grid <- stats::rnorm(M_sim,
-                           mean = int_object$mean,
-                           sd = sqrt(int_object$var))
+                                  mean = int_object$mean,
+                                  sd = sqrt(int_object$var))
         test_f <- int_object$conditional_density(test_grid)
         test_g <- dnorm(test_grid,
                         mean = int_object$mean,
                         sd = sqrt(int_object$var))
         M <- min(10,  M_corr*quantile(test_f/test_g, .95, type = 1))
+      }
     }
+
 
     # For some very extreme observations, M can become very small here. For the time being,
     # we will return nothing if that happens
@@ -216,16 +223,17 @@ replicate_under_ci <- function(lg_object,
     for(i in 1:2) {
 
         # Data without the other variable
-        temp_lg_object <- lg_main(x = lg_object$x[,-i],
-                                  bw_method = lg_object$bw_method,
-                                  est_method = lg_object$est_method,
-                                  transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
-                                  plugin_constant_marginal = lg_object$plugin_constant_marginal,
-                                  plugin_constant_joint = lg_object$plugin_constant_joint,
-                                  plugin_exponent_marginal = lg_object$plugin_exponent_marginal,
-                                  plugin_exponent_joint = lg_object$plugin_exponent_joint,
-                                  tol_marginal = lg_object$tol_marginal,
-                                  tol_joint = lg_object$tol_joint)
+        temp_lg_object <-
+          suppressMessages(lg_main(x = lg_object$x[,-i],
+                                   bw_method = lg_object$bw_method,
+                                   est_method = lg_object$est_method,
+                                   transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
+                                   plugin_constant_marginal = lg_object$plugin_constant_marginal,
+                                   plugin_constant_joint = lg_object$plugin_constant_joint,
+                                   plugin_exponent_marginal = lg_object$plugin_exponent_marginal,
+                                   plugin_exponent_joint = lg_object$plugin_exponent_joint,
+                                   tol_marginal = lg_object$tol_marginal,
+                                   tol_joint = lg_object$tol_joint))
 
         # Fill each row with a new sample, one for each condition
         for(j in 1:n) {
@@ -290,7 +298,7 @@ local_conditional_covariance <- function(clg_object, coord = c(1, 2)) {
 ci_test_statistic <- function(lg_object, h = function(x) x^2) {
 
     # Calculate the conditional coveriance between the first two variables in the data points
-    clg_object <- clg(lg_object, fixed_grid = lg_object$x)
+    suppressMessages(clg_object <- clg(lg_object, fixed_grid = lg_object$x))
 
     # Extract the conditional covariances and calculate the value of the test statistic
     mean(h(local_conditional_covariance(clg_object)))
@@ -319,8 +327,9 @@ ci_test_statistic <- function(lg_object, h = function(x) x^2) {
 #' @param return_time Measure how long the test takes to run, and return along
 #'   with the test result
 #' @export
-ci_test <- function(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000, M = NULL,
-                    M_sim = 1500, M_corr = 1.5, n_corr = 1.2, extend = .3, return_time = TRUE) {
+ci_test <- function(lg_object, h = function(x) x^2, n_rep = 500, nodes = 100,
+                    M = NULL, M_sim = 1500, M_corr = 1.5, n_corr = 1.2,
+                    extend = .3, return_time = TRUE) {
 
     ## Start the clock
     if(return_time) {
@@ -342,15 +351,16 @@ ci_test <- function(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000, 
     for(i in 1:n_rep) {
 
         # First, create the temporary lg-object. Parameters are the same as for the original data.
-        temp_lg_object <- lg_main(replicates$replicates[[i]], bw_method = lg_object$bw_method,
-                                  est_method = lg_object$est_method,
-                                  transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
-                                  plugin_constant_marginal = lg_object$plugin_constant_marginal,
-                                  plugin_constant_joint = lg_object$plugin_constant_joint,
-                                  plugin_exponent_marginal = lg_object$plugin_exponent_marginal,
-                                  plugin_exponent_joint = lg_object$plugin_exponent_joint,
-                                  tol_marginal = lg_object$tol_marginal,
-                                  tol_joint = lg_object$tol_joint)
+      suppressMessages(temp_lg_object <-
+                        lg_main(replicates$replicates[[i]], bw_method = lg_object$bw_method,
+                                est_method = lg_object$est_method,
+                                transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
+                                plugin_constant_marginal = lg_object$plugin_constant_marginal,
+                                plugin_constant_joint = lg_object$plugin_constant_joint,
+                                plugin_exponent_marginal = lg_object$plugin_exponent_marginal,
+                                plugin_exponent_joint = lg_object$plugin_exponent_joint,
+                                tol_marginal = lg_object$tol_marginal,
+                                tol_joint = lg_object$tol_joint))
 
         # Then calculate the test statistic
         replicated[i] <- ci_test_statistic(temp_lg_object, h = h)
@@ -363,6 +373,14 @@ ci_test <- function(lg_object, h = function(x) x^2, n_rep = 1000, nodes = 1000, 
         duration <- as.numeric(end_time - start_time, unit = "mins")
     } else {
         duration <- NA
+    }
+
+    Mret_na_check <- na.omit(replicates$Mret)
+    if(class(attributes(Mret_na_check)$na.action) == "omit") {
+      message(paste("The following observations (outliers probably) caused problems while generating bootstrap-replicates, and was removed from the sample: ",
+                    (attributes(Mret_na_check)$na.action),
+                    ".",
+                    sep = ""))
     }
 
     return(list(p_value = mean(observed < replicated),
