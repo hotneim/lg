@@ -33,6 +33,17 @@ trans_normal<- function(x) {
     transformed_data <- matrix(unlist(lapply(X = as.list(1:d),
                                              FUN = transform_data)), ncol = d)
 
+    # In some very rare cases the logspline algorithm fails, and produces
+    # NaNs. Check for this, and re-run using the old-logspline-function.
+    failed <- apply(is.nan(transformed_data), 2, any)
+    if(any(failed)) {
+      for(j in which(failed)) {
+        estimate_marginal_old <- logspline::oldlogspline.to.logspline(logspline::oldlogspline(x[,j]))
+        transformed_data[,j] <- qnorm(logspline::plogspline(x[,j],
+                                                      estimate_marginal_old))
+      }
+    }
+
     # The list to be returned
     ret = list(transformed_data = transformed_data)
 
