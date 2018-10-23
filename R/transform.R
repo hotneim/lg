@@ -39,6 +39,7 @@ trans_normal<- function(x) {
     if(any(failed)) {
       for(j in which(failed)) {
         estimate_marginal_old <- logspline::oldlogspline.to.logspline(logspline::oldlogspline(x[,j]))
+        marginal_estimates[[j]] <- estimate_marginal_old
         transformed_data[,j] <- qnorm(logspline::plogspline(x[,j],
                                                       estimate_marginal_old))
       }

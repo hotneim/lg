@@ -1,3 +1,11 @@
+# lg 0.2.0.9002 
+
+   * Switches to old logspline algorithm if the new fails (very rare). 
+
+# lg 0.2.0.9001 
+   
+   * Better NA handling, epecially in the test for conditional independence
+
 # lg 0.2.0 
 
    * Added function partial_cor() for calculating the local partial correlations
