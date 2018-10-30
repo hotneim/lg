@@ -81,6 +81,17 @@ cond_dens_est <- clg(lg_object = lg_object,
 
 If we want to estimate the conditional density of CAC and FTSE given DAX and SMI, for example, we must first shuffle the data so that CAC and FTSE come first, and supply the conditional value for DAX and SMI through the vector *condition*, now having two elements.
 
+# Independence tests and test of financial conatgion
+
+The following statistical tests are available:
+
+- Test for independence between two stochastic vectors by Berentsen and Tjøstheim (2014).
+- Test for serial dependence in a time series by Lacal and Tjøstheim (2017a).
+- Test for cross-dependence between two time series by Lacal and Tjøstheim (2017b).
+- Test for financial contagion during crises by Støve et al. (2014).
+
+
+
 # References
 
 Berentsen, Geir Drage, Tore Selland Kleppe, and Dag Tjøstheim. "Introducing localgauss, an R package for estimating and visualizing local Gaussian correlation." Journal of Statistical Software 56.1 (2014): 1-18.
