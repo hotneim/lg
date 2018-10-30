@@ -350,3 +350,50 @@ bw_select <- function(x,
     return(ret)
 
 }
+
+#' Create simple bandwidth object
+#'
+#' Create a simple bandwidths object for local Gaussian correlations
+#'
+#' This function provides a quick way of producing a bandwidth object that may
+#' be used in the \code{lg_main()}-function. The user must specify a bandwidth
+#' \code{joint} that is used for all joint bandwidths, and the user may specify
+#' \code{marg}, a marginal bandwidth that will be used for all marginal
+#' bandwidths. This is needed if the subsequent analyses use
+#' \code{est_method = "5par_marginals_fixed"}.
+#'
+#' The function must know the dimension of the problem, which is achieved by
+#' either supplying the data set \code{x} or the number of variables \code{dim}.
+#'
+#' @param joint Joint bandwidth
+#' @param marg Marginal bandwidths
+#' @param x The data set
+#' @param dim The number of variables
+#'
+#' @examples
+#'
+#'   bw_object <- bw_simple(joint = 1, marg = 1, dim = 3)
+#'
+#' @export
+
+bw_simple <- function(joint = 1, marg = NA, x = NULL, dim = NULL) {
+
+  # Check that we have wither the data or a dimension
+  if(is.null(x) & is.null(dim)) {
+    stop("Specify either x or dim")
+  }
+
+  # Create a dummy data det if only the dimension is specified
+  if(is.null(x)) {
+    x <- matrix(1, nrow = 2, ncol = dim)
+  }
+
+  bw_select(x,
+            bw_method = "plugin",
+            est_method = "5par_marginals_fixed",
+            plugin_constant_marginal = marg,
+            plugin_exponent_marginal = 0,
+            plugin_constant_joint = joint,
+            plugin_exponent_joint = 0)
+
+}

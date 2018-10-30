@@ -40,7 +40,7 @@
 #'   the local Gaussian correlation" Statistics and Computing 28, no. 2 (2018):
 #'   303-321.
 #'
-#' @importFrom stats dnorm optim optimise qnorm quantile cov splinefun
+#' @importFrom stats dnorm optim optimise qnorm quantile cov splinefun na.omit
 #' @importFrom utils combn tail
 #' @docType package
 #' @name lg
