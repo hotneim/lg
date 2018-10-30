@@ -131,7 +131,7 @@ and SMI, for example, we must first shuffle the data so that CAC and
 FTSE come first, and supply the conditional value for DAX and SMI
 through the vector *condition*, now having two elements.
 
-# Independence tests and test of financial conatgion
+# Independence tests and test of financial contagion
 
 The following statistical tests are available:
 
@@ -161,6 +161,16 @@ test_result <- ind_test(lg_object, n_rep = 20)
 test_result$p_value
 #> [1] 0
 ```
+
+The test for serial dependence in a time series \(\{X_t\}\) can be
+performed in exactly the same way by collecting \(\{X_t\}\) and
+\(\{X_{t-k}\}\) as columns in the data set, for some lag \(k\). For a
+test for serial cross dependence between \(\{X_t\}\) and \(\{Y_t\}\) one
+must collect \(\{X_t\}\) and \(\{Y_{t-k}\}\) as columns in the data set,
+but also choose either `bootstrap_type = "block"` or `bootstrap_type =
+"stationary"` in order to correctly resample under the null hypothesis.
+We refer to the original article Lacal and Tjøstheim (2017b) for details
+on this.
 
 # References
 
