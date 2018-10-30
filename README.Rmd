@@ -104,17 +104,24 @@ test_result <- ind_test(lg_object, n_rep = 20)
 test_result$p_value
 ```
 
-The test for serial dependence in a time series $\{X_t\}$ can be performed in exactly the same way by collecting $\{X_t\}$ and $\{X_{t-k}\}$ as columns in the data set, for some lag $k$. For a test for serial cross dependence between $\{X_t\}$ and $\{Y_t\}$ one must collect $\{X_t\}$ and $\{Y_{t-k}\}$ as columns in the data set, but also choose either `bootstrap_type = "block"` or `bootstrap_type = "stationary"` in order to correctly resample under the null hypothesis. We refer to the original article Lacal and Tjøstheim (2017b) for details on this.
+The test for serial dependence in a time series X(t) can be performed in exactly the same way by collecting *X(t)* and *X(t-k)* as columns in the data set, for some lag *k*. For a test for serial cross dependence between *X(t)* and *Y(t)* one must collect *X(t)* and *Y(t-k)* as columns in the data set, but also choose either `bootstrap_type = "block"` or `bootstrap_type = "stationary"` in order to correctly resample under the null hypothesis. We refer to the original article Lacal and Tjøstheim (2017b) for details on this.
 
-
-
+In order to perform the test for financial contagion, one must collect the non-crisis and crisis data in separate data sets, and create separate lg-objects, and then apply the *cont_test()*-function.
 
 # References
 
 Berentsen, Geir Drage, Tore Selland Kleppe, and Dag Tjøstheim. "Introducing localgauss, an R package for estimating and visualizing local Gaussian correlation." Journal of Statistical Software 56.1 (2014): 1-18.
 
+Berentsen, Geir Drage, and Dag Tjøstheim. "Recognizing and visualizing departures from independence in bivariate data using local Gaussian correlation." Statistics and Computing 24.5 (2014): 785-801.
+
+Lacal, Virginia, and Dag Tjøstheim. "Local Gaussian autocorrelation and tests for serial independence." Journal of Time Series Analysis 38.1 (2017a): 51-71.
+
+Lacal, Virginia, and Dag Tjøstheim. "Estimating and testing nonlinear local dependence between two time series." Journal of Business & Economic Statistics just-accepted (2017b).
+
 Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for multivariate data." Statistics and Computing 27.6 (2017): 1595-1616.
 
 Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using the local Gaussian correlation." Statistics and Computing 28.2 (2018): 303-321.
+
+Støve, Bård, Dag Tjøstheim, and Karl Ove Hufthammer. "Using local Gaussian correlation in a nonlinear re-examination of financial contagion." Journal of Empirical Finance 25 (2014): 62-82.
 
 Tjøstheim, Dag, & Hufthammer, Karl Ove (2013). Local Gaussian correlation: a new measure of dependence. Journal of Econometrics, 172(1), 33-48.
