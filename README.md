@@ -143,6 +143,25 @@ The following statistical tests are available:
     Tjøstheim (2017b).
   - Test for financial contagion during crises by Støve et al. (2014).
 
+Let us quickly demonstrate their implementation. For the first test, we
+generate some data from a bivariate \(t\)-distribution. They are
+uncorrelated, but not independent. In order to test for independence, we
+create an lg-object, and apply the function *ind\_test()*. One may of
+course change the estimation method, the bandwidths and so in the call
+to *lg\_main()*, and there are furher options available in
+*ind\_test()*. For this illustration we use only 20 bootstrap
+replications, but this must of course be significantly higher in
+practical applications.
+
+``` r
+set.seed(1)
+x <- mvtnorm::rmvt(n = 100, df = 2)
+lg_object <- lg_main(x, est_method = "5par")
+test_result <- ind_test(lg_object, n_rep = 20)
+test_result$p_value
+#> [1] 0
+```
+
 # References
 
 Berentsen, Geir Drage, Tore Selland Kleppe, and Dag Tjøstheim.
