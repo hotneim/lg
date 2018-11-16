@@ -6,7 +6,8 @@
 \usage{
 cont_test(lg_object_non_crisis, lg_object_crisis,
   grid_range = quantile(rbind(lg_object_non_crisis$x,
-  lg_object_crisis$x), c(0.05, 0.95)), grid_length = 30, n_rep = 1000)
+  lg_object_crisis$x), c(0.05, 0.95)), grid_length = 30, n_rep = 1000,
+  weight = function(y) {     rep(1, nrow(y)) })
 }
 \arguments{
 \item{lg_object_non_crisis}{An object of type \code{lg}, as produced by the
@@ -23,6 +24,8 @@ diagonal specified by this vector of length two.}
 \item{grid_length}{The number of grid points.}
 
 \item{n_rep}{The number of bootstrap replicates.}
+
+\item{weight}{Weight function}
 }
 \value{
 A list containing the test result as well as various parameters. The

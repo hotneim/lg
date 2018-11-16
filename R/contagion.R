@@ -18,6 +18,7 @@
 #'   diagonal specified by this vector of length two.
 #' @param grid_length The number of grid points.
 #' @param n_rep The number of bootstrap replicates.
+#' @param weight Weight function
 #'
 #' @return A list containing the test result as well as various parameters. The
 #'   elements are:
@@ -64,7 +65,8 @@ cont_test <- function(lg_object_non_crisis, lg_object_crisis,
                       grid_range = quantile(rbind(lg_object_non_crisis$x,
                                                   lg_object_crisis$x),
                                             c(.05, .95)),
-                      grid_length = 30, n_rep = 1000) {
+                      grid_length = 30, n_rep = 1000,
+                      weight = function(y) {rep(1, nrow(y))}) {
 
     # Do sanity checks of the arguments
     check_lg(lg_object_non_crisis)
@@ -104,6 +106,7 @@ cont_test <- function(lg_object_non_crisis, lg_object_crisis,
                   seq(from = grid_range[1],
                       to = grid_range[2],
                       length.out = grid_length))
+    weights <- weight(grid)
 
     # Calculate the local correlation for the observed data
     dlg_object_non_crisis <- dlg(lg_object_non_crisis,
@@ -116,7 +119,8 @@ cont_test <- function(lg_object_non_crisis, lg_object_crisis,
                    non_crisis = dlg_object_non_crisis$loc_cor,
                    crisis = dlg_object_crisis$loc_cor)
 
-    observed <- mean(local_correlations$crisis - local_correlations$non_crisis)
+    observed <- mean((local_correlations$crisis -
+                        local_correlations$non_crisis)*weights)
 
     # Do the bootstrapping
     complete_sample <- rbind(lg_object_non_crisis$x,
@@ -155,8 +159,8 @@ cont_test <- function(lg_object_non_crisis, lg_object_crisis,
                                            grid = grid)
 
         # The resampled value of the test statistic
-        replicated[i] <- mean(dlg_object_crisis_resampled$loc_cor -
-            dlg_object_non_crisis_resampled$loc_cor)
+        replicated[i] <- mean((dlg_object_crisis_resampled$loc_cor -
+            dlg_object_non_crisis_resampled$loc_cor)*weights)
     }
 
     ret <- list(observed = observed,
