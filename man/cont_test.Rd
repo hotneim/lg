@@ -4,17 +4,17 @@
 \alias{cont_test}
 \title{Test for financial contagion}
 \usage{
-cont_test(lg_object_non_crisis, lg_object_crisis,
-  grid_range = quantile(rbind(lg_object_non_crisis$x,
-  lg_object_crisis$x), c(0.05, 0.95)), grid_length = 30, n_rep = 1000,
-  weight = function(y) {     rep(1, nrow(y)) })
+cont_test(lg_object_nc, lg_object_c,
+  grid_range = quantile(rbind(lg_object_nc$x, lg_object_c$x), c(0.05,
+  0.95)), grid_length = 30, n_rep = 1000, weight = function(y) {    
+  rep(1, nrow(y)) })
 }
 \arguments{
-\item{lg_object_non_crisis}{An object of type \code{lg}, as produced by the
+\item{lg_object_nc}{An object of type \code{lg}, as produced by the
 \code{lg_main}-function for the observations covering the non-crisis
 period. The data must be two dimensional.}
 
-\item{lg_object_crisis}{An object of type \code{lg}, as produced by the
+\item{lg_object_c}{An object of type \code{lg}, as produced by the
 \code{lg_main}-function for the observations covering the crisis period.
 The data must be two dimensional.}
 
