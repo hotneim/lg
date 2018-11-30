@@ -1,8 +1,3 @@
-## Resubmission
-This is a resubmission. In this version I have
-
-*  replaced akima::aspline() with stats::splinefun(). 
-
 ## Test environments
 * local Ubuntu 16.04.1 LTS, R 3.5.1
 * win-builder
