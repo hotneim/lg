@@ -64,7 +64,7 @@ function.
     lg_object1 <- lg_main(x1)
     test_result1 = ind_test(lg_object1,
                             bootstrap_type = "plain",
-                            n_rep = 20)
+                            n_rep = 5)
 
     # Test for serial dependence in time series, lag 1
     data(EuStockMarkets)
@@ -73,14 +73,14 @@ function.
     lg_object2 <- lg_main(x2)
     test_result2 = ind_test(lg_object2,
                             bootstrap_type = "plain",
-                            n_rep = 20)
+                            n_rep = 5)
 
     # Test for cross-dependence, lag 1
     x3 <- cbind(logreturns[1:100,1], logreturns[2:101, 2])
     lg_object3 <- lg_main(x3)
     test_result3 = ind_test(lg_object3,
                             bootstrap_type = "block",
-                            n_rep = 20)
+                            n_rep = 5)
 
 }
 \references{
