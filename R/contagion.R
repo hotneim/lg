@@ -49,9 +49,11 @@
 #'    lg_object_c  <- lg_main(crisis, est_method = "5par",
 #'                            transform_to_marginal_normality = FALSE)
 #'
+#'    \dontrun{
 #'    # Run the test (with very few resamples for illustration)
 #'    test_result <- cont_test(lg_object_nc, lg_object_c,
 #'                             n_rep = 10)
+#'    }
 #'
 #' @references
 #'
