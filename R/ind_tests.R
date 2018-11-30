@@ -22,7 +22,7 @@
 #'   nonparametric bootstrap valid for independence test for iid data and for
 #'   serial dependence within a time series. Choose "stationary" or "block" for
 #'   a test for cross dependence between two time series.
-#' @param block_length Block length if using block boorstrap for the cross
+#' @param block_length Block length if using block bootstrap for the cross
 #'   dependence test. Calculated by \code{np::b.star()} if not supplied.
 #' @param n_rep Number of bootstrap replications.
 #'
