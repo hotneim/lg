@@ -8,10 +8,10 @@
 #' during crisis times. The distinction between crisis and non-crisis times must
 #' be made by the user.
 #'
-#' @param lg_object_non_crisis An object of type \code{lg}, as produced by the
+#' @param lg_object_nc An object of type \code{lg}, as produced by the
 #'   \code{lg_main}-function for the observations covering the non-crisis
 #'   period. The data must be two dimensional.
-#' @param lg_object_crisis An object of type \code{lg}, as produced by the
+#' @param lg_object_c An object of type \code{lg}, as produced by the
 #'   \code{lg_main}-function for the observations covering the crisis period.
 #'   The data must be two dimensional.
 #' @param grid_range This test measures the local correlations a long the
@@ -61,19 +61,19 @@
 #'
 #' @export
 
-cont_test <- function(lg_object_non_crisis, lg_object_crisis,
-                      grid_range = quantile(rbind(lg_object_non_crisis$x,
-                                                  lg_object_crisis$x),
+cont_test <- function(lg_object_nc, lg_object_c,
+                      grid_range = quantile(rbind(lg_object_nc$x,
+                                                  lg_object_c$x),
                                             c(.05, .95)),
                       grid_length = 30, n_rep = 1000,
                       weight = function(y) {rep(1, nrow(y))}) {
 
     # Do sanity checks of the arguments
-    check_lg(lg_object_non_crisis)
-    check_lg(lg_object_crisis)
+    check_lg(lg_object_nc)
+    check_lg(lg_object_c)
 
     # Both data sets must be two-dimensional
-    if((ncol(lg_object_non_crisis$x) != 2) | (ncol(lg_object_crisis$x) != 2)) {
+    if((ncol(lg_object_nc$x) != 2) | (ncol(lg_object_c$x) != 2)) {
       stop("Both data sets must have two columns.")
     }
 
@@ -109,22 +109,22 @@ cont_test <- function(lg_object_non_crisis, lg_object_crisis,
     weights <- weight(grid)
 
     # Calculate the local correlation for the observed data
-    dlg_object_non_crisis <- dlg(lg_object_non_crisis,
+    dlg_object_nc <- dlg(lg_object_nc,
                                  grid = grid)
-    dlg_object_crisis <- dlg(lg_object_crisis,
+    dlg_object_c <- dlg(lg_object_c,
                              grid = grid)
 
     local_correlations <-
         data.frame(x = grid[,1],
-                   non_crisis = dlg_object_non_crisis$loc_cor,
-                   crisis = dlg_object_crisis$loc_cor)
+                   non_crisis = dlg_object_nc$loc_cor,
+                   crisis = dlg_object_c$loc_cor)
 
     observed <- mean((local_correlations$crisis -
                         local_correlations$non_crisis)*weights)
 
     # Do the bootstrapping
-    complete_sample <- rbind(lg_object_non_crisis$x,
-                             lg_object_crisis$x)
+    complete_sample <- rbind(lg_object_nc$x,
+                             lg_object_c$x)
 
     for(i in 1:n_rep) {
 
@@ -132,35 +132,35 @@ cont_test <- function(lg_object_non_crisis, lg_object_crisis,
             complete_sample[sample(1:nrow(complete_sample), replace = TRUE),]
 
         # Split the resampled data into non-crisis and crisis periods
-        resampled_non_crisis <- resampled[1:nrow(lg_object_non_crisis$x),]
-        resampled_crisis     <- resampled[nrow((lg_object_non_crisis$x) + 1):
+        resampled_non_crisis <- resampled[1:nrow(lg_object_nc$x),]
+        resampled_crisis     <- resampled[nrow((lg_object_nc$x) + 1):
                                               nrow(complete_sample),]
 
         # Create new lg-objects with the same parameters as for the observed
         # data
-        lg_object_non_crisis_resampled <-
+        lg_object_nc_resampled <-
             lg_main(x = resampled_non_crisis,
-                    bw = lg_object_non_crisis$bw,
-                    est_method = lg_object_non_crisis$est_method,
+                    bw = lg_object_nc$bw,
+                    est_method = lg_object_nc$est_method,
                     transform_to_marginal_normality =
-                        lg_object_non_crisis$transform_to_marginal_normality)
+                        lg_object_nc$transform_to_marginal_normality)
 
-        lg_object_crisis_resampled <-
+        lg_object_c_resampled <-
             lg_main(x = resampled_crisis,
-                    bw = lg_object_crisis$bw,
-                    est_method = lg_object_crisis$est_method,
+                    bw = lg_object_c$bw,
+                    est_method = lg_object_c$est_method,
                     transform_to_marginal_normality =
-                        lg_object_crisis$transform_to_marginal_normality)
+                        lg_object_c$transform_to_marginal_normality)
 
         # Calculate the local correlation for the resampled data
-        dlg_object_non_crisis_resampled <- dlg(lg_object_non_crisis_resampled,
+        dlg_object_nc_resampled <- dlg(lg_object_nc_resampled,
                                                grid = grid)
-        dlg_object_crisis_resampled <- dlg(lg_object_crisis_resampled,
+        dlg_object_c_resampled <- dlg(lg_object_c_resampled,
                                            grid = grid)
 
         # The resampled value of the test statistic
-        replicated[i] <- mean((dlg_object_crisis_resampled$loc_cor -
-            dlg_object_non_crisis_resampled$loc_cor)*weights)
+        replicated[i] <- mean((dlg_object_c_resampled$loc_cor -
+            dlg_object_nc_resampled$loc_cor)*weights)
     }
 
     ret <- list(observed = observed,
