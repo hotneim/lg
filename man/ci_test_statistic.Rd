@@ -5,7 +5,8 @@
 \title{Calculate the value of the test statistic for the conditional independence
 test}
 \usage{
-ci_test_statistic(lg_object, h = function(x) x^2)
+ci_test_statistic(lg_object, h = function(x) x^2, S = function(y)
+  rep(T, nrow(y)))
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -13,6 +14,9 @@ ci_test_statistic(lg_object, h = function(x) x^2)
 
 \item{h}{The \code{h}-function used in the calculation of the test statistic.
 The default value is \code{h(x) = x^2}.}
+
+\item{S}{The integration area in the test statistic. Logical function that
+takes grid points as argument.}
 }
 \description{
 Calculate the test statistic in the test for conditional independence between

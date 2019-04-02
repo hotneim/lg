@@ -67,15 +67,33 @@ check_bw_bivariate <- function(bw) {
     }
 }
 
+#' Check bandwidth vector
+#'
+#' Checks that the bandwidth vector supplied to the bivariate density function
+#' is a numeric vector of length 3.
+#'
+#' @param bw The bandwidth vector to be checked
+check_bw_trivariate <- function(bw) {
+  # The bandwidths can only be a numerical vector of two elements
+  if(!is.vector(bw)) {
+    stop("bw must be a vector")
+  } else if(length(bw) != 3) {
+    stop("bw must have length 2")
+  } else if(!is.numeric(bw)) {
+    stop("bw must be numeric")
+  }
+}
+
+
 #' Check estimation method
 #'
 #' Checks that the estimation method is one of the allowed values, currently
 #' "1par", "5par" and "5par_marginals_fixed".
 #'
-#' @param est_method Check if equal to "1par" or "5par"
+#' @param est_method Check if equal to a valid value
 check_est_method <- function(est_method) {
-    if(!(est_method %in% c("1par", "5par", "5par_marginals_fixed")))
-        stop("Estimation method must be either '1par', '5par' or '5par_marginals_fixed'")
+    if(!(est_method %in% c("1par", "5par", "5par_marginals_fixed", "trivariate_full")))
+        stop("Estimation method must be either '1par', '5par', '5par_marginals_fixed' or 'trivariate_full'")
 }
 
 #' Check bw method

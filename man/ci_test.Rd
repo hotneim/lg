@@ -4,9 +4,9 @@
 \alias{ci_test}
 \title{Test for conditional independence}
 \usage{
-ci_test(lg_object, h = function(x) x^2, n_rep = 500, nodes = 100,
-  M = NULL, M_sim = 1500, M_corr = 1.5, n_corr = 1.2,
-  extend = 0.3, return_time = TRUE)
+ci_test(lg_object, h = function(x) x^2, S = function(y) rep(T,
+  nrow(y)), n_rep = 500, nodes = 100, M = NULL, M_sim = 1500,
+  M_corr = 1.5, n_corr = 1.2, extend = 0.3, return_time = TRUE)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -14,6 +14,9 @@ ci_test(lg_object, h = function(x) x^2, n_rep = 500, nodes = 100,
 
 \item{h}{The \code{h}-function used in the calculation of the test statistic.
 The default value is \code{h(x) = x^2}.}
+
+\item{S}{The integration area in the test statistic. Logical function that
+takes grid points as argument.}
 
 \item{n_rep}{The number of replicated bootstrap samples}
 

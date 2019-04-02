@@ -489,6 +489,13 @@ dlg <- function(lg_object, grid = NULL, level = 0.95, normalization_points = NUL
       grid <- rbind(grid, extra_grid)
     }
 
+    # We do not have asymptotic standard deviations for the trivariate local
+    # correlations (yet)
+    if((lg_object$est_method == "trivariate_full") & (!is.null(level))) {
+      level <- NULL
+      message("Asymptotic standard deviations are not available for trivariate fits.")
+    }
+
     # Extract the data that we will us in the optimization, transform the grid if needed
     if(lg_object$transform_to_marginal_normality) {
         x <- lg_object$transformed_data
@@ -533,6 +540,16 @@ dlg <- function(lg_object, grid = NULL, level = 0.95, normalization_points = NUL
         loc_sd <- cbind(estimate$par_est[, "sig_1"],
                         estimate$par_est[, "sig_2"])
         loc_cor[,1] <- estimate$par_est[, "rho"]
+    } else if (lg_object$est_method == "trivariate_full"){  # If method is "trivariate_full", we also do the estimation in one go:
+      estimate <- dlg_trivariate(x = x,
+                                 eval_points = x0,
+                                 bw = c(lg_object$bw$joint[1, "bw1"],
+                                        lg_object$bw$joint[1, "bw2"],
+                                        lg_object$bw$joint[1, "bw3"]),
+                                 est_method = lg_object$est_method)
+    loc_cor <- estimate$par_est
+    f_est_trivariate <- estimate$f_est
+
     } else {  # And if not, we estimate the local correlation pairwise now
         for(i in 1:nrow(pairs)) {
             if(lg_object$est_method == "1par") {
@@ -555,12 +572,16 @@ dlg <- function(lg_object, grid = NULL, level = 0.95, normalization_points = NUL
     }
 
     # Evaluate the density estimate
-    f_est <- mvnorm_eval(eval_points = x0,
-                         loc_mean = loc_mean,
-                         loc_sd = loc_sd,
-                         loc_cor = loc_cor,
-                         pairs = pairs)*
+    if(lg_object$est_method != "trivariate_full") {
+      f_est <- mvnorm_eval(eval_points = x0,
+                           loc_mean = loc_mean,
+                           loc_sd = loc_sd,
+                           loc_cor = loc_cor,
+                           pairs = pairs)*
         apply(normalizing_constants, 1, prod)
+    } else {
+      f_est <- f_est_trivariate*apply(normalizing_constants, 1, prod)
+    }
 
     # If we normalize, calculate the constant and remove the extra grid points.
     # If not, set the normalizing constant equal to one.
@@ -947,3 +968,168 @@ clg <- function(lg_object, grid = NULL, condition = NULL,
 
     return(ret)
 }
+
+#' Trivariate density estimation
+#'
+#' \code{dlg_trivariate} returns the locally Gaussian density estimate of a
+#' trivariate distribution on a given grid.
+#'
+#' In some applications it may be desired to produce a full locally Gaussian fit
+#' of a trivariate density function without having to resort to bivariate
+#' approximations. This function takes a trivariate data set, \code{x}, and a
+#' trivariate set of grid points \code{eval_points}, and returns the trivariate,
+#' locally Gaussian density estimate in these points. We also need a vector of
+#' bandwidths, \code{bw}, with three elements, and an estimation method
+#' \code{est_method}, which in this case is fixed at "trivariate_full", and
+#' included only to be fully compatible with the other methods in this package.
+#'
+#' This function will only work on the marginally standard normal scale! Please
+#' use the wrapper function \code{dlg()} for density estimation. This will
+#' ensure that all parameters have proper values.
+#'
+#' @param x The data matrix (or data frame). Must have exactly 2 columns.
+#' @param eval_points The grid where the density should be estimated. Must have
+#'   exactly 2 columns.
+#' @param grid_size If \code{eval_points} is not supplied, then the function
+#'   will create a suitable grid diagonally through the data, with this many
+#'   grid points.
+#' @param bw The two bandwidths, a numeric vector of length 2.
+#' @param est_method The estimation method, must either be "1par" for estimation
+#'   with just the local correlation, or "5par"  for a full locally Gaussian fit
+#'   with all 5 parameters.
+#' @param run_checks Logical. Should sanity checks be run on the arguments?
+#'   Useful to disable this when doing cross-validation for example.
+#'
+#' @return A list including the data set \code{$x}, the grid
+#'   \code{$eval_points}, the bandwidths \code{$bw}, as well as a matrix of the
+#'   estimated parameter estimates \code{$par_est} and the estimated bivariate
+#'   density \code{$f_est}.
+#'
+#' @examples
+#'   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+#'   bw <- c(1, 1, 1)
+#'   eval_points <- cbind(seq(-4, 4, 1), seq(-4, 4, 1), seq(-4, 4, 1))
+#'
+#'   estimate <- dlg_trivariate(x, eval_points = eval_points, bw = bw)
+#'
+#' @export
+dlg_trivariate <- function(x,
+                           eval_points = NULL,
+                           grid_size = 15,
+                           bw = c(1, 1, 1),
+                           est_method = "trivariate_full",
+                           run_checks = TRUE) {
+
+  # Check that everything is the way it should be -----------------------------
+  if(run_checks) {
+    x <- check_data(x, dim_check = 3, type = "data")
+    check_bw_trivariate(bw = bw)
+    check_est_method(est_method)
+    if(!identical(eval_points, NA))
+      eval_points <- check_data(eval_points, dim_check = 3, type = "grid")
+  }
+
+  # If eval_points not supplied, create a suitable grid
+  if(identical(eval_points, NULL)) {
+    eval_points <- apply(x,
+                         2,
+                         function(x) seq(quantile(x,.001),quantile(x,.999),
+                                         length.out = grid_size))
+  }
+
+  # We declare a function that maximizes the local likelihood in one grid point.
+  maximize_likelihood = function(grid_point) {
+
+    # Some quantities for the likelihood function that do not need to be
+    # evaluated at every iteration.
+    K <- 1/((2*pi)*
+              sqrt(2*pi)*bw[1]*bw[2]*bw[3])*
+      exp(-0.5*((x[,1] - grid_point[1])^2/bw[1]^2 +
+                  (x[,2] - grid_point[2])^2/bw[2]^2 +
+                  (x[,3] - grid_point[3])^2/bw[3]^2))
+
+    mK <- mean(K)
+    m1 <- mean(x[,1]^2*K)
+    m2 <- mean(x[,2]^2*K)
+    m3 <- mean(x[,3]^2*K)
+    m4 <- mean(x[,1]*x[,2]*K)
+    m5 <- mean(x[,1]*x[,3]*K)
+    m6 <- mean(x[,2]*x[,3]*K)
+
+    # The likelihood function
+    lik <- function(rho) {
+
+      w <- x[,1]^2*(rho[3]^2 - 1) +
+        x[,2]^2*(rho[2]^2 - 1) +
+        x[,3]^2*(rho[1]^2 - 1) +
+        2*(x[,1]*x[,2]*(rho[1] - rho[2]*rho[3]) +
+             x[,1]*x[,3]*(rho[2] - rho[1]*rho[3]) +
+             x[,2]*x[,3]*(rho[3] - rho[1]*rho[2]))
+
+      r <- 1 - rho[1]^2 - rho[2]^2 - rho[3]^2 + 2*rho[1]*rho[2]*rho[3]
+
+      d <- (1 + bw[1]^2)*(1 + bw[2]^2)*(1 + bw[3]^2) +
+        2*prod(rho) -
+        (1 + bw[1]^2)*rho[3]^2 -
+        (1 + bw[2]^2)*rho[2]^2 -
+        (1 + bw[3]^2)*rho[1]^2
+
+      exponent <-
+        -0.5*(
+          grid_point[1]^2 * ((1 + bw[2]^2)*(1 + bw[3]^2) - rho[3]^2) +
+            grid_point[2]^2 * ((1 + bw[1]^2)*(1 + bw[3]^2) - rho[2]^2) +
+            grid_point[3]^2 * ((1 + bw[1]^2)*(1 + bw[2]^2) - rho[1]^2) +
+            2*grid_point[1]*grid_point[2] * (rho[2]*rho[3] - rho[1]*(1 + bw[3]^2)) +
+            2*grid_point[2]*grid_point[3] * (rho[1]*rho[2] - rho[3]*(1 + bw[1]^2)) +
+            2*grid_point[1]*grid_point[3] * (rho[1]*rho[3] - rho[2]*(1 + bw[2]^2))
+        )/d
+
+      -(mK*(-1.5*log(2*pi)) +
+          mK*(-0.5*log(r)) +
+          0.5/r*(
+            (rho[3]^2 - 1)*m1 +
+              (rho[2]^2 - 1)*m2 +
+              (rho[1]^2 - 1)*m3 +
+              2*(rho[1] - rho[2]*rho[3])*m4 +
+              2*(rho[2] - rho[1]*rho[3])*m5 +
+              2*(rho[3] - rho[1]*rho[2])*m6
+          )) +
+        (1/(2*pi*sqrt(2*pi*d)))*exp(exponent)
+    }
+
+
+    # Return the maximum of the likelihood and the density estimate
+    opt <- try(optim(par = stats::cor(x)[c(2, 3, 6)],
+                     fn = lik),
+               silent = TRUE)
+
+    # Store the result if the optimization went alright. Return NA if not.
+    if(class(opt) != "try-error") {
+      return(c(opt$par,
+               mvtnorm::dmvnorm(c(grid_point), mean = c(0,0,0),
+                                sigma = matrix(c(1, opt$par[1], opt$par[2],
+                                                 opt$par[1], 1, opt$par[3],
+                                                 opt$par[2], opt$par[3], 1), 3))))
+    } else {
+      return(rep(NA, 4))
+    }
+  }
+
+  ## Send the grid points to 'maximize_likelihood'
+  est <- cbind(do.call(rbind,
+                       lapply(X = split(eval_points, row(eval_points)),
+                              FUN = maximize_likelihood)))
+  par_est <- matrix(est[,1:3], ncol = 3)
+  f_est = as.vector(est[,4])
+  colnames(par_est) <- c('rho12', 'rho13', 'rho23')
+
+  return(list(x = x,
+              eval_points = eval_points,
+              bw = bw,
+              par_est = par_est,
+              f_est = f_est))
+
+}
+
+
+

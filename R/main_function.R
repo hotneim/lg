@@ -148,6 +148,9 @@ lg_main <- function(x,
     if((est_method == "1par") & (transform_to_marginal_normality == FALSE)) {
         warning("Estimation method '1par' assumes marginal standard normality.")
     }
+    if((est_method == "trivariate_full") & (transform_to_marginal_normality == FALSE)) {
+        warning("Estimation method 'trivariate_full' assumes marginal standard normality.")
+    }
 
     # Return a list
     ret <- list()

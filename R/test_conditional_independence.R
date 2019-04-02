@@ -295,6 +295,8 @@ local_conditional_covariance <- function(clg_object, coord = c(1, 2)) {
 #'   \code{lg_main}-function
 #' @param h The \code{h}-function used in the calculation of the test statistic.
 #'   The default value is \code{h(x) = x^2}.
+#' @param S The integration area in the test statistic. Logical function that
+#'   takes grid points as argument.
 ci_test_statistic <- function(lg_object, h = function(x) x^2, S = function(y) rep(T, nrow(y))) {
 
     # Calculate the conditional coveriance between the first two variables in the data points
@@ -313,6 +315,8 @@ ci_test_statistic <- function(lg_object, h = function(x) x^2, S = function(y) re
 #'   \code{lg_main}-function
 #' @param h The \code{h}-function used in the calculation of the test statistic.
 #'   The default value is \code{h(x) = x^2}.
+#' @param S The integration area in the test statistic. Logical function that
+#'   takes grid points as argument.
 #' @param n_rep The number of replicated bootstrap samples
 #' @param nodes Either the number of equidistant nodes to generate, or a vector
 #'   of nodes supplied by the user

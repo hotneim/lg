@@ -301,13 +301,26 @@ bw_select <- function(x,
         }
     }
 
-    # Find the joint bandwidths
-    joint_bandwidths <- data.frame(t(combn(c(1:d), 2)), 0*t(combn(c(1:d), 2)))
-    joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
-    colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
+    if (est_method == "trivariate_full") {
+      bw <- bw_select_plugin_multivariate(n = n,
+                                          c = plugin_constant_joint,
+                                          a = plugin_exponent_joint)
 
-    # Iterate over all the pairs
-    for(i in 1:nrow(joint_bandwidths)) {
+      joint_bandwidths <- data.frame(x1 = 1,
+                                     x2 = 2,
+                                     x3 = 3,
+                                     bw1 = bw,
+                                     bw2 = bw,
+                                     bw3 = bw)
+    } else {
+
+      # Find the joint bandwidths
+      joint_bandwidths <- data.frame(t(combn(c(1:d), 2)), 0*t(combn(c(1:d), 2)))
+      joint_bandwidths <- data.frame(joint_bandwidths, joint_bandwidths[,4])
+      colnames(joint_bandwidths) <- c('x1', 'x2', 'bw1', 'bw2', 'convergence')
+
+      # Iterate over all the pairs
+      for(i in 1:nrow(joint_bandwidths)) {
 
         variables <- c(joint_bandwidths$x1[i], joint_bandwidths$x2[i])
 
@@ -316,30 +329,32 @@ bw_select <- function(x,
 
         if(bw_method == "cv") {
 
-            result <- bw_select_cv_bivariate(x = bivariate_data,
-                                             tol = tol_joint,
-                                             est_method = est_method,
-                                             bw_marginal = marginal_bandwidths[variables])
+          result <- bw_select_cv_bivariate(x = bivariate_data,
+                                           tol = tol_joint,
+                                           est_method = est_method,
+                                           bw_marginal = marginal_bandwidths[variables])
 
-            if(result$convergence != 0)
-                    warning(paste("Cross valdidation for joint bandwidths",
-                                  as.character(variables[1]), "and",  as.character(variables[2]),
-                                  "did not converge properly"))
+          if(result$convergence != 0)
+            warning(paste("Cross valdidation for joint bandwidths",
+                          as.character(variables[1]), "and",  as.character(variables[2]),
+                          "did not converge properly"))
 
-            joint_bandwidths$bw1[i] <- result$bw[1]
-            joint_bandwidths$bw2[i] <- result$bw[2]
-            joint_bandwidths$convergence[i] <- result$convergence
+          joint_bandwidths$bw1[i] <- result$bw[1]
+          joint_bandwidths$bw2[i] <- result$bw[2]
+          joint_bandwidths$convergence[i] <- result$convergence
 
         } else if(bw_method == "plugin") {
 
-            bw <- bw_select_plugin_multivariate(n = n,
-                                             c = plugin_constant_joint,
-                                             a = plugin_exponent_joint)
-            joint_bandwidths$bw1 <- bw
-            joint_bandwidths$bw2 <- bw
-            joint_bandwidths$convergence <- NA
+          bw <- bw_select_plugin_multivariate(n = n,
+                                              c = plugin_constant_joint,
+                                              a = plugin_exponent_joint)
+          joint_bandwidths$bw1 <- bw
+          joint_bandwidths$bw2 <- bw
+          joint_bandwidths$convergence <- NA
 
         }
+
+      }
 
     }
 
