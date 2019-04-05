@@ -223,10 +223,23 @@ replicate_under_ci <- function(lg_object,
     for(i in 1:2) {
 
         # Data without the other variable
+        #
+        # Here we need to make a choice about the estimation method. If we have
+        # trivariate_full, or trivariate simple *and* the number of avriables is
+        # only three, it must be set to "1par" here.
+
+        if((d == 3) & (lg_object$est_method == "trivariate_simple")) {
+          est_method_rep <- "1par"
+        } else if(lg_object$est_method == "trivariate_full") {
+          est_method_rep <- "1par"
+        } else {
+          est_method_rep <- lg_object$est_method
+        }
+
         temp_lg_object <-
           suppressMessages(lg_main(x = lg_object$x[,-i],
                                    bw_method = lg_object$bw_method,
-                                   est_method = lg_object$est_method,
+                                   est_method = est_method_rep,
                                    transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
                                    plugin_constant_marginal = lg_object$plugin_constant_marginal,
                                    plugin_constant_joint = lg_object$plugin_constant_joint,

@@ -74,7 +74,7 @@
 #'   303-321.
 #'
 #'@export
-partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = 0.95) {
+partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = NULL) {
 
   # The local partial correlation is (currently) only defined for *pairs* of
   # variables, given a *set* of variables. As in the conditional density

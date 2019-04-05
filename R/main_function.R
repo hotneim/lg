@@ -151,6 +151,9 @@ lg_main <- function(x,
     if((est_method == "trivariate_full") & (transform_to_marginal_normality == FALSE)) {
         warning("Estimation method 'trivariate_full' assumes marginal standard normality.")
     }
+    if((est_method == "trivariate_full") & (ncol(x) != 3)) {
+        stop("Data must be trivariate if estimation method is 'trivariate_full'")
+    }
 
     # Return a list
     ret <- list()

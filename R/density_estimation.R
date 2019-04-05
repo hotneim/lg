@@ -457,7 +457,7 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
 #' @export
-dlg <- function(lg_object, grid = NULL, level = 0.95, normalization_points = NULL) {
+dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL) {
 
     # Do some checks first
     check_lg(lg_object)
@@ -550,7 +550,56 @@ dlg <- function(lg_object, grid = NULL, level = 0.95, normalization_points = NUL
     loc_cor <- estimate$par_est
     f_est_trivariate <- estimate$f_est
 
-    } else {  # And if not, we estimate the local correlation pairwise now
+    } else if(lg_object$est_method == "trivariate_simple") {
+      # This is a way to involve trivariate local correlations in the
+      # multivariate case. It is tailored so that it can be used in the
+      # conditional independence test.
+      #
+      # The idea is that the local correlation between x1 and x2 as well as the
+      # local correlations between (x3, ..., xp) are calculated using the
+      # pairwise algorithm, while the local correlations between these two
+      # groups are calculated with x1, x2 as wel as the third variable in
+      # question.
+
+      # First, we identify the pair of variables for which the local
+      # correlations should be estimated using bivariate fits:
+      bivariate_fits <-
+        which(apply(pairs, 1, function(x) (1 %in% x) & (2 %in% x)) |
+              !apply(pairs, 1, function(x) (1 %in% x) | (2 %in% x)))
+
+      for(i in bivariate_fits) {
+        pairwise_estimate <-
+          dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
+                        eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
+                        bw = c(lg_object$bw$joint[i, "bw1"],
+                               lg_object$bw$joint[i, "bw2"]),
+                        est_method = "1par",
+                        marginal_estimates = NA)
+
+        loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
+      }
+
+      # The, we continue by estimating the local correlations for the remaining
+      # pairs. These will be calulated two ata a time, because we get for
+      # example rho13 and rho23 from the same fit, and we don't want to do the
+      # same estimation twice. We can loop over the non-(1,2) variables
+      for(i in 3:d) {
+        pairwise_estimate <- dlg_trivariate(x = x[, c(1, 2, i)],
+                                            eval_points = x0[, c(1, 2, i)],
+                                            bw = c(lg_object$bw$joint[i, "bw1"],
+                                                   lg_object$bw$joint[i, "bw2"],
+                                                   lg_object$bw$joint$bw2[which(lg_object$bw$joint$x2 == i)[1]]),
+                                            est_method = "trivariate_full")
+
+        # Enter the first estimated local correlation
+        loc_cor[, which(((pairs$x1 == 1) & (pairs$x2 == i)) | ((pairs$x1 == i) & (pairs$x2 == 1)))] <-
+          pairwise_estimate$par_est[, "rho13"]
+
+        # Enter the second estimated local correlation
+        loc_cor[, which(((pairs$x1 == 2) & (pairs$x2 == i)) | ((pairs$x1 == i) & (pairs$x2 == 2)))] <-
+          pairwise_estimate$par_est[, "rho23"]
+      }
+    } else {# And if not, we estimate the local correlation pairwise now
         for(i in 1:nrow(pairs)) {
             if(lg_object$est_method == "1par") {
                 pairwise_marginal_estimates <- NA
@@ -839,8 +888,10 @@ clg <- function(lg_object, grid = NULL, condition = NULL,
       estimation_grid <- rbind(estimation_grid, extra_grid)
     }
 
+
+
     # Estimate the local correlation in these points using the density function
-    density_object <- dlg(lg_object, grid = estimation_grid)
+    density_object <- dlg(lg_object, grid = estimation_grid, level = NULL)
 
     # In each grid point, we need to calculate the conditional mean vector and
     # covariance matrix in order to calculate the conditional density estimate.

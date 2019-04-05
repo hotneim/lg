@@ -4,7 +4,7 @@
 \alias{partial_cor}
 \title{Calculate the local Gaussian partial correlation}
 \usage{
-partial_cor(lg_object, grid = NULL, condition = NULL, level = 0.95)
+partial_cor(lg_object, grid = NULL, condition = NULL, level = NULL)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

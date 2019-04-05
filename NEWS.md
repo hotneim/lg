@@ -1,3 +1,8 @@
+# lg 0.3.1
+
+   * Added "trivariate_full" and "trivariate_simple" as options for estimation 
+     method
+
 # lg 0.3.0
  
    * Added contagion test and independence tests.

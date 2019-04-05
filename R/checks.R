@@ -92,8 +92,8 @@ check_bw_trivariate <- function(bw) {
 #'
 #' @param est_method Check if equal to a valid value
 check_est_method <- function(est_method) {
-    if(!(est_method %in% c("1par", "5par", "5par_marginals_fixed", "trivariate_full")))
-        stop("Estimation method must be either '1par', '5par', '5par_marginals_fixed' or 'trivariate_full'")
+    if(!(est_method %in% c("1par", "5par", "5par_marginals_fixed", "trivariate_full", "trivariate_simple")))
+        stop("Estimation method must be either '1par', '5par', '5par_marginals_fixed', 'trivariate_full' or 'trivariate_simple'")
 }
 
 #' Check bw method
