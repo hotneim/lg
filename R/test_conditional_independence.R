@@ -233,7 +233,7 @@ replicate_under_ci <- function(lg_object,
         } else if(lg_object$est_method == "trivariate_full") {
           est_method_rep <- "1par"
         } else {
-          est_method_rep <- lg_object$est_method
+          est_method_rep <- "1par"
         }
 
         temp_lg_object <-
