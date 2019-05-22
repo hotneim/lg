@@ -403,6 +403,9 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #'   intervals should be returned.
 #' @param normalization_points How many grid points for approximating the integral
 #'   of the density estimate, to use for normalization?
+#' @param bootstrap Calculate bootstrapped confidence intervals instead.
+#' @param B Number of bootstrap replications if using bootstrapped confidence
+#'   intervals.
 #'
 #' @return A list containing the density estimate as well as all the running
 #'   parameters that has been used. The elements are:
@@ -457,7 +460,7 @@ dlg_marginal_wrapper <- function(data_matrix, eval_matrix, bw_vector){
 #' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 #'
 #' @export
-dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL) {
+dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL, bootstrap = F, B = 500) {
 
     # Do some checks first
     check_lg(lg_object)
@@ -680,75 +683,119 @@ dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL) {
     # intervals for the local correlations and the density estimates.
     if(!is.null(level)) {
 
-      # x is the data, or the transformed data. x0 is the grid
-      # where we do estimation, transformed or not.
+      if(bootstrap) {
 
-      # We need to evaluate the density estimate in the observations, and do
-      # that by running the dlg-function.
-      density_object_obs <- dlg(lg_object, grid = lg_object$x, level = NULL)
+        bootstrapped_local_correlations <- list()
 
-      # We initialize a matrix for the asymptotic standard deviation for
-      # the local correlations. It will have the same dimension as the matrix of
-      # estimates:
-      loc_cor_sd <- NA*loc_cor
+        for ( i in 1:B) {
 
-      # We approximate the J- and M integrals by Monte Carlo an d the LLN, using
-      # locally Gaussian estimates in the observations. This has to be done for
-      # each pair of variables.
-      for(i in 1:nrow(pairs)) {
+          lg_object_replicated <-
+            lg_main(x = lg_object$x[sample(1:nrow(x), replace = T), ],
+                    bw_method = lg_object$bw_method,
+                    est_method = lg_object$est_method,
+                    transform_to_marginal_normality = lg_object$transform_to_marginal_normality,
+                    bw = lg_object$bw)
 
-        # We first calculate the J- and M integrals. The result are big
-        # matrices, with one column per grid point.
-        integrand_J <- apply(x0[, unlist(c(pairs[i,]))],
-                             1,
-                             function(t) mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
-                                                          sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
-                                                                         lg_object$bw$joint$bw2[i]^2)))*
-                               u(x[,pairs[i,1]],
-                                 x[,pairs[i,2]],
-                                 c(density_object_obs$loc_cor[,i]))^2)
+          bootstrapped_local_correlations[[i]] <-
+            dlg(lg_object_replicated,
+                grid = grid,
+                level = NULL,
+                normalization_points = normalization_points)$loc_cor
 
-        integrand_M1 <- apply(x0[, unlist(c(pairs[i,]))],
-                              1,
-                              function(t)
-                                mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
-                                                 sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
-                                                                lg_object$bw$joint$bw2[i]^2)))^2*
-                                u(x[,pairs[i,1]],
-                                  x[,pairs[i,2]],
-                                  c(density_object_obs$loc_cor[,i]))^2)
+        }
 
-        integrand_M2 <- apply(x0[, unlist(c(pairs[i,]))],
-                              1,
-                              function(t)
-                                mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
-                                                 sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
-                                                                lg_object$bw$joint$bw2[i]^2)))*
-                                u(x[,pairs[i,1]],
-                                  x[,pairs[i,2]],
-                                  c(density_object_obs$loc_cor[,i])))
+        loc_cor_lower <- loc_cor_upper <- loc_cor_sd <- NA*loc_cor
 
-        # We approximate the J and the two parts of the M matrices by a Monte
-        # Carlo approximation:
-        J  <- colMeans(integrand_J)
-        M1 <- lg_object$bw$joint$bw1[i] * lg_object$bw$joint$bw2[i] * colMeans(integrand_M1)
-        M2 <- lg_object$bw$joint$bw1[i] * lg_object$bw$joint$bw2[i] * colMeans(integrand_M2)^2
+        # Loop over the pairs
+        for(i in 1:ncol(loc_cor)) {
+          replicated <- matrix(NA, ncol = B, nrow = nrow(loc_cor))
+          # Loop over the replicates to extract them from the list
+          for(j in 1:B) {
+            replicated[,j] <- bootstrapped_local_correlations[[j]][,i]
+          }
 
-        # The final estimate of the standard deviation will be the the expression below:
-        loc_cor_sd[, i] <- sqrt( (M1 - M2)/(J^2*
-                                              nrow(x)*
-                                              lg_object$bw$joint$bw1[i]*
-                                              lg_object$bw$joint$bw2[i])  )
+          loc_cor_sd[, i] <- apply(replicated, 1, stats::sd)
+          loc_cor_lower[,i] <- apply(replicated, 1, quantile,  (1 - level)/2)
+          loc_cor_upper[,i] <- apply(replicated, 1, quantile, 1 - (1 - level)/2)
+
+          ret$loc_cor_sd <- loc_cor_sd
+          ret$loc_cor_lower <- loc_cor_lower
+          ret$loc_cor_upper <- loc_cor_upper
+        }
+
+
+      } else {
+
+        # x is the data, or the transformed data. x0 is the grid
+        # where we do estimation, transformed or not.
+
+        # We need to evaluate the density estimate in the observations, and do
+        # that by running the dlg-function.
+        density_object_obs <- dlg(lg_object, grid = lg_object$x, level = NULL)
+
+        # We initialize a matrix for the asymptotic standard deviation for
+        # the local correlations. It will have the same dimension as the matrix of
+        # estimates:
+        loc_cor_sd <- NA*loc_cor
+
+        # We approximate the J- and M integrals by Monte Carlo an d the LLN, using
+        # locally Gaussian estimates in the observations. This has to be done for
+        # each pair of variables.
+        for(i in 1:nrow(pairs)) {
+
+          # We first calculate the J- and M integrals. The result are big
+          # matrices, with one column per grid point.
+          integrand_J <- apply(x0[, unlist(c(pairs[i,]))],
+                               1,
+                               function(t) mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
+                                                            sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
+                                                                           lg_object$bw$joint$bw2[i]^2)))*
+                                 u(x[,pairs[i,1]],
+                                   x[,pairs[i,2]],
+                                   c(density_object_obs$loc_cor[,i]))^2)
+
+          integrand_M1 <- apply(x0[, unlist(c(pairs[i,]))],
+                                1,
+                                function(t)
+                                  mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
+                                                   sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
+                                                                  lg_object$bw$joint$bw2[i]^2)))^2*
+                                  u(x[,pairs[i,1]],
+                                    x[,pairs[i,2]],
+                                    c(density_object_obs$loc_cor[,i]))^2)
+
+          integrand_M2 <- apply(x0[, unlist(c(pairs[i,]))],
+                                1,
+                                function(t)
+                                  mvtnorm::dmvnorm(x = (x[, unlist(c(pairs[i,]))] - t),
+                                                   sigma = diag(c(lg_object$bw$joint$bw1[i]^2,
+                                                                  lg_object$bw$joint$bw2[i]^2)))*
+                                  u(x[,pairs[i,1]],
+                                    x[,pairs[i,2]],
+                                    c(density_object_obs$loc_cor[,i])))
+
+          # We approximate the J and the two parts of the M matrices by a Monte
+          # Carlo approximation:
+          J  <- colMeans(integrand_J)
+          M1 <- lg_object$bw$joint$bw1[i] * lg_object$bw$joint$bw2[i] * colMeans(integrand_M1)
+          M2 <- lg_object$bw$joint$bw1[i] * lg_object$bw$joint$bw2[i] * colMeans(integrand_M2)^2
+
+          # The final estimate of the standard deviation will be the the expression below:
+          loc_cor_sd[, i] <- sqrt( (M1 - M2)/(J^2*
+                                                nrow(x)*
+                                                lg_object$bw$joint$bw1[i]*
+                                                lg_object$bw$joint$bw2[i])  )
+        }
+
+        # Calculate the confidence limits based on the asymptotic normality:
+        loc_cor_lower <- loc_cor + qnorm((1 - level)/2) * loc_cor_sd
+        loc_cor_upper <- loc_cor - qnorm((1 - level)/2) * loc_cor_sd
+
+        # Add the asymptotic standard deviations and confidence limits to the list that we return:
+        ret$loc_cor_sd <- loc_cor_sd
+        ret$loc_cor_lower <- loc_cor_lower
+        ret$loc_cor_upper <- loc_cor_upper
       }
-
-      # Calculate the confidence limits based on the asymptotic normality:
-      loc_cor_lower <- loc_cor + qnorm((1 - level)/2) * loc_cor_sd
-      loc_cor_upper <- loc_cor - qnorm((1 - level)/2) * loc_cor_sd
-
-      # Add the asymptotic standard deviations and confidence limits to the list that we return:
-      ret$loc_cor_sd <- loc_cor_sd
-      ret$loc_cor_lower <- loc_cor_lower
-      ret$loc_cor_upper <- loc_cor_upper
     }
 
     class(ret) <- "dlg"

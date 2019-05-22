@@ -1,3 +1,7 @@
+# lg 0.3.2
+
+   * Added bootstrap confidence intervals as option in dlg.
+
 # lg 0.3.1
 
    * Added "trivariate_full" and "trivariate_simple" as options for estimation 

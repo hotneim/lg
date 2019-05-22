@@ -4,7 +4,8 @@
 \alias{dlg}
 \title{The locally Gaussian density estimator (LGDE)}
 \usage{
-dlg(lg_object, grid, level = 0.95, normalization_points = NULL)
+dlg(lg_object, grid, level = 0.95, normalization_points = NULL,
+  bootstrap = F, B = 500)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
@@ -18,6 +19,11 @@ intervals should be returned.}
 
 \item{normalization_points}{How many grid points for approximating the integral
 of the density estimate, to use for normalization?}
+
+\item{bootstrap}{Calculate bootstrapped confidence intervals instead.}
+
+\item{B}{Number of bootstrap replications if using bootstrapped confidence
+intervals.}
 }
 \value{
 A list containing the density estimate as well as all the running
