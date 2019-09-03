@@ -88,8 +88,10 @@ bw_select_cv_univariate <- function(x, tol = 10^(-3)) {
 #'   by the \code{optim}-function.
 #'
 #' @examples
-#'   x <- cbind(rnorm(100), rnorm(100))
-#'   bw <- bw_select_cv_univariate(x)
+#'   \dontrun{
+#'     x <- cbind(rnorm(100), rnorm(100))
+#'     bw <- bw_select_cv_univariate(x)
+#'   }
 #'
 #' @references
 #'
@@ -301,17 +303,33 @@ bw_select <- function(x,
         }
     }
 
-    if (est_method == "trivariate_full") {
-      bw <- bw_select_plugin_multivariate(n = n,
-                                          c = plugin_constant_joint,
-                                          a = plugin_exponent_joint)
+    if (est_method == "trivariate") {
 
-      joint_bandwidths <- data.frame(x1 = 1,
-                                     x2 = 2,
-                                     x3 = 3,
-                                     bw1 = bw,
-                                     bw2 = bw,
-                                     bw3 = bw)
+      if(bw_method == "plugin") {
+        bw <- bw_select_plugin_multivariate(n = n,
+                                            c = plugin_constant_joint,
+                                            a = plugin_exponent_joint)
+
+        joint_bandwidths <- data.frame(x1 = 1,
+                                       x2 = 2,
+                                       x3 = 3,
+                                       bw1 = bw,
+                                       bw2 = bw,
+                                       bw3 = bw)
+      } else if(bw_method == "cv") {
+        cv_bandwidths <- bw_select_cv_trivariate(x, tol = tol_joint)
+
+        if(cv_bandwidths$convergence != 0)
+          warning(paste("Cross valdidation for joint bandwidths did not converge properly"))
+
+        joint_bandwidths <- data.frame(x1 = 1,
+                                       x2 = 2,
+                                       x3 = 3,
+                                       bw1 = cv_bandwidths$bw[1],
+                                       bw2 = cv_bandwidths$bw[2],
+                                       bw3 = cv_bandwidths$bw[3],
+                                       convergence = cv_bandwidths$convergence)
+      }
     } else {
 
       # Find the joint bandwidths
@@ -410,5 +428,75 @@ bw_simple <- function(joint = 1, marg = NA, x = NULL, dim = NULL) {
             plugin_exponent_marginal = 0,
             plugin_constant_joint = joint,
             plugin_exponent_joint = 0)
+
+}
+
+#' Cross-validation for trivariate distributions
+#'
+#' Uses cross-validation to find the optimal bandwidth for a trivariate locally
+#' Gaussian fit
+#'
+#' This function provides an implementation for the Cross Validation algorithm
+#' for bandwidth selection described in Otneim & Tjøstheim (2017), Section 4,
+#' but for trivariate distributions. Let \eqn{\hat{f}_h(x)} be the trivariate
+#' locally Gaussian density estimate obtained using the bandwidth \eqn{h}, then
+#' this function returns the bandwidth that maximizes
+#' \deqn{CV(h) = n^{-1} \sum_{i=1}^n \log \hat{f}_h^{(-i)}(x_i),} where
+#' \eqn{\hat{f}_h^{(-i)}} is the density estimate calculated without observation
+#' \eqn{x_i}.
+#'
+#' The recommended use of this function is through the \code{lg_main} wrapper
+#' function.
+#'
+#' @param x The matrix of data points.
+#' @param tol The absolute tolerance in the optimization, used by the
+#'   \code{optim}-function.
+#'
+#' @return The function returns a list with two elements: \code{bw} is the
+#'   selected bandwidths, and \code{convergence} is the convergence flag returned
+#'   by the \code{optim}-function.
+#'
+#' @examples
+#'   \dontrun{
+#'     x <- cbind(rnorm(100), rnorm(100), rnorm(100))
+#'     bw <- bw_select_cv_trivariate(x)
+#'   }
+#' @references
+#'
+#' Otneim, Håkon, and Dag Tjøstheim. "The locally gaussian density estimator for
+#' multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
+#'
+#' @export
+bw_select_cv_trivariate <- function(x,
+                                   tol = 10^(-3)) {
+
+  # Perform some checks
+  x <- check_data(x, dim_check = 3, type = "data")
+
+  # The estimated (negative) KL-error for a given bandwidth, calculated by
+  # cross-validation
+  KL <- function(bw) {
+
+    # Leave one out
+    objective <- function(j) {
+      log(dlg_trivariate(x = x[-j,],
+                        bw = bw,
+                        eval_points = matrix(x[j,], ncol = 3),
+                        est_method = "trivariate",
+                        run_checks = FALSE)$f_est)
+    }
+
+    objective_values <- do.call(rbind, lapply(X = as.list(1:nrow(x)),
+                                              FUN = objective))
+
+    -mean(objective_values[abs(objective_values) != Inf],
+          na.rm = TRUE)
+  }
+
+  # Minimize negative KL
+  result <- optim(c(1, 1, 1), KL, control = list(abstol = tol))
+
+  return(list(bw = result$par,
+              convergence = result$convergence))
 
 }

@@ -2,6 +2,7 @@
 
 export(bw_select)
 export(bw_select_cv_bivariate)
+export(bw_select_cv_trivariate)
 export(bw_select_cv_univariate)
 export(bw_select_plugin_multivariate)
 export(bw_select_plugin_univariate)

@@ -50,7 +50,7 @@ lg_object <- lg_main(x)
 
 # Estimation of density functions
 
-We can then specify a set of grid points and estimate the probability density function of *x* using the *dlg()*-function. We choose a set of grid ponts that go diagonally through R^4, estimate, and plot the result as follows:
+We can then specify a set of grid points and estimate the probability density function of *x* using the *dlg()*-function. We choose a set of grid points that go diagonally through R^4, estimate, and plot the result as follows:
 
 ```{r estimate-density}
 grid <- matrix(rep(seq(-.03, .03, length.out = 100), 4), ncol = 4, byrow = FALSE)
@@ -94,7 +94,7 @@ Let us quickly demonstrate their implementation. For the first test, we generate
 some data from a bivariate $t$-distribution. They are uncorrelated, but not 
 independent. In order to test for independence, we create an lg-object, and 
 apply the function *ind_test()*. One may of course change the estimation method, 
-the bandwidths and so in the call to *lg_main()*, and there are furher options available in *ind_test()*. For this illustration we use only 20 bootstrap replications, but this must of course be significantly higher in practical applications.
+the bandwidths and so in the call to *lg_main()*, and there are further options available in *ind_test()*. For this illustration we use only 20 bootstrap replications, but this must of course be significantly higher in practical applications.
 
 ```{r independence-test}
 set.seed(1)

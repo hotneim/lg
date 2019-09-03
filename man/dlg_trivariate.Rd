@@ -5,7 +5,7 @@
 \title{Trivariate density estimation}
 \usage{
 dlg_trivariate(x, eval_points = NULL, grid_size = 15, bw = c(1, 1,
-  1), est_method = "trivariate_full", run_checks = TRUE)
+  1), est_method = "trivariate", run_checks = TRUE)
 }
 \arguments{
 \item{x}{The data matrix (or data frame). Must have exactly 2 columns.}
@@ -43,7 +43,7 @@ approximations. This function takes a trivariate data set, \code{x}, and a
 trivariate set of grid points \code{eval_points}, and returns the trivariate,
 locally Gaussian density estimate in these points. We also need a vector of
 bandwidths, \code{bw}, with three elements, and an estimation method
-\code{est_method}, which in this case is fixed at "trivariate_full", and
+\code{est_method}, which in this case is fixed at "trivariate", and
 included only to be fully compatible with the other methods in this package.
 
 This function will only work on the marginally standard normal scale! Please

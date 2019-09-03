@@ -43,8 +43,10 @@ The recommended use of this function is through the \code{lg_main} wrapper
 function.
 }
 \examples{
-  x <- cbind(rnorm(100), rnorm(100))
-  bw <- bw_select_cv_univariate(x)
+  \dontrun{
+    x <- cbind(rnorm(100), rnorm(100))
+    bw <- bw_select_cv_univariate(x)
+  }
 
 }
 \references{

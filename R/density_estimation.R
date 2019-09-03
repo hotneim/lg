@@ -494,9 +494,9 @@ dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL, boot
 
     # We do not have asymptotic standard deviations for the trivariate local
     # correlations (yet)
-    if((lg_object$est_method == "trivariate_full") & (!is.null(level))) {
+    if((lg_object$est_method == "trivariate") & (!is.null(level)) & !bootstrap) {
       level <- NULL
-      message("Asymptotic standard deviations are not available for trivariate fits.")
+      message("Asymptotic standard deviations are not available for trivariate fits. Use bootstrap instead.")
     }
 
     # Extract the data that we will us in the optimization, transform the grid if needed
@@ -543,7 +543,8 @@ dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL, boot
         loc_sd <- cbind(estimate$par_est[, "sig_1"],
                         estimate$par_est[, "sig_2"])
         loc_cor[,1] <- estimate$par_est[, "rho"]
-    } else if (lg_object$est_method == "trivariate_full"){  # If method is "trivariate_full", we also do the estimation in one go:
+
+    } else if (lg_object$est_method == "trivariate"){
       estimate <- dlg_trivariate(x = x,
                                  eval_points = x0,
                                  bw = c(lg_object$bw$joint[1, "bw1"],
@@ -553,56 +554,7 @@ dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL, boot
     loc_cor <- estimate$par_est
     f_est_trivariate <- estimate$f_est
 
-    } else if(lg_object$est_method == "trivariate_simple") {
-      # This is a way to involve trivariate local correlations in the
-      # multivariate case. It is tailored so that it can be used in the
-      # conditional independence test.
-      #
-      # The idea is that the local correlation between x1 and x2 as well as the
-      # local correlations between (x3, ..., xp) are calculated using the
-      # pairwise algorithm, while the local correlations between these two
-      # groups are calculated with x1, x2 as wel as the third variable in
-      # question.
-
-      # First, we identify the pair of variables for which the local
-      # correlations should be estimated using bivariate fits:
-      bivariate_fits <-
-        which(apply(pairs, 1, function(x) (1 %in% x) & (2 %in% x)) |
-              !apply(pairs, 1, function(x) (1 %in% x) | (2 %in% x)))
-
-      for(i in bivariate_fits) {
-        pairwise_estimate <-
-          dlg_bivariate(x = x[, c(pairs$x1[i], pairs$x2[i])],
-                        eval_points = x0[, c(pairs$x1[i], pairs$x2[i])],
-                        bw = c(lg_object$bw$joint[i, "bw1"],
-                               lg_object$bw$joint[i, "bw2"]),
-                        est_method = "1par",
-                        marginal_estimates = NA)
-
-        loc_cor[,i] <- pairwise_estimate$par_est[, "rho"]
-      }
-
-      # The, we continue by estimating the local correlations for the remaining
-      # pairs. These will be calulated two ata a time, because we get for
-      # example rho13 and rho23 from the same fit, and we don't want to do the
-      # same estimation twice. We can loop over the non-(1,2) variables
-      for(i in 3:d) {
-        pairwise_estimate <- dlg_trivariate(x = x[, c(1, 2, i)],
-                                            eval_points = x0[, c(1, 2, i)],
-                                            bw = c(lg_object$bw$joint[i, "bw1"],
-                                                   lg_object$bw$joint[i, "bw2"],
-                                                   lg_object$bw$joint$bw2[which(lg_object$bw$joint$x2 == i)[1]]),
-                                            est_method = "trivariate_full")
-
-        # Enter the first estimated local correlation
-        loc_cor[, which(((pairs$x1 == 1) & (pairs$x2 == i)) | ((pairs$x1 == i) & (pairs$x2 == 1)))] <-
-          pairwise_estimate$par_est[, "rho13"]
-
-        # Enter the second estimated local correlation
-        loc_cor[, which(((pairs$x1 == 2) & (pairs$x2 == i)) | ((pairs$x1 == i) & (pairs$x2 == 2)))] <-
-          pairwise_estimate$par_est[, "rho23"]
-      }
-    } else {# And if not, we estimate the local correlation pairwise now
+    } else {
         for(i in 1:nrow(pairs)) {
             if(lg_object$est_method == "1par") {
                 pairwise_marginal_estimates <- NA
@@ -624,7 +576,7 @@ dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL, boot
     }
 
     # Evaluate the density estimate
-    if(lg_object$est_method != "trivariate_full") {
+    if(lg_object$est_method != "trivariate") {
       f_est <- mvnorm_eval(eval_points = x0,
                            loc_mean = loc_mean,
                            loc_sd = loc_sd,
@@ -724,7 +676,9 @@ dlg <- function(lg_object, grid, level = 0.95, normalization_points = NULL, boot
         }
 
 
-      } else {
+      }
+
+      if(!bootstrap & (lg_object$est_method != "trivariate")) {
 
         # x is the data, or the transformed data. x0 is the grid
         # where we do estimation, transformed or not.
@@ -1078,7 +1032,7 @@ clg <- function(lg_object, grid = NULL, condition = NULL,
 #' trivariate set of grid points \code{eval_points}, and returns the trivariate,
 #' locally Gaussian density estimate in these points. We also need a vector of
 #' bandwidths, \code{bw}, with three elements, and an estimation method
-#' \code{est_method}, which in this case is fixed at "trivariate_full", and
+#' \code{est_method}, which in this case is fixed at "trivariate", and
 #' included only to be fully compatible with the other methods in this package.
 #'
 #' This function will only work on the marginally standard normal scale! Please
@@ -1115,7 +1069,7 @@ dlg_trivariate <- function(x,
                            eval_points = NULL,
                            grid_size = 15,
                            bw = c(1, 1, 1),
-                           est_method = "trivariate_full",
+                           est_method = "trivariate",
                            run_checks = TRUE) {
 
   # Check that everything is the way it should be -----------------------------
@@ -1183,7 +1137,7 @@ dlg_trivariate <- function(x,
         )/d
 
       -(mK*(-1.5*log(2*pi)) +
-          mK*(-0.5*log(r)) +
+          mK*(-0.5*suppressWarnings(log(r))) +
           0.5/r*(
             (rho[3]^2 - 1)*m1 +
               (rho[2]^2 - 1)*m2 +

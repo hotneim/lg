@@ -1,5 +1,5 @@
 ## Test environments
-* local Ubuntu 16.04.1 LTS, R 3.5.1
+* local MacOS 10.14.6, R 3.6.1
 * win-builder
 
 ## R CMD check results

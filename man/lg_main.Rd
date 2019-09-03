@@ -18,8 +18,8 @@ observation.}
 \code{"cv"} (cross-validation, slow, but accurate) or \code{"plugin"} (fast,
 but crude).}
 
-\item{est_method}{The estimation method, must be either "1par", "5par" or
-"5par_marginals_fixed" (see details).}
+\item{est_method}{The estimation method, must be either "1par", "5par",
+"5par_marginals_fixed" or "trivariate". (see details).}
 
 \item{transform_to_marginal_normality}{Logical, \code{TRUE} if we want to
 transform our data to marginal standard normality. This is assumed by method
@@ -90,6 +90,12 @@ The third option is \code{est_method = "5par"}, which is a full nonparametric
 locally Gaussian fit of a bivariate density as laid out and used by Tjøstheim
 & Hufthammer (2013) and others. This is simply a wrapper for the
 \code{localgauss}-package by Berentsen et.al. (2014).
+
+A recent option is described by Otneim and Tjøstheim (2019), who allow a full
+trivariate fit to a three dimensional data set that is transformed to marginal
+standard normality in the context of their test for conditional independence
+(see \code{?ci_test} for details), but this can of course be used as an option
+to estimate three-variate density functions as well.
 }
 \examples{
   x <- cbind(rnorm(100), rnorm(100), rnorm(100))
@@ -140,6 +146,9 @@ multivariate data." Statistics and Computing 27, no. 6 (2017): 1595-1616.
 Otneim, Håkon, and Dag Tjøstheim. "Conditional density estimation using
 the local Gaussian correlation" Statistics and Computing 28, no. 2 (2018):
 303-321.
+
+Otneim, Håkon, and Dag Tjøstheim. "The local Gaussian partial correlation"
+Working paper (2019).
 
 Tjøstheim, D., & Hufthammer, K. O. (2013). Local Gaussian correlation: a new
 measure of dependence. Journal of Econometrics, 172(1), 33-48.

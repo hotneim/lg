@@ -1,18 +1,15 @@
-# lg 0.3.2
+# lg 0.4.0
 
    * Added bootstrap confidence intervals as option in dlg.
-
-# lg 0.3.1
-
-   * Added "trivariate_full" and "trivariate_simple" as options for estimation 
-     method
+   * Added the estimation method "trivariate" for joint estimation and independence testing 
+     with trivariate data.
 
 # lg 0.3.0
  
    * Added contagion test and independence tests.
    * Added bw_simple for quick construction of bandwidth object.
    * Switches to old logspline algorithm if the new fails (very rare). 
-   * Better NA handling, epecially in the test for conditional independence
+   * Better NA handling, especially in the test for conditional independence
 
 # lg 0.2.0 
 

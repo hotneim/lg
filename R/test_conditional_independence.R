@@ -225,15 +225,13 @@ replicate_under_ci <- function(lg_object,
         # Data without the other variable
         #
         # Here we need to make a choice about the estimation method. If we have
-        # trivariate_full, or trivariate simple *and* the number of avriables is
+        # trivariate *and* the number of avriables is
         # only three, it must be set to "1par" here.
 
-        if((d == 3) & (lg_object$est_method == "trivariate_simple")) {
-          est_method_rep <- "1par"
-        } else if(lg_object$est_method == "trivariate_full") {
+        if(lg_object$est_method == "trivariate") {
           est_method_rep <- "1par"
         } else {
-          est_method_rep <- "1par"
+          est_method_rep <- lg_object$est_method
         }
 
         temp_lg_object <-
