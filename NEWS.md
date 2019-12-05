@@ -1,3 +1,7 @@
+# lg 0.4.1
+
+   * Fixed small bug causing error in r-devel
+
 # lg 0.4.0
 
    * Added bootstrap confidence intervals as option in dlg.

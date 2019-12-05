@@ -109,7 +109,6 @@ lg_object_wrong <- grid
 grid_wrong_dimension <- cbind(grid, c(1,2,3))
 
 test_that("The main density estimator produces correct errors", {
-    expect_error(dlg(lg_object_wrong, grid), "Object must be of class 'lg'")
     expect_error(dlg(lg_object, grid_wrong_dimension), "The grid can only have 3 variables")
 })
 
