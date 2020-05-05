@@ -86,27 +86,44 @@ partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = NULL) 
   if(is.null(grid)) {
     stop("You must supply a grid where the local partial correlation is to be evaluated.")
   } else {
-    if(ncol(grid) != 2) {
-      stop("The grid must have exactly two columns.")
+    if(ncol(grid) != (ncol(lg_object$x) - length(condition))) {
+      stop(paste("The grid must have exactly",
+                 (ncol(lg_object$x) - length(condition)),
+                 "columns."))
+
     }
   }
 
   if(is.null(condition)) {
     stop("You must supply the values of the conditioning variables.")
-  } else {
-    if(length(condition) != (ncol(lg_object$x) - 2))
-      stop("The number of conditions must be exactly two less than the number of variables in the data.")
   }
 
   # We use the function for conditional density estimation to extract the
   # conditional (or partial) covariance matrices.
   clg_object <- clg(lg_object = lg_object, grid = grid, condition = condition)
 
-  # The element c_cov in the clg_object is now a list of the local covariance
-  # matrices, which we translate into correlation matrices and pick out the
-  # off-diagonal element.
-  partial_correlations <-
-    unlist(lapply(clg_object$c_cov, function(S) stats::cov2cor(S)[1,2]))
+  # We identify the pairs of independent variables
+  n_independent_variables <- ncol(lg_object$x) - length(condition)
+  pairs <- data.frame(t(combn(c(1:n_independent_variables), 2)))
+  colnames(pairs) <- c("x1", "x2")
+
+  # Initialize the matrix where we will strore the estimated local partial
+  # correlations
+  partial_correlations <- matrix(NA,
+                                 nrow = nrow(grid),
+                                 ncol = nrow(pairs))
+
+  # For each pair of independent variables, extract and put the estimated
+  # partial correlations into the matrix.
+  partial_correlation_matrices <-
+    lapply(clg_object$c_cov, function(S) stats::cov2cor(S))
+
+  for(i in 1:nrow(pairs)) {
+    partial_correlations[,i] <-
+      unlist(lapply(partial_correlation_matrices,
+                    function(S) S[pairs$x1[i],pairs$x2[i]]))
+
+  }
 
   # When calculating the gradient, we need the estimated local partial
   # covariance matrices, and they are returned by the clg-function.
@@ -119,7 +136,8 @@ partial_cor <- function(lg_object, grid = NULL, condition = NULL, level = NULL) 
              transformed_grid = clg_object$transformed_grid,
              x = lg_object$x,
              transformed_data = lg_object$transformed_data,
-             bw = lg_object$bw)
+             bw = lg_object$bw,
+             pairs = pairs)
 
   # Calculate the asymptotic standard deviation
   # If the level-argument is provided, we also calculate the standard

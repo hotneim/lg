@@ -3,7 +3,6 @@
 \docType{package}
 \name{lg}
 \alias{lg}
-\alias{lg-package}
 \title{\code{lg}: A package for calculating the local Gaussian correlation in
 multivariate applications.}
 \description{

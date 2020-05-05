@@ -5,8 +5,11 @@
 \title{Calculate the value of the test statistic for the conditional independence
 test}
 \usage{
-ci_test_statistic(lg_object, h = function(x) x^2, S = function(y)
-  rep(T, nrow(y)))
+ci_test_statistic(
+  lg_object,
+  h = function(x) x^2,
+  S = function(y) rep(T, nrow(y))
+)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

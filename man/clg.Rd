@@ -4,8 +4,13 @@
 \alias{clg}
 \title{The locally Gaussian conditional density estimator}
 \usage{
-clg(lg_object, grid = NULL, condition = NULL,
-  normalization_points = NULL, fixed_grid = NULL)
+clg(
+  lg_object,
+  grid = NULL,
+  condition = NULL,
+  normalization_points = NULL,
+  fixed_grid = NULL
+)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

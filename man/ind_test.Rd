@@ -4,9 +4,14 @@
 \alias{ind_test}
 \title{Independence tests}
 \usage{
-ind_test(lg_object, h = function(x) x^2, S = function(y)
-  as.logical(rep(1, nrow(y))), bootstrap_type = "plain",
-  block_length = NULL, n_rep = 1000)
+ind_test(
+  lg_object,
+  h = function(x) x^2,
+  S = function(y) as.logical(rep(1, nrow(y))),
+  bootstrap_type = "plain",
+  block_length = NULL,
+  n_rep = 1000
+)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

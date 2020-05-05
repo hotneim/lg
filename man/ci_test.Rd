@@ -4,9 +4,19 @@
 \alias{ci_test}
 \title{Test for conditional independence}
 \usage{
-ci_test(lg_object, h = function(x) x^2, S = function(y) rep(T,
-  nrow(y)), n_rep = 500, nodes = 100, M = NULL, M_sim = 1500,
-  M_corr = 1.5, n_corr = 1.2, extend = 0.3, return_time = TRUE)
+ci_test(
+  lg_object,
+  h = function(x) x^2,
+  S = function(y) rep(T, nrow(y)),
+  n_rep = 500,
+  nodes = 100,
+  M = NULL,
+  M_sim = 1500,
+  M_corr = 1.5,
+  n_corr = 1.2,
+  extend = 0.3,
+  return_time = TRUE
+)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the

@@ -4,8 +4,12 @@
 \alias{bw_select_cv_bivariate}
 \title{Cross-validation for bivariate distributions}
 \usage{
-bw_select_cv_bivariate(x, tol = 10^(-3), est_method = "1par",
-  bw_marginal = NULL)
+bw_select_cv_bivariate(
+  x,
+  tol = 10^(-3),
+  est_method = "1par",
+  bw_marginal = NULL
+)
 }
 \arguments{
 \item{x}{The matrix of data points.}

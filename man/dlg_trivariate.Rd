@@ -4,8 +4,14 @@
 \alias{dlg_trivariate}
 \title{Trivariate density estimation}
 \usage{
-dlg_trivariate(x, eval_points = NULL, grid_size = 15, bw = c(1, 1,
-  1), est_method = "trivariate", run_checks = TRUE)
+dlg_trivariate(
+  x,
+  eval_points = NULL,
+  grid_size = 15,
+  bw = c(1, 1, 1),
+  est_method = "trivariate",
+  run_checks = TRUE
+)
 }
 \arguments{
 \item{x}{The data matrix (or data frame). Must have exactly 2 columns.}

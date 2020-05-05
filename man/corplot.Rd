@@ -4,13 +4,31 @@
 \alias{corplot}
 \title{Plot local correlation maps}
 \usage{
-corplot(dlg_object, pair = 1, gaussian_scale = FALSE,
-  plot_colormap = TRUE, plot_obs = FALSE, plot_labels = TRUE,
-  plot_legend = FALSE, plot_thres = 0, alpha_tile = 0.8,
-  alpha_point = 0.8, low_color = "blue", high_color = "red",
-  break_int = 0.2, label_size = 3, font_family = "sans",
-  point_size = NULL, xlim = NULL, ylim = NULL, xlab = NULL,
-  ylab = NULL, rholab = NULL, main = NULL, subtitle = NULL)
+corplot(
+  dlg_object,
+  pair = 1,
+  gaussian_scale = FALSE,
+  plot_colormap = TRUE,
+  plot_obs = FALSE,
+  plot_labels = TRUE,
+  plot_legend = FALSE,
+  plot_thres = 0,
+  alpha_tile = 0.8,
+  alpha_point = 0.8,
+  low_color = "blue",
+  high_color = "red",
+  break_int = 0.2,
+  label_size = 3,
+  font_family = "sans",
+  point_size = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  rholab = NULL,
+  main = NULL,
+  subtitle = NULL
+)
 }
 \arguments{
 \item{dlg_object}{The density estimation object produced by the dlg-function}

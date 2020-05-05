@@ -4,11 +4,19 @@
 \alias{lg_main}
 \title{Create an \code{lg} object}
 \usage{
-lg_main(x, bw_method = "plugin", est_method = "1par",
-  transform_to_marginal_normality = TRUE, bw = NULL,
-  plugin_constant_marginal = 1.75, plugin_constant_joint = 1.75,
-  plugin_exponent_marginal = -1/5, plugin_exponent_joint = -1/6,
-  tol_marginal = 10^(-3), tol_joint = 10^(-3))
+lg_main(
+  x,
+  bw_method = "plugin",
+  est_method = "1par",
+  transform_to_marginal_normality = TRUE,
+  bw = NULL,
+  plugin_constant_marginal = 1.75,
+  plugin_constant_joint = 1.75,
+  plugin_exponent_marginal = -1/5,
+  plugin_exponent_joint = -1/6,
+  tol_marginal = 10^(-3),
+  tol_joint = 10^(-3)
+)
 }
 \arguments{
 \item{x}{A matrix or data frame with data, on column per variable, one row per
@@ -103,7 +111,7 @@ to estimate three-variate density functions as well.
   # Quick example
   lg_object1 <- lg_main(x, bw_method = "plugin", est_method = "1par")
 
-  # In the simulation experiments in Otneim & Tjøstheim (2017a),
+  # In the simulation experiments in Otneim & TjÃ¸stheim (2017a),
   # the cross-validation bandwidth selection is used:
   \dontrun{
   lg_object2 <- lg_main(x, bw_method = "cv", est_method = "1par")

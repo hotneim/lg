@@ -4,9 +4,17 @@
 \alias{dlg_bivariate}
 \title{Bivariate density estimation}
 \usage{
-dlg_bivariate(x, eval_points = NA, grid_size = 15, bw = c(1, 1),
-  est_method = "1par", tol = .Machine$double.eps^0.25/10^4,
-  run_checks = TRUE, marginal_estimates = NA, bw_marginal = NA)
+dlg_bivariate(
+  x,
+  eval_points = NA,
+  grid_size = 15,
+  bw = c(1, 1),
+  est_method = "1par",
+  tol = .Machine$double.eps^0.25/10^4,
+  run_checks = TRUE,
+  marginal_estimates = NA,
+  bw_marginal = NA
+)
 }
 \arguments{
 \item{x}{The data matrix (or data frame). Must have exactly 2 columns.}

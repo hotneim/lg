@@ -4,8 +4,16 @@
 \alias{replicate_under_ci}
 \title{Bootstrap replication under the null hypothesis}
 \usage{
-replicate_under_ci(lg_object, n_rep, nodes, M = NULL, M_sim = 1500,
-  M_corr = 1.5, n_corr = 1.2, extend = 0.3)
+replicate_under_ci(
+  lg_object,
+  n_rep,
+  nodes,
+  M = NULL,
+  M_sim = 1500,
+  M_corr = 1.5,
+  n_corr = 1.2,
+  extend = 0.3
+)
 }
 \arguments{
 \item{lg_object}{An object of type \code{lg}, as produced by the
